@@ -1,0 +1,335 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * contributor license agreements.  See the NOTICE file distributed with<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * this work for additional information regarding copyright ownership.<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * The ASF licenses this file to You under the Apache License, Version 2.0<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * (the "License"); you may not use this file except in compliance with<a name="line.6"></a>
+<span class="sourceLineNo">007</span> * the License.  You may obtain a copy of the License at<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *<a name="line.8"></a>
+<span class="sourceLineNo">009</span> *      http://www.apache.org/licenses/LICENSE-2.0<a name="line.9"></a>
+<span class="sourceLineNo">010</span> *<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * Unless required by applicable law or agreed to in writing, software<a name="line.11"></a>
+<span class="sourceLineNo">012</span> * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.12"></a>
+<span class="sourceLineNo">013</span> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * See the License for the specific language governing permissions and<a name="line.14"></a>
+<span class="sourceLineNo">015</span> * limitations under the License.<a name="line.15"></a>
+<span class="sourceLineNo">016</span> */<a name="line.16"></a>
+<span class="sourceLineNo">017</span>package org.apache.camel.processor;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import java.util.concurrent.RejectedExecutionException;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import java.util.concurrent.ScheduledExecutorService;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import java.util.concurrent.TimeUnit;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import java.util.concurrent.atomic.AtomicInteger;<a name="line.22"></a>
+<span class="sourceLineNo">023</span><a name="line.23"></a>
+<span class="sourceLineNo">024</span>import org.apache.camel.AsyncCallback;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import org.apache.camel.CamelContext;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import org.apache.camel.Exchange;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import org.apache.camel.Processor;<a name="line.27"></a>
+<span class="sourceLineNo">028</span>import org.apache.camel.util.ObjectHelper;<a name="line.28"></a>
+<span class="sourceLineNo">029</span>import org.slf4j.Logger;<a name="line.29"></a>
+<span class="sourceLineNo">030</span>import org.slf4j.LoggerFactory;<a name="line.30"></a>
+<span class="sourceLineNo">031</span><a name="line.31"></a>
+<span class="sourceLineNo">032</span>/**<a name="line.32"></a>
+<span class="sourceLineNo">033</span> * A useful base class for any processor which provides some kind of throttling<a name="line.33"></a>
+<span class="sourceLineNo">034</span> * or delayed processing.<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * &lt;p/&gt;<a name="line.35"></a>
+<span class="sourceLineNo">036</span> * This implementation will block while waiting.<a name="line.36"></a>
+<span class="sourceLineNo">037</span> * <a name="line.37"></a>
+<span class="sourceLineNo">038</span> * @version <a name="line.38"></a>
+<span class="sourceLineNo">039</span> */<a name="line.39"></a>
+<span class="sourceLineNo">040</span>public abstract class DelayProcessorSupport extends DelegateAsyncProcessor {<a name="line.40"></a>
+<span class="sourceLineNo">041</span>    protected final Logger log = LoggerFactory.getLogger(getClass());<a name="line.41"></a>
+<span class="sourceLineNo">042</span>    private final CamelContext camelContext;<a name="line.42"></a>
+<span class="sourceLineNo">043</span>    private final ScheduledExecutorService executorService;<a name="line.43"></a>
+<span class="sourceLineNo">044</span>    private final boolean shutdownExecutorService;<a name="line.44"></a>
+<span class="sourceLineNo">045</span>    private boolean asyncDelayed;<a name="line.45"></a>
+<span class="sourceLineNo">046</span>    private boolean callerRunsWhenRejected = true;<a name="line.46"></a>
+<span class="sourceLineNo">047</span>    private final AtomicInteger delayedCount = new AtomicInteger(0);<a name="line.47"></a>
+<span class="sourceLineNo">048</span><a name="line.48"></a>
+<span class="sourceLineNo">049</span>    // TODO: Add option to cancel tasks on shutdown so we can stop fast<a name="line.49"></a>
+<span class="sourceLineNo">050</span><a name="line.50"></a>
+<span class="sourceLineNo">051</span>    private final class ProcessCall implements Runnable {<a name="line.51"></a>
+<span class="sourceLineNo">052</span>        private final Exchange exchange;<a name="line.52"></a>
+<span class="sourceLineNo">053</span>        private final AsyncCallback callback;<a name="line.53"></a>
+<span class="sourceLineNo">054</span><a name="line.54"></a>
+<span class="sourceLineNo">055</span>        ProcessCall(Exchange exchange, AsyncCallback callback) {<a name="line.55"></a>
+<span class="sourceLineNo">056</span>            this.exchange = exchange;<a name="line.56"></a>
+<span class="sourceLineNo">057</span>            this.callback = callback;<a name="line.57"></a>
+<span class="sourceLineNo">058</span>        }<a name="line.58"></a>
+<span class="sourceLineNo">059</span><a name="line.59"></a>
+<span class="sourceLineNo">060</span>        public void run() {<a name="line.60"></a>
+<span class="sourceLineNo">061</span>            // we are running now so decrement the counter<a name="line.61"></a>
+<span class="sourceLineNo">062</span>            delayedCount.decrementAndGet();<a name="line.62"></a>
+<span class="sourceLineNo">063</span><a name="line.63"></a>
+<span class="sourceLineNo">064</span>            log.trace("Delayed task woke up and continues routing for exchangeId: {}", exchange.getExchangeId());<a name="line.64"></a>
+<span class="sourceLineNo">065</span>            if (!isRunAllowed()) {<a name="line.65"></a>
+<span class="sourceLineNo">066</span>                exchange.setException(new RejectedExecutionException("Run is not allowed"));<a name="line.66"></a>
+<span class="sourceLineNo">067</span>            }<a name="line.67"></a>
+<span class="sourceLineNo">068</span><a name="line.68"></a>
+<span class="sourceLineNo">069</span>            // process the exchange now that we woke up<a name="line.69"></a>
+<span class="sourceLineNo">070</span>            DelayProcessorSupport.this.processor.process(exchange, new AsyncCallback() {<a name="line.70"></a>
+<span class="sourceLineNo">071</span>                @Override<a name="line.71"></a>
+<span class="sourceLineNo">072</span>                public void done(boolean doneSync) {<a name="line.72"></a>
+<span class="sourceLineNo">073</span>                    log.trace("Delayed task done for exchangeId: {}", exchange.getExchangeId());<a name="line.73"></a>
+<span class="sourceLineNo">074</span>                    // we must done the callback from this async callback as well, to ensure callback is done correctly<a name="line.74"></a>
+<span class="sourceLineNo">075</span>                    // must invoke done on callback with false, as that is what the original caller would<a name="line.75"></a>
+<span class="sourceLineNo">076</span>                    // expect as we returned false in the process method<a name="line.76"></a>
+<span class="sourceLineNo">077</span>                    callback.done(false);<a name="line.77"></a>
+<span class="sourceLineNo">078</span>                }<a name="line.78"></a>
+<span class="sourceLineNo">079</span>            });<a name="line.79"></a>
+<span class="sourceLineNo">080</span>        }<a name="line.80"></a>
+<span class="sourceLineNo">081</span>    }<a name="line.81"></a>
+<span class="sourceLineNo">082</span><a name="line.82"></a>
+<span class="sourceLineNo">083</span>    public DelayProcessorSupport(CamelContext camelContext, Processor processor) {<a name="line.83"></a>
+<span class="sourceLineNo">084</span>        this(camelContext, processor, null, false);<a name="line.84"></a>
+<span class="sourceLineNo">085</span>    }<a name="line.85"></a>
+<span class="sourceLineNo">086</span><a name="line.86"></a>
+<span class="sourceLineNo">087</span>    public DelayProcessorSupport(CamelContext camelContext, Processor processor, ScheduledExecutorService executorService, boolean shutdownExecutorService) {<a name="line.87"></a>
+<span class="sourceLineNo">088</span>        super(processor);<a name="line.88"></a>
+<span class="sourceLineNo">089</span>        this.camelContext = camelContext;<a name="line.89"></a>
+<span class="sourceLineNo">090</span>        this.executorService = executorService;<a name="line.90"></a>
+<span class="sourceLineNo">091</span>        this.shutdownExecutorService = shutdownExecutorService;<a name="line.91"></a>
+<span class="sourceLineNo">092</span>    }<a name="line.92"></a>
+<span class="sourceLineNo">093</span>    <a name="line.93"></a>
+<span class="sourceLineNo">094</span>    protected boolean processDelay(Exchange exchange, AsyncCallback callback, long delay) {<a name="line.94"></a>
+<span class="sourceLineNo">095</span>        if (!isAsyncDelayed() || exchange.isTransacted()) {<a name="line.95"></a>
+<span class="sourceLineNo">096</span>            // use synchronous delay (also required if using transactions)<a name="line.96"></a>
+<span class="sourceLineNo">097</span>            try {<a name="line.97"></a>
+<span class="sourceLineNo">098</span>                delay(delay, exchange);<a name="line.98"></a>
+<span class="sourceLineNo">099</span>                // then continue routing<a name="line.99"></a>
+<span class="sourceLineNo">100</span>                return processor.process(exchange, callback);<a name="line.100"></a>
+<span class="sourceLineNo">101</span>            } catch (Exception e) {<a name="line.101"></a>
+<span class="sourceLineNo">102</span>                // exception occurred so we are done<a name="line.102"></a>
+<span class="sourceLineNo">103</span>                exchange.setException(e);<a name="line.103"></a>
+<span class="sourceLineNo">104</span>                callback.done(true);<a name="line.104"></a>
+<span class="sourceLineNo">105</span>                return true;<a name="line.105"></a>
+<span class="sourceLineNo">106</span>            }<a name="line.106"></a>
+<span class="sourceLineNo">107</span>        } else {<a name="line.107"></a>
+<span class="sourceLineNo">108</span>            // asynchronous delay so schedule a process call task<a name="line.108"></a>
+<span class="sourceLineNo">109</span>            // and increment the counter (we decrement the counter when we run the ProcessCall)<a name="line.109"></a>
+<span class="sourceLineNo">110</span>            delayedCount.incrementAndGet();<a name="line.110"></a>
+<span class="sourceLineNo">111</span>            ProcessCall call = new ProcessCall(exchange, callback);<a name="line.111"></a>
+<span class="sourceLineNo">112</span>            try {<a name="line.112"></a>
+<span class="sourceLineNo">113</span>                log.trace("Scheduling delayed task to run in {} millis for exchangeId: {}",<a name="line.113"></a>
+<span class="sourceLineNo">114</span>                        delay, exchange.getExchangeId());<a name="line.114"></a>
+<span class="sourceLineNo">115</span>                executorService.schedule(call, delay, TimeUnit.MILLISECONDS);<a name="line.115"></a>
+<span class="sourceLineNo">116</span>                // tell Camel routing engine we continue routing asynchronous<a name="line.116"></a>
+<span class="sourceLineNo">117</span>                return false;<a name="line.117"></a>
+<span class="sourceLineNo">118</span>            } catch (RejectedExecutionException e) {<a name="line.118"></a>
+<span class="sourceLineNo">119</span>                // we were not allowed to run the ProcessCall, so need to decrement the counter here<a name="line.119"></a>
+<span class="sourceLineNo">120</span>                delayedCount.decrementAndGet();<a name="line.120"></a>
+<span class="sourceLineNo">121</span>                if (isCallerRunsWhenRejected()) {<a name="line.121"></a>
+<span class="sourceLineNo">122</span>                    if (!isRunAllowed()) {<a name="line.122"></a>
+<span class="sourceLineNo">123</span>                        exchange.setException(new RejectedExecutionException());<a name="line.123"></a>
+<span class="sourceLineNo">124</span>                    } else {<a name="line.124"></a>
+<span class="sourceLineNo">125</span>                        log.debug("Scheduling rejected task, so letting caller run, delaying at first for {} millis for exchangeId: {}", delay, exchange.getExchangeId());<a name="line.125"></a>
+<span class="sourceLineNo">126</span>                        // let caller run by processing<a name="line.126"></a>
+<span class="sourceLineNo">127</span>                        try {<a name="line.127"></a>
+<span class="sourceLineNo">128</span>                            delay(delay, exchange);<a name="line.128"></a>
+<span class="sourceLineNo">129</span>                        } catch (InterruptedException ie) {<a name="line.129"></a>
+<span class="sourceLineNo">130</span>                            exchange.setException(ie);<a name="line.130"></a>
+<span class="sourceLineNo">131</span>                        }<a name="line.131"></a>
+<span class="sourceLineNo">132</span>                        // then continue routing<a name="line.132"></a>
+<span class="sourceLineNo">133</span>                        return processor.process(exchange, callback);<a name="line.133"></a>
+<span class="sourceLineNo">134</span>                    }<a name="line.134"></a>
+<span class="sourceLineNo">135</span>                } else {<a name="line.135"></a>
+<span class="sourceLineNo">136</span>                    exchange.setException(e);<a name="line.136"></a>
+<span class="sourceLineNo">137</span>                }<a name="line.137"></a>
+<span class="sourceLineNo">138</span>                // caller don't run the task so we are done<a name="line.138"></a>
+<span class="sourceLineNo">139</span>                callback.done(true);<a name="line.139"></a>
+<span class="sourceLineNo">140</span>                return true;<a name="line.140"></a>
+<span class="sourceLineNo">141</span>            }<a name="line.141"></a>
+<span class="sourceLineNo">142</span>        }<a name="line.142"></a>
+<span class="sourceLineNo">143</span>    }<a name="line.143"></a>
+<span class="sourceLineNo">144</span><a name="line.144"></a>
+<span class="sourceLineNo">145</span>    @Override<a name="line.145"></a>
+<span class="sourceLineNo">146</span>    public boolean process(Exchange exchange, AsyncCallback callback) {<a name="line.146"></a>
+<span class="sourceLineNo">147</span>        if (!isRunAllowed()) {<a name="line.147"></a>
+<span class="sourceLineNo">148</span>            exchange.setException(new RejectedExecutionException("Run is not allowed"));<a name="line.148"></a>
+<span class="sourceLineNo">149</span>            callback.done(true);<a name="line.149"></a>
+<span class="sourceLineNo">150</span>            return true;<a name="line.150"></a>
+<span class="sourceLineNo">151</span>        }<a name="line.151"></a>
+<span class="sourceLineNo">152</span><a name="line.152"></a>
+<span class="sourceLineNo">153</span>        // calculate delay and wait<a name="line.153"></a>
+<span class="sourceLineNo">154</span>        long delay;<a name="line.154"></a>
+<span class="sourceLineNo">155</span>        try {<a name="line.155"></a>
+<span class="sourceLineNo">156</span>            delay = calculateDelay(exchange);<a name="line.156"></a>
+<span class="sourceLineNo">157</span>            if (delay &lt;= 0) {<a name="line.157"></a>
+<span class="sourceLineNo">158</span>                // no delay then continue routing<a name="line.158"></a>
+<span class="sourceLineNo">159</span>                log.trace("No delay for exchangeId: {}", exchange.getExchangeId());<a name="line.159"></a>
+<span class="sourceLineNo">160</span>                return processor.process(exchange, callback);<a name="line.160"></a>
+<span class="sourceLineNo">161</span>            }<a name="line.161"></a>
+<span class="sourceLineNo">162</span>        } catch (Throwable e) {<a name="line.162"></a>
+<span class="sourceLineNo">163</span>            exchange.setException(e);<a name="line.163"></a>
+<span class="sourceLineNo">164</span>            callback.done(true);<a name="line.164"></a>
+<span class="sourceLineNo">165</span>            return true;<a name="line.165"></a>
+<span class="sourceLineNo">166</span>        }<a name="line.166"></a>
+<span class="sourceLineNo">167</span>        <a name="line.167"></a>
+<span class="sourceLineNo">168</span>        return processDelay(exchange, callback, delay);<a name="line.168"></a>
+<span class="sourceLineNo">169</span>    }<a name="line.169"></a>
+<span class="sourceLineNo">170</span><a name="line.170"></a>
+<span class="sourceLineNo">171</span>    public boolean isAsyncDelayed() {<a name="line.171"></a>
+<span class="sourceLineNo">172</span>        return asyncDelayed;<a name="line.172"></a>
+<span class="sourceLineNo">173</span>    }<a name="line.173"></a>
+<span class="sourceLineNo">174</span><a name="line.174"></a>
+<span class="sourceLineNo">175</span>    public void setAsyncDelayed(boolean asyncDelayed) {<a name="line.175"></a>
+<span class="sourceLineNo">176</span>        this.asyncDelayed = asyncDelayed;<a name="line.176"></a>
+<span class="sourceLineNo">177</span>    }<a name="line.177"></a>
+<span class="sourceLineNo">178</span><a name="line.178"></a>
+<span class="sourceLineNo">179</span>    public boolean isCallerRunsWhenRejected() {<a name="line.179"></a>
+<span class="sourceLineNo">180</span>        return callerRunsWhenRejected;<a name="line.180"></a>
+<span class="sourceLineNo">181</span>    }<a name="line.181"></a>
+<span class="sourceLineNo">182</span><a name="line.182"></a>
+<span class="sourceLineNo">183</span>    public void setCallerRunsWhenRejected(boolean callerRunsWhenRejected) {<a name="line.183"></a>
+<span class="sourceLineNo">184</span>        this.callerRunsWhenRejected = callerRunsWhenRejected;<a name="line.184"></a>
+<span class="sourceLineNo">185</span>    }<a name="line.185"></a>
+<span class="sourceLineNo">186</span><a name="line.186"></a>
+<span class="sourceLineNo">187</span>    protected abstract long calculateDelay(Exchange exchange);<a name="line.187"></a>
+<span class="sourceLineNo">188</span><a name="line.188"></a>
+<span class="sourceLineNo">189</span>    /**<a name="line.189"></a>
+<span class="sourceLineNo">190</span>     * Gets the current number of {@link Exchange}s being delayed (hold back due throttle limit hit)<a name="line.190"></a>
+<span class="sourceLineNo">191</span>     */<a name="line.191"></a>
+<span class="sourceLineNo">192</span>    public int getDelayedCount() {<a name="line.192"></a>
+<span class="sourceLineNo">193</span>        return delayedCount.get();<a name="line.193"></a>
+<span class="sourceLineNo">194</span>    }<a name="line.194"></a>
+<span class="sourceLineNo">195</span><a name="line.195"></a>
+<span class="sourceLineNo">196</span>    /**<a name="line.196"></a>
+<span class="sourceLineNo">197</span>     * Delays the given time before continuing.<a name="line.197"></a>
+<span class="sourceLineNo">198</span>     * &lt;p/&gt;<a name="line.198"></a>
+<span class="sourceLineNo">199</span>     * This implementation will block while waiting<a name="line.199"></a>
+<span class="sourceLineNo">200</span>     * <a name="line.200"></a>
+<span class="sourceLineNo">201</span>     * @param delay the delay time in millis<a name="line.201"></a>
+<span class="sourceLineNo">202</span>     * @param exchange the exchange being processed<a name="line.202"></a>
+<span class="sourceLineNo">203</span>     */<a name="line.203"></a>
+<span class="sourceLineNo">204</span>    protected void delay(long delay, Exchange exchange) throws InterruptedException {<a name="line.204"></a>
+<span class="sourceLineNo">205</span>        // only run is we are started<a name="line.205"></a>
+<span class="sourceLineNo">206</span>        if (!isRunAllowed()) {<a name="line.206"></a>
+<span class="sourceLineNo">207</span>            return;<a name="line.207"></a>
+<span class="sourceLineNo">208</span>        }<a name="line.208"></a>
+<span class="sourceLineNo">209</span><a name="line.209"></a>
+<span class="sourceLineNo">210</span>        if (delay &lt; 0) {<a name="line.210"></a>
+<span class="sourceLineNo">211</span>            return;<a name="line.211"></a>
+<span class="sourceLineNo">212</span>        } else {<a name="line.212"></a>
+<span class="sourceLineNo">213</span>            try {<a name="line.213"></a>
+<span class="sourceLineNo">214</span>                // keep track on delayer counter while we sleep<a name="line.214"></a>
+<span class="sourceLineNo">215</span>                delayedCount.incrementAndGet();<a name="line.215"></a>
+<span class="sourceLineNo">216</span>                sleep(delay);<a name="line.216"></a>
+<span class="sourceLineNo">217</span>            } catch (InterruptedException e) {<a name="line.217"></a>
+<span class="sourceLineNo">218</span>                handleSleepInterruptedException(e, exchange);<a name="line.218"></a>
+<span class="sourceLineNo">219</span>            } finally {<a name="line.219"></a>
+<span class="sourceLineNo">220</span>                delayedCount.decrementAndGet();<a name="line.220"></a>
+<span class="sourceLineNo">221</span>            }<a name="line.221"></a>
+<span class="sourceLineNo">222</span>        }<a name="line.222"></a>
+<span class="sourceLineNo">223</span>    }<a name="line.223"></a>
+<span class="sourceLineNo">224</span><a name="line.224"></a>
+<span class="sourceLineNo">225</span>    /**<a name="line.225"></a>
+<span class="sourceLineNo">226</span>     * Called when a sleep is interrupted; allows derived classes to handle this case differently<a name="line.226"></a>
+<span class="sourceLineNo">227</span>     */<a name="line.227"></a>
+<span class="sourceLineNo">228</span>    protected void handleSleepInterruptedException(InterruptedException e, Exchange exchange) throws InterruptedException {<a name="line.228"></a>
+<span class="sourceLineNo">229</span>        if (log.isDebugEnabled()) {<a name="line.229"></a>
+<span class="sourceLineNo">230</span>            log.debug("Sleep interrupted, are we stopping? {}", isStopping() || isStopped());<a name="line.230"></a>
+<span class="sourceLineNo">231</span>        }<a name="line.231"></a>
+<span class="sourceLineNo">232</span>        Thread.currentThread().interrupt();<a name="line.232"></a>
+<span class="sourceLineNo">233</span>        throw e;<a name="line.233"></a>
+<span class="sourceLineNo">234</span>    }<a name="line.234"></a>
+<span class="sourceLineNo">235</span><a name="line.235"></a>
+<span class="sourceLineNo">236</span>    protected long currentSystemTime() {<a name="line.236"></a>
+<span class="sourceLineNo">237</span>        return System.currentTimeMillis();<a name="line.237"></a>
+<span class="sourceLineNo">238</span>    }<a name="line.238"></a>
+<span class="sourceLineNo">239</span><a name="line.239"></a>
+<span class="sourceLineNo">240</span>    private void sleep(long delay) throws InterruptedException {<a name="line.240"></a>
+<span class="sourceLineNo">241</span>        if (delay &lt;= 0) {<a name="line.241"></a>
+<span class="sourceLineNo">242</span>            return;<a name="line.242"></a>
+<span class="sourceLineNo">243</span>        }<a name="line.243"></a>
+<span class="sourceLineNo">244</span>        log.trace("Sleeping for: {} millis", delay);<a name="line.244"></a>
+<span class="sourceLineNo">245</span>        Thread.sleep(delay);<a name="line.245"></a>
+<span class="sourceLineNo">246</span>    }<a name="line.246"></a>
+<span class="sourceLineNo">247</span><a name="line.247"></a>
+<span class="sourceLineNo">248</span>    @Override<a name="line.248"></a>
+<span class="sourceLineNo">249</span>    protected void doStart() throws Exception {<a name="line.249"></a>
+<span class="sourceLineNo">250</span>        if (isAsyncDelayed()) {<a name="line.250"></a>
+<span class="sourceLineNo">251</span>            ObjectHelper.notNull(executorService, "executorService", this);<a name="line.251"></a>
+<span class="sourceLineNo">252</span>        }<a name="line.252"></a>
+<span class="sourceLineNo">253</span>        super.doStart();<a name="line.253"></a>
+<span class="sourceLineNo">254</span>    }<a name="line.254"></a>
+<span class="sourceLineNo">255</span><a name="line.255"></a>
+<span class="sourceLineNo">256</span>    @Override<a name="line.256"></a>
+<span class="sourceLineNo">257</span>    protected void doShutdown() throws Exception {<a name="line.257"></a>
+<span class="sourceLineNo">258</span>        if (shutdownExecutorService &amp;&amp; executorService != null) {<a name="line.258"></a>
+<span class="sourceLineNo">259</span>            camelContext.getExecutorServiceManager().shutdownNow(executorService);<a name="line.259"></a>
+<span class="sourceLineNo">260</span>        }<a name="line.260"></a>
+<span class="sourceLineNo">261</span>        super.doShutdown();<a name="line.261"></a>
+<span class="sourceLineNo">262</span>    }<a name="line.262"></a>
+<span class="sourceLineNo">263</span>}<a name="line.263"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

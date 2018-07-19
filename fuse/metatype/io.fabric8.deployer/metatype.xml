@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/io.fabric8.deployer.ProjectDeployerImpl">
+    <OCD id="io.fabric8.deployer" name="%io.fabric8.deployer.name" description="%io.fabric8.deployer.description"/>
+    <Designate pid="io.fabric8.deployer">
+        <Object ocdref="io.fabric8.deployer"/>
+    </Designate>
+</metatype:MetaData>

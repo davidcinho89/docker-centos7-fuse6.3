@@ -1,0 +1,10 @@
+[Unit]
+Description=RedHat Jboss Fuse
+After=syslog.target network.target
+[Service]
+Type=forking
+User=fuse
+ExecStart=/opt/rh/fuse/bin/admin start root
+ExecStop=/opt/rh/fuse/bin/admin stop root
+[Install]
+WantedBy=multi-user.target

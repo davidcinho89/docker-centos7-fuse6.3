@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/io.fabric8.zookeeper.bootstrap.ZooKeeperServerFactory">
+    <OCD id="io.fabric8.zookeeper.server" name="%io.fabric8.zookeeper.server.name" description="%io.fabric8.zookeeper.server.description">
+        <AD id="tickTime" type="String" name="%io.fabric8.zookeeper.server.tickTime.name" description="%io.fabric8.zookeeper.server.tickTime.description"/>
+        <AD id="dataDir" type="String" name="%io.fabric8.zookeeper.server.dataDir.name" description="%io.fabric8.zookeeper.server.dataDir.description"/>
+        <AD id="clientPort" type="String" name="%io.fabric8.zookeeper.server.clientPort.name" description="%io.fabric8.zookeeper.server.clientPort.description"/>
+        <AD id="initLimit" type="String" name="%io.fabric8.zookeeper.server.initLimit.name" description="%io.fabric8.zookeeper.server.initLimit.description"/>
+        <AD id="syncLimit" type="String" name="%io.fabric8.zookeeper.server.syncLimit.name" description="%io.fabric8.zookeeper.server.syncLimit.description"/>
+        <AD id="dataLogDir" type="String" name="%io.fabric8.zookeeper.server.dataLogDir.name" description="%io.fabric8.zookeeper.server.dataLogDir.description"/>
+        <AD id="snapRetainCount" type="String" name="%io.fabric8.zookeeper.server.snapRetainCount.name" description="%io.fabric8.zookeeper.server.snapRetainCount.description"/>
+        <AD id="purgeInterval" type="String" name="%io.fabric8.zookeeper.server.purgeInterval.name" description="%io.fabric8.zookeeper.server.purgeInterval.description"/>
+    </OCD>
+    <Designate pid="io.fabric8.zookeeper.server">
+        <Object ocdref="io.fabric8.zookeeper.server"/>
+    </Designate>
+</metatype:MetaData>

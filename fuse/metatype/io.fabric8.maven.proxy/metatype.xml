@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/io.fabric8.maven.proxy.impl.MavenProxyRegistrationHandler">
+    <OCD id="io.fabric8.maven.proxy" name="%io.fabric8.maven.proxy.name" description="%io.fabric8.maven.proxy.description">
+        <AD id="realm" type="String" default="karaf" name="%io.fabric8.maven.proxy.realm.name" description="%io.fabric8.maven.proxy.realm.description"/>
+        <AD id="role" type="String" default="admin\,manager\,viewer\,Monitor\,Operator\,Maintainer\,Deployer\,Auditor\,Administrator\,SuperUser" name="%io.fabric8.maven.proxy.role.name" description="%io.fabric8.maven.proxy.role.description"/>
+        <AD id="name" type="String" default="${runtime.id}" name="%io.fabric8.maven.proxy.name.name" description="%io.fabric8.maven.proxy.name.description"/>
+        <AD id="threadMaximumPoolSize" type="Integer" default="5" name="%io.fabric8.maven.proxy.threadMaximumPoolSize.name" description="%io.fabric8.maven.proxy.threadMaximumPoolSize.description"/>
+        <AD id="upload" type="String" default="${runtime.data}/data/maven/upload" name="%io.fabric8.maven.proxy.upload.name" description="%io.fabric8.maven.proxy.upload.description"/>
+    </OCD>
+    <Designate pid="io.fabric8.maven.proxy">
+        <Object ocdref="io.fabric8.maven.proxy"/>
+    </Designate>
+</metatype:MetaData>

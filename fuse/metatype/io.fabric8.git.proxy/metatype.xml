@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/io.fabric8.git.internal.GitProxyRegistrationHandler">
+    <OCD id="io.fabric8.git.proxy" name="%io.fabric8.git.proxy.name" description="%io.fabric8.git.proxy.description">
+        <AD id="proxyProtocol" type="String" name="%io.fabric8.git.proxy.proxyProtocol.name" description="%io.fabric8.git.proxy.proxyProtocol.description"/>
+        <AD id="proxyHost" type="String" name="%io.fabric8.git.proxy.proxyHost.name" description="%io.fabric8.git.proxy.proxyHost.description"/>
+        <AD id="proxyPort" type="String" name="%io.fabric8.git.proxy.proxyPort.name" description="%io.fabric8.git.proxy.proxyPort.description"/>
+        <AD id="nonProxyHosts" type="String" name="%io.fabric8.git.proxy.nonProxyHosts.name" description="%io.fabric8.git.proxy.nonProxyHosts.description"/>
+    </OCD>
+    <Designate pid="io.fabric8.git.proxy">
+        <Object ocdref="io.fabric8.git.proxy"/>
+    </Designate>
+</metatype:MetaData>

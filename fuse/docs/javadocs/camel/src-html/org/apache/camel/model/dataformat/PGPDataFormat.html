@@ -1,0 +1,363 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * contributor license agreements.  See the NOTICE file distributed with<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * this work for additional information regarding copyright ownership.<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * The ASF licenses this file to You under the Apache License, Version 2.0<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * (the "License"); you may not use this file except in compliance with<a name="line.6"></a>
+<span class="sourceLineNo">007</span> * the License.  You may obtain a copy of the License at<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *<a name="line.8"></a>
+<span class="sourceLineNo">009</span> *      http://www.apache.org/licenses/LICENSE-2.0<a name="line.9"></a>
+<span class="sourceLineNo">010</span> *<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * Unless required by applicable law or agreed to in writing, software<a name="line.11"></a>
+<span class="sourceLineNo">012</span> * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.12"></a>
+<span class="sourceLineNo">013</span> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * See the License for the specific language governing permissions and<a name="line.14"></a>
+<span class="sourceLineNo">015</span> * limitations under the License.<a name="line.15"></a>
+<span class="sourceLineNo">016</span> */<a name="line.16"></a>
+<span class="sourceLineNo">017</span>package org.apache.camel.model.dataformat;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import javax.xml.bind.annotation.XmlAccessType;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import javax.xml.bind.annotation.XmlAccessorType;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import javax.xml.bind.annotation.XmlAttribute;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import javax.xml.bind.annotation.XmlRootElement;<a name="line.22"></a>
+<span class="sourceLineNo">023</span><a name="line.23"></a>
+<span class="sourceLineNo">024</span>import org.apache.camel.CamelContext;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import org.apache.camel.model.DataFormatDefinition;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import org.apache.camel.spi.DataFormat;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import org.apache.camel.spi.Metadata;<a name="line.27"></a>
+<span class="sourceLineNo">028</span><a name="line.28"></a>
+<span class="sourceLineNo">029</span>/**<a name="line.29"></a>
+<span class="sourceLineNo">030</span> * PGP data format<a name="line.30"></a>
+<span class="sourceLineNo">031</span> */<a name="line.31"></a>
+<span class="sourceLineNo">032</span>@Metadata(label = "dataformat,transformation,security", title = "PGP")<a name="line.32"></a>
+<span class="sourceLineNo">033</span>@XmlRootElement(name = "pgp")<a name="line.33"></a>
+<span class="sourceLineNo">034</span>@XmlAccessorType(XmlAccessType.FIELD)<a name="line.34"></a>
+<span class="sourceLineNo">035</span>public class PGPDataFormat extends DataFormatDefinition {<a name="line.35"></a>
+<span class="sourceLineNo">036</span>    @XmlAttribute<a name="line.36"></a>
+<span class="sourceLineNo">037</span>    private String keyUserid;<a name="line.37"></a>
+<span class="sourceLineNo">038</span>    @XmlAttribute<a name="line.38"></a>
+<span class="sourceLineNo">039</span>    private String signatureKeyUserid;<a name="line.39"></a>
+<span class="sourceLineNo">040</span>    @XmlAttribute<a name="line.40"></a>
+<span class="sourceLineNo">041</span>    private String password;<a name="line.41"></a>
+<span class="sourceLineNo">042</span>    @XmlAttribute<a name="line.42"></a>
+<span class="sourceLineNo">043</span>    private String signaturePassword;<a name="line.43"></a>
+<span class="sourceLineNo">044</span>    @XmlAttribute<a name="line.44"></a>
+<span class="sourceLineNo">045</span>    private String keyFileName;<a name="line.45"></a>
+<span class="sourceLineNo">046</span>    @XmlAttribute<a name="line.46"></a>
+<span class="sourceLineNo">047</span>    private String signatureKeyFileName;<a name="line.47"></a>
+<span class="sourceLineNo">048</span>    @XmlAttribute<a name="line.48"></a>
+<span class="sourceLineNo">049</span>    private String signatureKeyRing;<a name="line.49"></a>
+<span class="sourceLineNo">050</span>    @XmlAttribute<a name="line.50"></a>
+<span class="sourceLineNo">051</span>    private Boolean armored;<a name="line.51"></a>
+<span class="sourceLineNo">052</span>    @XmlAttribute @Metadata(defaultValue = "true")<a name="line.52"></a>
+<span class="sourceLineNo">053</span>    private Boolean integrity;<a name="line.53"></a>
+<span class="sourceLineNo">054</span>    @XmlAttribute<a name="line.54"></a>
+<span class="sourceLineNo">055</span>    private String provider;<a name="line.55"></a>
+<span class="sourceLineNo">056</span>    @XmlAttribute<a name="line.56"></a>
+<span class="sourceLineNo">057</span>    private Integer algorithm;<a name="line.57"></a>
+<span class="sourceLineNo">058</span>    @XmlAttribute<a name="line.58"></a>
+<span class="sourceLineNo">059</span>    private Integer compressionAlgorithm;<a name="line.59"></a>
+<span class="sourceLineNo">060</span>    @XmlAttribute<a name="line.60"></a>
+<span class="sourceLineNo">061</span>    private Integer hashAlgorithm;<a name="line.61"></a>
+<span class="sourceLineNo">062</span>    @XmlAttribute<a name="line.62"></a>
+<span class="sourceLineNo">063</span>    private String signatureVerificationOption;<a name="line.63"></a>
+<span class="sourceLineNo">064</span><a name="line.64"></a>
+<span class="sourceLineNo">065</span>    public PGPDataFormat() {<a name="line.65"></a>
+<span class="sourceLineNo">066</span>        super("pgp");<a name="line.66"></a>
+<span class="sourceLineNo">067</span>    }<a name="line.67"></a>
+<span class="sourceLineNo">068</span><a name="line.68"></a>
+<span class="sourceLineNo">069</span>    @Override<a name="line.69"></a>
+<span class="sourceLineNo">070</span>    protected void configureDataFormat(DataFormat dataFormat, CamelContext camelContext) {<a name="line.70"></a>
+<span class="sourceLineNo">071</span>        if (keyUserid != null) {<a name="line.71"></a>
+<span class="sourceLineNo">072</span>            setProperty(camelContext, dataFormat, "keyUserid", keyUserid);<a name="line.72"></a>
+<span class="sourceLineNo">073</span>        }<a name="line.73"></a>
+<span class="sourceLineNo">074</span>        if (signatureKeyUserid != null) {<a name="line.74"></a>
+<span class="sourceLineNo">075</span>            setProperty(camelContext, dataFormat, "signatureKeyUserid", signatureKeyUserid);<a name="line.75"></a>
+<span class="sourceLineNo">076</span>        }<a name="line.76"></a>
+<span class="sourceLineNo">077</span>        if (password != null) {<a name="line.77"></a>
+<span class="sourceLineNo">078</span>            setProperty(camelContext, dataFormat, "password", password);<a name="line.78"></a>
+<span class="sourceLineNo">079</span>        }<a name="line.79"></a>
+<span class="sourceLineNo">080</span>        if (signaturePassword != null) {<a name="line.80"></a>
+<span class="sourceLineNo">081</span>            setProperty(camelContext, dataFormat, "signaturePassword", signaturePassword);<a name="line.81"></a>
+<span class="sourceLineNo">082</span>        }<a name="line.82"></a>
+<span class="sourceLineNo">083</span>        if (keyFileName != null) {<a name="line.83"></a>
+<span class="sourceLineNo">084</span>            setProperty(camelContext, dataFormat, "keyFileName", keyFileName);<a name="line.84"></a>
+<span class="sourceLineNo">085</span>        }<a name="line.85"></a>
+<span class="sourceLineNo">086</span>        if (signatureKeyFileName != null) {<a name="line.86"></a>
+<span class="sourceLineNo">087</span>            setProperty(camelContext, dataFormat, "signatureKeyFileName", signatureKeyFileName);<a name="line.87"></a>
+<span class="sourceLineNo">088</span>        }<a name="line.88"></a>
+<span class="sourceLineNo">089</span>        if (signatureKeyRing != null) {<a name="line.89"></a>
+<span class="sourceLineNo">090</span>            setProperty(camelContext, dataFormat, "signatureKeyRing", signatureKeyRing);<a name="line.90"></a>
+<span class="sourceLineNo">091</span>        }<a name="line.91"></a>
+<span class="sourceLineNo">092</span>        if (armored != null) {<a name="line.92"></a>
+<span class="sourceLineNo">093</span>            setProperty(camelContext, dataFormat, "armored", armored);<a name="line.93"></a>
+<span class="sourceLineNo">094</span>        }<a name="line.94"></a>
+<span class="sourceLineNo">095</span>        if (integrity != null) {<a name="line.95"></a>
+<span class="sourceLineNo">096</span>            setProperty(camelContext, dataFormat, "integrity", integrity);<a name="line.96"></a>
+<span class="sourceLineNo">097</span>        }<a name="line.97"></a>
+<span class="sourceLineNo">098</span>        if (provider != null) {<a name="line.98"></a>
+<span class="sourceLineNo">099</span>            setProperty(camelContext, dataFormat, "provider", provider);<a name="line.99"></a>
+<span class="sourceLineNo">100</span>        }<a name="line.100"></a>
+<span class="sourceLineNo">101</span>        if (algorithm != null) {<a name="line.101"></a>
+<span class="sourceLineNo">102</span>            setProperty(camelContext, dataFormat, "algorithm", algorithm);<a name="line.102"></a>
+<span class="sourceLineNo">103</span>        }<a name="line.103"></a>
+<span class="sourceLineNo">104</span>        if (compressionAlgorithm != null) {<a name="line.104"></a>
+<span class="sourceLineNo">105</span>            setProperty(camelContext, dataFormat, "compressionAlgorithm", compressionAlgorithm);<a name="line.105"></a>
+<span class="sourceLineNo">106</span>        }<a name="line.106"></a>
+<span class="sourceLineNo">107</span>        if (hashAlgorithm != null) {<a name="line.107"></a>
+<span class="sourceLineNo">108</span>            setProperty(camelContext, dataFormat, "hashAlgorithm", hashAlgorithm);<a name="line.108"></a>
+<span class="sourceLineNo">109</span>        }<a name="line.109"></a>
+<span class="sourceLineNo">110</span>        if (signatureVerificationOption != null) {<a name="line.110"></a>
+<span class="sourceLineNo">111</span>            setProperty(camelContext, dataFormat, "signatureVerificationOption", signatureVerificationOption);<a name="line.111"></a>
+<span class="sourceLineNo">112</span>        }<a name="line.112"></a>
+<span class="sourceLineNo">113</span>    }<a name="line.113"></a>
+<span class="sourceLineNo">114</span><a name="line.114"></a>
+<span class="sourceLineNo">115</span>    public String getSignatureKeyUserid() {<a name="line.115"></a>
+<span class="sourceLineNo">116</span>        return signatureKeyUserid;<a name="line.116"></a>
+<span class="sourceLineNo">117</span>    }<a name="line.117"></a>
+<span class="sourceLineNo">118</span><a name="line.118"></a>
+<span class="sourceLineNo">119</span>    /**<a name="line.119"></a>
+<span class="sourceLineNo">120</span>     * User ID of the key in the PGP keyring used for signing (during encryption) or signature verification (during decryption).<a name="line.120"></a>
+<span class="sourceLineNo">121</span>     * During the signature verification process the specified User ID restricts the public keys from the public<a name="line.121"></a>
+<span class="sourceLineNo">122</span>     * keyring which can be used for the verification. If no User ID is specified for the signature verficiation<a name="line.122"></a>
+<span class="sourceLineNo">123</span>     * then any public key in the public keyring can be used for the verification. Can also be only a part of a user ID.<a name="line.123"></a>
+<span class="sourceLineNo">124</span>     * For example, if the user ID is "Test User &lt;test@camel.com&gt;" then you can use the<a name="line.124"></a>
+<span class="sourceLineNo">125</span>     * part "Test User" or "&lt;test@camel.com&gt;" to address the User ID.<a name="line.125"></a>
+<span class="sourceLineNo">126</span>     */<a name="line.126"></a>
+<span class="sourceLineNo">127</span>    public void setSignatureKeyUserid(String signatureKeyUserid) {<a name="line.127"></a>
+<span class="sourceLineNo">128</span>        this.signatureKeyUserid = signatureKeyUserid;<a name="line.128"></a>
+<span class="sourceLineNo">129</span>    }<a name="line.129"></a>
+<span class="sourceLineNo">130</span><a name="line.130"></a>
+<span class="sourceLineNo">131</span>    public String getSignaturePassword() {<a name="line.131"></a>
+<span class="sourceLineNo">132</span>        return signaturePassword;<a name="line.132"></a>
+<span class="sourceLineNo">133</span>    }<a name="line.133"></a>
+<span class="sourceLineNo">134</span><a name="line.134"></a>
+<span class="sourceLineNo">135</span>    /**<a name="line.135"></a>
+<span class="sourceLineNo">136</span>     * Password used when opening the private key used for signing (during encryption).<a name="line.136"></a>
+<span class="sourceLineNo">137</span>     */<a name="line.137"></a>
+<span class="sourceLineNo">138</span>    public void setSignaturePassword(String signaturePassword) {<a name="line.138"></a>
+<span class="sourceLineNo">139</span>        this.signaturePassword = signaturePassword;<a name="line.139"></a>
+<span class="sourceLineNo">140</span>    }<a name="line.140"></a>
+<span class="sourceLineNo">141</span><a name="line.141"></a>
+<span class="sourceLineNo">142</span>    public String getSignatureKeyFileName() {<a name="line.142"></a>
+<span class="sourceLineNo">143</span>        return signatureKeyFileName;<a name="line.143"></a>
+<span class="sourceLineNo">144</span>    }<a name="line.144"></a>
+<span class="sourceLineNo">145</span><a name="line.145"></a>
+<span class="sourceLineNo">146</span>    /**<a name="line.146"></a>
+<span class="sourceLineNo">147</span>     * Filename of the keyring to use for signing (during encryption) or for signature verification (during decryption);<a name="line.147"></a>
+<span class="sourceLineNo">148</span>     * must be accessible as a classpath resource (but you can specify a location in the file system by using the "file:" prefix).<a name="line.148"></a>
+<span class="sourceLineNo">149</span>     */<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    public void setSignatureKeyFileName(String signatureKeyFileName) {<a name="line.150"></a>
+<span class="sourceLineNo">151</span>        this.signatureKeyFileName = signatureKeyFileName;<a name="line.151"></a>
+<span class="sourceLineNo">152</span>    }<a name="line.152"></a>
+<span class="sourceLineNo">153</span><a name="line.153"></a>
+<span class="sourceLineNo">154</span>    public String getSignatureKeyRing() {<a name="line.154"></a>
+<span class="sourceLineNo">155</span>        return signatureKeyRing;<a name="line.155"></a>
+<span class="sourceLineNo">156</span>    }<a name="line.156"></a>
+<span class="sourceLineNo">157</span><a name="line.157"></a>
+<span class="sourceLineNo">158</span>    /**<a name="line.158"></a>
+<span class="sourceLineNo">159</span>     * Keyring used for signing/verifying as byte array.<a name="line.159"></a>
+<span class="sourceLineNo">160</span>     * You can not set the signatureKeyFileName and signatureKeyRing at the same time.<a name="line.160"></a>
+<span class="sourceLineNo">161</span>     */<a name="line.161"></a>
+<span class="sourceLineNo">162</span>    public void setSignatureKeyRing(String signatureKeyRing) {<a name="line.162"></a>
+<span class="sourceLineNo">163</span>        this.signatureKeyRing = signatureKeyRing;<a name="line.163"></a>
+<span class="sourceLineNo">164</span>    }<a name="line.164"></a>
+<span class="sourceLineNo">165</span><a name="line.165"></a>
+<span class="sourceLineNo">166</span>    public Integer getHashAlgorithm() {<a name="line.166"></a>
+<span class="sourceLineNo">167</span>        return hashAlgorithm;<a name="line.167"></a>
+<span class="sourceLineNo">168</span>    }<a name="line.168"></a>
+<span class="sourceLineNo">169</span><a name="line.169"></a>
+<span class="sourceLineNo">170</span>    /**<a name="line.170"></a>
+<span class="sourceLineNo">171</span>     * Signature hash algorithm; possible values are defined in org.bouncycastle.bcpg.HashAlgorithmTags;<a name="line.171"></a>
+<span class="sourceLineNo">172</span>     * for example 2 (= SHA1), 8 (= SHA256), 9 (= SHA384), 10 (= SHA512), 11 (=SHA224). Only relevant for signing.<a name="line.172"></a>
+<span class="sourceLineNo">173</span>     */<a name="line.173"></a>
+<span class="sourceLineNo">174</span>    public void setHashAlgorithm(Integer hashAlgorithm) {<a name="line.174"></a>
+<span class="sourceLineNo">175</span>        this.hashAlgorithm = hashAlgorithm;<a name="line.175"></a>
+<span class="sourceLineNo">176</span>    }<a name="line.176"></a>
+<span class="sourceLineNo">177</span><a name="line.177"></a>
+<span class="sourceLineNo">178</span>    public Boolean getArmored() {<a name="line.178"></a>
+<span class="sourceLineNo">179</span>        return armored;<a name="line.179"></a>
+<span class="sourceLineNo">180</span>    }<a name="line.180"></a>
+<span class="sourceLineNo">181</span><a name="line.181"></a>
+<span class="sourceLineNo">182</span>    /**<a name="line.182"></a>
+<span class="sourceLineNo">183</span>     * This option will cause PGP to base64 encode the encrypted text, making it available for copy/paste, etc.<a name="line.183"></a>
+<span class="sourceLineNo">184</span>     */<a name="line.184"></a>
+<span class="sourceLineNo">185</span>    public void setArmored(Boolean armored) {<a name="line.185"></a>
+<span class="sourceLineNo">186</span>        this.armored = armored;<a name="line.186"></a>
+<span class="sourceLineNo">187</span>    }<a name="line.187"></a>
+<span class="sourceLineNo">188</span><a name="line.188"></a>
+<span class="sourceLineNo">189</span>    public Boolean getIntegrity() {<a name="line.189"></a>
+<span class="sourceLineNo">190</span>        return integrity;<a name="line.190"></a>
+<span class="sourceLineNo">191</span>    }<a name="line.191"></a>
+<span class="sourceLineNo">192</span><a name="line.192"></a>
+<span class="sourceLineNo">193</span>    /**<a name="line.193"></a>
+<span class="sourceLineNo">194</span>     * Adds an integrity check/sign into the encryption file.<a name="line.194"></a>
+<span class="sourceLineNo">195</span>     * &lt;p/&gt;<a name="line.195"></a>
+<span class="sourceLineNo">196</span>     * The default value is true.<a name="line.196"></a>
+<span class="sourceLineNo">197</span>     */<a name="line.197"></a>
+<span class="sourceLineNo">198</span>    public void setIntegrity(Boolean integrity) {<a name="line.198"></a>
+<span class="sourceLineNo">199</span>        this.integrity = integrity;<a name="line.199"></a>
+<span class="sourceLineNo">200</span>    }<a name="line.200"></a>
+<span class="sourceLineNo">201</span><a name="line.201"></a>
+<span class="sourceLineNo">202</span>    public String getKeyFileName() {<a name="line.202"></a>
+<span class="sourceLineNo">203</span>        return keyFileName;<a name="line.203"></a>
+<span class="sourceLineNo">204</span>    }<a name="line.204"></a>
+<span class="sourceLineNo">205</span><a name="line.205"></a>
+<span class="sourceLineNo">206</span>    /**<a name="line.206"></a>
+<span class="sourceLineNo">207</span>     * Filename of the keyring; must be accessible as a classpath resource (but you can specify a location in the file system by using the "file:" prefix).<a name="line.207"></a>
+<span class="sourceLineNo">208</span>     */<a name="line.208"></a>
+<span class="sourceLineNo">209</span>    public void setKeyFileName(String keyFileName) {<a name="line.209"></a>
+<span class="sourceLineNo">210</span>        this.keyFileName = keyFileName;<a name="line.210"></a>
+<span class="sourceLineNo">211</span>    }<a name="line.211"></a>
+<span class="sourceLineNo">212</span><a name="line.212"></a>
+<span class="sourceLineNo">213</span>    public String getKeyUserid() {<a name="line.213"></a>
+<span class="sourceLineNo">214</span>        return keyUserid;<a name="line.214"></a>
+<span class="sourceLineNo">215</span>    }<a name="line.215"></a>
+<span class="sourceLineNo">216</span><a name="line.216"></a>
+<span class="sourceLineNo">217</span>    /**<a name="line.217"></a>
+<span class="sourceLineNo">218</span>     * The user ID of the key in the PGP keyring used during encryption.<a name="line.218"></a>
+<span class="sourceLineNo">219</span>     * Can also be only a part of a user ID.<a name="line.219"></a>
+<span class="sourceLineNo">220</span>     * For example, if the user ID is "Test User &lt;test@camel.com&gt;"<a name="line.220"></a>
+<span class="sourceLineNo">221</span>     * then you can use the part "Test User" or "&lt;test@camel.com&gt;" to address the user ID.<a name="line.221"></a>
+<span class="sourceLineNo">222</span>     */<a name="line.222"></a>
+<span class="sourceLineNo">223</span>    public void setKeyUserid(String keyUserid) {<a name="line.223"></a>
+<span class="sourceLineNo">224</span>        this.keyUserid = keyUserid;<a name="line.224"></a>
+<span class="sourceLineNo">225</span>    }<a name="line.225"></a>
+<span class="sourceLineNo">226</span><a name="line.226"></a>
+<span class="sourceLineNo">227</span>    public String getPassword() {<a name="line.227"></a>
+<span class="sourceLineNo">228</span>        return password;<a name="line.228"></a>
+<span class="sourceLineNo">229</span>    }<a name="line.229"></a>
+<span class="sourceLineNo">230</span><a name="line.230"></a>
+<span class="sourceLineNo">231</span>    public Integer getAlgorithm() {<a name="line.231"></a>
+<span class="sourceLineNo">232</span>        return algorithm;<a name="line.232"></a>
+<span class="sourceLineNo">233</span>    }<a name="line.233"></a>
+<span class="sourceLineNo">234</span><a name="line.234"></a>
+<span class="sourceLineNo">235</span>    /**<a name="line.235"></a>
+<span class="sourceLineNo">236</span>     * Symmetric key encryption algorithm; possible values are defined in org.bouncycastle.bcpg.SymmetricKeyAlgorithmTags;<a name="line.236"></a>
+<span class="sourceLineNo">237</span>     * for example 2 (= TRIPLE DES), 3 (= CAST5), 4 (= BLOWFISH), 6 (= DES), 7 (= AES_128). Only relevant for encrypting.<a name="line.237"></a>
+<span class="sourceLineNo">238</span>     */<a name="line.238"></a>
+<span class="sourceLineNo">239</span>    public void setAlgorithm(Integer algorithm) {<a name="line.239"></a>
+<span class="sourceLineNo">240</span>        this.algorithm = algorithm;<a name="line.240"></a>
+<span class="sourceLineNo">241</span>    }<a name="line.241"></a>
+<span class="sourceLineNo">242</span><a name="line.242"></a>
+<span class="sourceLineNo">243</span>    public Integer getCompressionAlgorithm() {<a name="line.243"></a>
+<span class="sourceLineNo">244</span>        return compressionAlgorithm;<a name="line.244"></a>
+<span class="sourceLineNo">245</span>    }<a name="line.245"></a>
+<span class="sourceLineNo">246</span><a name="line.246"></a>
+<span class="sourceLineNo">247</span>    /**<a name="line.247"></a>
+<span class="sourceLineNo">248</span>     * Compression algorithm; possible values are defined in org.bouncycastle.bcpg.CompressionAlgorithmTags;<a name="line.248"></a>
+<span class="sourceLineNo">249</span>     * for example 0 (= UNCOMPRESSED), 1 (= ZIP), 2 (= ZLIB), 3 (= BZIP2). Only relevant for encrypting.<a name="line.249"></a>
+<span class="sourceLineNo">250</span>     */<a name="line.250"></a>
+<span class="sourceLineNo">251</span>    public void setCompressionAlgorithm(Integer compressionAlgorithm) {<a name="line.251"></a>
+<span class="sourceLineNo">252</span>        this.compressionAlgorithm = compressionAlgorithm;<a name="line.252"></a>
+<span class="sourceLineNo">253</span>    }<a name="line.253"></a>
+<span class="sourceLineNo">254</span><a name="line.254"></a>
+<span class="sourceLineNo">255</span>    /**<a name="line.255"></a>
+<span class="sourceLineNo">256</span>     * Password used when opening the private key (not used for encryption).<a name="line.256"></a>
+<span class="sourceLineNo">257</span>     */<a name="line.257"></a>
+<span class="sourceLineNo">258</span>    public void setPassword(String password) {<a name="line.258"></a>
+<span class="sourceLineNo">259</span>        this.password = password;<a name="line.259"></a>
+<span class="sourceLineNo">260</span>    }<a name="line.260"></a>
+<span class="sourceLineNo">261</span><a name="line.261"></a>
+<span class="sourceLineNo">262</span>    public String getProvider() {<a name="line.262"></a>
+<span class="sourceLineNo">263</span>        return provider;<a name="line.263"></a>
+<span class="sourceLineNo">264</span>    }<a name="line.264"></a>
+<span class="sourceLineNo">265</span><a name="line.265"></a>
+<span class="sourceLineNo">266</span>    /**<a name="line.266"></a>
+<span class="sourceLineNo">267</span>     * Java Cryptography Extension (JCE) provider, default is Bouncy Castle<a name="line.267"></a>
+<span class="sourceLineNo">268</span>     * ("BC"). Alternatively you can use, for example, the IAIK JCE provider; in<a name="line.268"></a>
+<span class="sourceLineNo">269</span>     * this case the provider must be registered beforehand and the Bouncy<a name="line.269"></a>
+<span class="sourceLineNo">270</span>     * Castle provider must not be registered beforehand. The Sun JCE provider<a name="line.270"></a>
+<span class="sourceLineNo">271</span>     * does not work.<a name="line.271"></a>
+<span class="sourceLineNo">272</span>     */<a name="line.272"></a>
+<span class="sourceLineNo">273</span>    public void setProvider(String provider) {<a name="line.273"></a>
+<span class="sourceLineNo">274</span>        this.provider = provider;<a name="line.274"></a>
+<span class="sourceLineNo">275</span>    }<a name="line.275"></a>
+<span class="sourceLineNo">276</span><a name="line.276"></a>
+<span class="sourceLineNo">277</span>    public String getSignatureVerificationOption() {<a name="line.277"></a>
+<span class="sourceLineNo">278</span>        return signatureVerificationOption;<a name="line.278"></a>
+<span class="sourceLineNo">279</span>    }<a name="line.279"></a>
+<span class="sourceLineNo">280</span><a name="line.280"></a>
+<span class="sourceLineNo">281</span>    /**<a name="line.281"></a>
+<span class="sourceLineNo">282</span>     * Controls the behavior for verifying the signature during unmarshaling. There are 4 values possible:<a name="line.282"></a>
+<span class="sourceLineNo">283</span>     * "optional": The PGP message may or may not contain signatures; if it does contain signatures, then a signature verification is executed.<a name="line.283"></a>
+<span class="sourceLineNo">284</span>     * "required": The PGP message must contain at least one signature; if this is not the case an exception (PGPException) is thrown. A signature verification is executed.<a name="line.284"></a>
+<span class="sourceLineNo">285</span>     * "ignore": Contained signatures in the PGP message are ignored; no signature verification is executed.<a name="line.285"></a>
+<span class="sourceLineNo">286</span>     * "no_signature_allowed": The PGP message must not contain a signature; otherwise an exception (PGPException) is thrown.<a name="line.286"></a>
+<span class="sourceLineNo">287</span>     */<a name="line.287"></a>
+<span class="sourceLineNo">288</span>    public void setSignatureVerificationOption(String signatureVerificationOption) {<a name="line.288"></a>
+<span class="sourceLineNo">289</span>        this.signatureVerificationOption = signatureVerificationOption;<a name="line.289"></a>
+<span class="sourceLineNo">290</span>    }<a name="line.290"></a>
+<span class="sourceLineNo">291</span>}<a name="line.291"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

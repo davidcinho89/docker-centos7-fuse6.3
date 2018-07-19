@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/io.fabric8.zookeeper.curator.CuratorACLManager">
+    <OCD id="io.fabric8.zookeeper.acl" name="%io.fabric8.zookeeper.acl.name" description="%io.fabric8.zookeeper.acl.description"/>
+    <Designate pid="io.fabric8.zookeeper.acl">
+        <Object ocdref="io.fabric8.zookeeper.acl"/>
+    </Designate>
+</metatype:MetaData>

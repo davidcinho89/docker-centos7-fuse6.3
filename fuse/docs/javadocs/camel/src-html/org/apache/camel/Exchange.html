@@ -1,0 +1,650 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * contributor license agreements.  See the NOTICE file distributed with<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * this work for additional information regarding copyright ownership.<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * The ASF licenses this file to You under the Apache License, Version 2.0<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * (the "License"); you may not use this file except in compliance with<a name="line.6"></a>
+<span class="sourceLineNo">007</span> * the License.  You may obtain a copy of the License at<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *<a name="line.8"></a>
+<span class="sourceLineNo">009</span> *      http://www.apache.org/licenses/LICENSE-2.0<a name="line.9"></a>
+<span class="sourceLineNo">010</span> *<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * Unless required by applicable law or agreed to in writing, software<a name="line.11"></a>
+<span class="sourceLineNo">012</span> * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.12"></a>
+<span class="sourceLineNo">013</span> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * See the License for the specific language governing permissions and<a name="line.14"></a>
+<span class="sourceLineNo">015</span> * limitations under the License.<a name="line.15"></a>
+<span class="sourceLineNo">016</span> */<a name="line.16"></a>
+<span class="sourceLineNo">017</span>package org.apache.camel;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import java.util.List;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import java.util.Map;<a name="line.20"></a>
+<span class="sourceLineNo">021</span><a name="line.21"></a>
+<span class="sourceLineNo">022</span>import org.apache.camel.spi.Synchronization;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import org.apache.camel.spi.UnitOfWork;<a name="line.23"></a>
+<span class="sourceLineNo">024</span><a name="line.24"></a>
+<span class="sourceLineNo">025</span>/**<a name="line.25"></a>
+<span class="sourceLineNo">026</span> * An Exchange is the message container holding the information during the entire routing of<a name="line.26"></a>
+<span class="sourceLineNo">027</span> * a {@link  Message} received by a {@link Consumer}. <a name="line.27"></a>
+<span class="sourceLineNo">028</span> * &lt;p/&gt;<a name="line.28"></a>
+<span class="sourceLineNo">029</span> * During processing down the {@link Processor} chain, the {@link Exchange} provides access to the <a name="line.29"></a>
+<span class="sourceLineNo">030</span> * current (not the original) request and response {@link Message} messages. The {@link Exchange} <a name="line.30"></a>
+<span class="sourceLineNo">031</span> * also holds meta-data during its entire lifetime stored as properties accessible using the <a name="line.31"></a>
+<span class="sourceLineNo">032</span> * various {@link #getProperty(String)} methods. The {@link #setProperty(String, Object)} is <a name="line.32"></a>
+<span class="sourceLineNo">033</span> * used to store a property. For example you can use this to store security, SLA related <a name="line.33"></a>
+<span class="sourceLineNo">034</span> * data or any other information deemed useful throughout processing. If an {@link Exchange} <a name="line.34"></a>
+<span class="sourceLineNo">035</span> * failed during routing the {@link Exception} that caused the failure is stored and accessible <a name="line.35"></a>
+<span class="sourceLineNo">036</span> * via the {@link #getException()} method.<a name="line.36"></a>
+<span class="sourceLineNo">037</span> * &lt;p/&gt;<a name="line.37"></a>
+<span class="sourceLineNo">038</span> * An Exchange is created when a {@link Consumer} receives a request. A new {@link Message} is<a name="line.38"></a>
+<span class="sourceLineNo">039</span> * created, the request is set as the body of the {@link Message} and depending on the {@link Consumer}<a name="line.39"></a>
+<span class="sourceLineNo">040</span> * other {@link Endpoint} and protocol related information is added as headers on the {@link Message}.<a name="line.40"></a>
+<span class="sourceLineNo">041</span> * Then an Exchange is created and the newly created {@link Message} is set as the in on the Exchange.<a name="line.41"></a>
+<span class="sourceLineNo">042</span> * Therefore an Exchange starts its life in a {@link Consumer}. The Exchange is then sent down the<a name="line.42"></a>
+<span class="sourceLineNo">043</span> * {@link Route} for processing along a {@link Processor} chain. The {@link Processor} as the name<a name="line.43"></a>
+<span class="sourceLineNo">044</span> * suggests is what processes the {@link Message} in the Exchange and Camel, in addition to <a name="line.44"></a>
+<span class="sourceLineNo">045</span> * providing out-of-the-box a large number of useful processors, it also allows you to create your own. <a name="line.45"></a>
+<span class="sourceLineNo">046</span> * The rule Camel uses is to take the out {@link Message} produced by the previous {@link Processor} <a name="line.46"></a>
+<span class="sourceLineNo">047</span> * and set it as the in for the next {@link Processor}. If the previous {@link Processor} did not<a name="line.47"></a>
+<span class="sourceLineNo">048</span> * produce an out, then the in of the previous {@link Processor} is sent as the next in. At the<a name="line.48"></a>
+<span class="sourceLineNo">049</span> * end of the processing chain, depending on the {@link ExchangePattern Message Exchange Pattern} (or MEP)<a name="line.49"></a>
+<span class="sourceLineNo">050</span> * the last out (or in of no out available) is sent by the {@link Consumer} back to the original caller.<a name="line.50"></a>
+<span class="sourceLineNo">051</span> * &lt;p/&gt;<a name="line.51"></a>
+<span class="sourceLineNo">052</span> * Camel, in addition to providing out-of-the-box a large number of useful processors, it also allows <a name="line.52"></a>
+<span class="sourceLineNo">053</span> * you to implement and use your own. When the Exchange is passed to a {@link Processor}, it always <a name="line.53"></a>
+<span class="sourceLineNo">054</span> * contains an in {@link Message} and no out {@link Message}. The {@link Processor} &lt;b&gt;may&lt;/b&gt; produce <a name="line.54"></a>
+<span class="sourceLineNo">055</span> * an out, depending on the nature of the {@link Processor}. The in {@link Message} can be accessed <a name="line.55"></a>
+<span class="sourceLineNo">056</span> * using the {@link #getIn()} method. Since the out message is null when entering the {@link Processor}, <a name="line.56"></a>
+<span class="sourceLineNo">057</span> * the {@link #getOut()} method is actually a convenient factory method that will lazily instantiate a <a name="line.57"></a>
+<span class="sourceLineNo">058</span> * {@link org.apache.camel.impl.DefaultMessage} which you could populate. As an alternative you could <a name="line.58"></a>
+<span class="sourceLineNo">059</span> * also instantiate your specialized  {@link Message} and set it on the exchange using the <a name="line.59"></a>
+<span class="sourceLineNo">060</span> * {@link #setOut(org.apache.camel.Message)} method. Please note that a {@link Message} contains not only <a name="line.60"></a>
+<span class="sourceLineNo">061</span> * the body but also headers and attachments. If you are creating a new {@link Message} the headers and <a name="line.61"></a>
+<span class="sourceLineNo">062</span> * attachments of the in {@link Message} are not automatically copied to the out by Camel and you'll have <a name="line.62"></a>
+<span class="sourceLineNo">063</span> * to set the headers and attachments you need yourself. If your {@link Processor} is not producing a <a name="line.63"></a>
+<span class="sourceLineNo">064</span> * different {@link Message} but only needs to slightly  modify the in, you can simply update the in <a name="line.64"></a>
+<span class="sourceLineNo">065</span> * {@link Message} returned by {@link #getIn()}. <a name="line.65"></a>
+<span class="sourceLineNo">066</span> * &lt;p/&gt;<a name="line.66"></a>
+<span class="sourceLineNo">067</span> * See this &lt;a href="http://camel.apache.org/using-getin-or-getout-methods-on-exchange.html"&gt;FAQ entry&lt;/a&gt; <a name="line.67"></a>
+<span class="sourceLineNo">068</span> * for more details.<a name="line.68"></a>
+<span class="sourceLineNo">069</span> * <a name="line.69"></a>
+<span class="sourceLineNo">070</span> */<a name="line.70"></a>
+<span class="sourceLineNo">071</span>public interface Exchange {<a name="line.71"></a>
+<span class="sourceLineNo">072</span><a name="line.72"></a>
+<span class="sourceLineNo">073</span>    String AUTHENTICATION                   = "CamelAuthentication";<a name="line.73"></a>
+<span class="sourceLineNo">074</span>    String AUTHENTICATION_FAILURE_POLICY_ID = "CamelAuthenticationFailurePolicyId";<a name="line.74"></a>
+<span class="sourceLineNo">075</span>    String ACCEPT_CONTENT_TYPE              = "CamelAcceptContentType";<a name="line.75"></a>
+<span class="sourceLineNo">076</span>    String AGGREGATED_SIZE                  = "CamelAggregatedSize";<a name="line.76"></a>
+<span class="sourceLineNo">077</span>    String AGGREGATED_TIMEOUT               = "CamelAggregatedTimeout";<a name="line.77"></a>
+<span class="sourceLineNo">078</span>    String AGGREGATED_COMPLETED_BY          = "CamelAggregatedCompletedBy";<a name="line.78"></a>
+<span class="sourceLineNo">079</span>    String AGGREGATED_CORRELATION_KEY       = "CamelAggregatedCorrelationKey";<a name="line.79"></a>
+<span class="sourceLineNo">080</span>    String AGGREGATED_COLLECTION_GUARD      = "CamelAggregatedCollectionGuard";<a name="line.80"></a>
+<span class="sourceLineNo">081</span>    String AGGREGATION_STRATEGY             = "CamelAggregationStrategy";<a name="line.81"></a>
+<span class="sourceLineNo">082</span>    String AGGREGATION_COMPLETE_CURRENT_GROUP = "CamelAggregationCompleteCurrentGroup";<a name="line.82"></a>
+<span class="sourceLineNo">083</span>    String AGGREGATION_COMPLETE_ALL_GROUPS  = "CamelAggregationCompleteAllGroups";<a name="line.83"></a>
+<span class="sourceLineNo">084</span>    String AGGREGATION_COMPLETE_ALL_GROUPS_INCLUSIVE  = "CamelAggregationCompleteAllGroupsInclusive";<a name="line.84"></a>
+<span class="sourceLineNo">085</span>    String ASYNC_WAIT                       = "CamelAsyncWait";<a name="line.85"></a>
+<span class="sourceLineNo">086</span><a name="line.86"></a>
+<span class="sourceLineNo">087</span>    String BATCH_INDEX                = "CamelBatchIndex";<a name="line.87"></a>
+<span class="sourceLineNo">088</span>    String BATCH_SIZE                 = "CamelBatchSize";<a name="line.88"></a>
+<span class="sourceLineNo">089</span>    String BATCH_COMPLETE             = "CamelBatchComplete";<a name="line.89"></a>
+<span class="sourceLineNo">090</span>    String BEAN_METHOD_NAME           = "CamelBeanMethodName";<a name="line.90"></a>
+<span class="sourceLineNo">091</span>    String BEAN_MULTI_PARAMETER_ARRAY = "CamelBeanMultiParameterArray";<a name="line.91"></a>
+<span class="sourceLineNo">092</span>    String BINDING                    = "CamelBinding";<a name="line.92"></a>
+<span class="sourceLineNo">093</span>    // do not prefix with Camel and use lower-case starting letter as its a shared key<a name="line.93"></a>
+<span class="sourceLineNo">094</span>    // used across other Apache products such as AMQ, SMX etc.<a name="line.94"></a>
+<span class="sourceLineNo">095</span>    String BREADCRUMB_ID              = "breadcrumbId";<a name="line.95"></a>
+<span class="sourceLineNo">096</span><a name="line.96"></a>
+<span class="sourceLineNo">097</span>    String CHARSET_NAME          = "CamelCharsetName";<a name="line.97"></a>
+<span class="sourceLineNo">098</span>    String CIRCUIT_BREAKER_STATE = "CamelCircuitBreakerState";<a name="line.98"></a>
+<span class="sourceLineNo">099</span>    String CREATED_TIMESTAMP     = "CamelCreatedTimestamp";<a name="line.99"></a>
+<span class="sourceLineNo">100</span>    String CONTENT_ENCODING      = "Content-Encoding";<a name="line.100"></a>
+<span class="sourceLineNo">101</span>    String CONTENT_LENGTH        = "Content-Length";<a name="line.101"></a>
+<span class="sourceLineNo">102</span>    String CONTENT_TYPE          = "Content-Type";<a name="line.102"></a>
+<span class="sourceLineNo">103</span>    String CORRELATION_ID        = "CamelCorrelationId";<a name="line.103"></a>
+<span class="sourceLineNo">104</span><a name="line.104"></a>
+<span class="sourceLineNo">105</span>    String DATASET_INDEX             = "CamelDataSetIndex";<a name="line.105"></a>
+<span class="sourceLineNo">106</span>    String DEFAULT_CHARSET_PROPERTY  = "org.apache.camel.default.charset";<a name="line.106"></a>
+<span class="sourceLineNo">107</span>    String DESTINATION_OVERRIDE_URL = "CamelDestinationOverrideUrl";<a name="line.107"></a>
+<span class="sourceLineNo">108</span>    String DISABLE_HTTP_STREAM_CACHE = "CamelDisableHttpStreamCache";<a name="line.108"></a>
+<span class="sourceLineNo">109</span>    String DUPLICATE_MESSAGE         = "CamelDuplicateMessage";<a name="line.109"></a>
+<span class="sourceLineNo">110</span>    <a name="line.110"></a>
+<span class="sourceLineNo">111</span>    String DOCUMENT_BUILDER_FACTORY = "CamelDocumentBuilderFactory";<a name="line.111"></a>
+<span class="sourceLineNo">112</span><a name="line.112"></a>
+<span class="sourceLineNo">113</span>    String EXCEPTION_CAUGHT           = "CamelExceptionCaught";<a name="line.113"></a>
+<span class="sourceLineNo">114</span>    String EXCEPTION_HANDLED          = "CamelExceptionHandled";<a name="line.114"></a>
+<span class="sourceLineNo">115</span>    String EVALUATE_EXPRESSION_RESULT = "CamelEvaluateExpressionResult";<a name="line.115"></a>
+<span class="sourceLineNo">116</span>    String ERRORHANDLER_HANDLED       = "CamelErrorHandlerHandled";<a name="line.116"></a>
+<span class="sourceLineNo">117</span>    String EXTERNAL_REDELIVERED       = "CamelExternalRedelivered";<a name="line.117"></a>
+<span class="sourceLineNo">118</span><a name="line.118"></a>
+<span class="sourceLineNo">119</span>    String FAILURE_HANDLED      = "CamelFailureHandled";<a name="line.119"></a>
+<span class="sourceLineNo">120</span>    String FAILURE_ENDPOINT     = "CamelFailureEndpoint";<a name="line.120"></a>
+<span class="sourceLineNo">121</span>    String FAILURE_ROUTE_ID     = "CamelFailureRouteId";<a name="line.121"></a>
+<span class="sourceLineNo">122</span>    String FILE_CONTENT_TYPE    = "CamelFileContentType";<a name="line.122"></a>
+<span class="sourceLineNo">123</span>    String FILE_LOCAL_WORK_PATH = "CamelFileLocalWorkPath";<a name="line.123"></a>
+<span class="sourceLineNo">124</span>    String FILE_NAME            = "CamelFileName";<a name="line.124"></a>
+<span class="sourceLineNo">125</span>    String FILE_NAME_ONLY       = "CamelFileNameOnly";<a name="line.125"></a>
+<span class="sourceLineNo">126</span>    String FILE_NAME_PRODUCED   = "CamelFileNameProduced";<a name="line.126"></a>
+<span class="sourceLineNo">127</span>    String FILE_NAME_CONSUMED   = "CamelFileNameConsumed";<a name="line.127"></a>
+<span class="sourceLineNo">128</span>    String FILE_PATH            = "CamelFilePath";<a name="line.128"></a>
+<span class="sourceLineNo">129</span>    String FILE_PARENT          = "CamelFileParent";<a name="line.129"></a>
+<span class="sourceLineNo">130</span>    String FILE_LAST_MODIFIED   = "CamelFileLastModified";<a name="line.130"></a>
+<span class="sourceLineNo">131</span>    String FILE_LENGTH          = "CamelFileLength";<a name="line.131"></a>
+<span class="sourceLineNo">132</span>    String FILE_LOCK_FILE_ACQUIRED = "CamelFileLockFileAcquired";<a name="line.132"></a>
+<span class="sourceLineNo">133</span>    String FILE_LOCK_FILE_NAME  = "CamelFileLockFileName";<a name="line.133"></a>
+<span class="sourceLineNo">134</span>    String FILE_LOCK_EXCLUSIVE_LOCK = "CamelFileLockExclusiveLock";<a name="line.134"></a>
+<span class="sourceLineNo">135</span>    String FILE_LOCK_RANDOM_ACCESS_FILE = "CamelFileLockRandomAccessFile";<a name="line.135"></a>
+<span class="sourceLineNo">136</span>    String FILTER_MATCHED       = "CamelFilterMatched";<a name="line.136"></a>
+<span class="sourceLineNo">137</span>    String FILTER_NON_XML_CHARS = "CamelFilterNonXmlChars";<a name="line.137"></a>
+<span class="sourceLineNo">138</span><a name="line.138"></a>
+<span class="sourceLineNo">139</span>    String GROUPED_EXCHANGE = "CamelGroupedExchange";<a name="line.139"></a>
+<span class="sourceLineNo">140</span>    <a name="line.140"></a>
+<span class="sourceLineNo">141</span>    String HTTP_BASE_URI           = "CamelHttpBaseUri";<a name="line.141"></a>
+<span class="sourceLineNo">142</span>    String HTTP_CHARACTER_ENCODING = "CamelHttpCharacterEncoding";<a name="line.142"></a>
+<span class="sourceLineNo">143</span>    String HTTP_METHOD             = "CamelHttpMethod";<a name="line.143"></a>
+<span class="sourceLineNo">144</span>    String HTTP_PATH               = "CamelHttpPath";<a name="line.144"></a>
+<span class="sourceLineNo">145</span>    String HTTP_PROTOCOL_VERSION   = "CamelHttpProtocolVersion";<a name="line.145"></a>
+<span class="sourceLineNo">146</span>    String HTTP_QUERY              = "CamelHttpQuery";<a name="line.146"></a>
+<span class="sourceLineNo">147</span>    String HTTP_RAW_QUERY          = "CamelHttpRawQuery";<a name="line.147"></a>
+<span class="sourceLineNo">148</span>    String HTTP_RESPONSE_CODE      = "CamelHttpResponseCode";<a name="line.148"></a>
+<span class="sourceLineNo">149</span>    String HTTP_RESPONSE_TEXT      = "CamelHttpResponseText";<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    String HTTP_URI                = "CamelHttpUri";<a name="line.150"></a>
+<span class="sourceLineNo">151</span>    String HTTP_URL                = "CamelHttpUrl";<a name="line.151"></a>
+<span class="sourceLineNo">152</span>    String HTTP_CHUNKED            = "CamelHttpChunked";<a name="line.152"></a>
+<span class="sourceLineNo">153</span>    String HTTP_SERVLET_REQUEST    = "CamelHttpServletRequest";<a name="line.153"></a>
+<span class="sourceLineNo">154</span>    String HTTP_SERVLET_RESPONSE   = "CamelHttpServletResponse";<a name="line.154"></a>
+<span class="sourceLineNo">155</span><a name="line.155"></a>
+<span class="sourceLineNo">156</span>    String INTERCEPTED_ENDPOINT = "CamelInterceptedEndpoint";<a name="line.156"></a>
+<span class="sourceLineNo">157</span>    String INTERCEPT_SEND_TO_ENDPOINT_WHEN_MATCHED = "CamelInterceptSendToEndpointWhenMatched";<a name="line.157"></a>
+<span class="sourceLineNo">158</span><a name="line.158"></a>
+<span class="sourceLineNo">159</span>    String LANGUAGE_SCRIPT          = "CamelLanguageScript";<a name="line.159"></a>
+<span class="sourceLineNo">160</span>    String LOG_DEBUG_BODY_MAX_CHARS = "CamelLogDebugBodyMaxChars";<a name="line.160"></a>
+<span class="sourceLineNo">161</span>    String LOG_DEBUG_BODY_STREAMS   = "CamelLogDebugStreams";<a name="line.161"></a>
+<span class="sourceLineNo">162</span>    String LOG_EIP_NAME             = "CamelLogEipName";<a name="line.162"></a>
+<span class="sourceLineNo">163</span>    String LOOP_INDEX               = "CamelLoopIndex";<a name="line.163"></a>
+<span class="sourceLineNo">164</span>    String LOOP_SIZE                = "CamelLoopSize";<a name="line.164"></a>
+<span class="sourceLineNo">165</span><a name="line.165"></a>
+<span class="sourceLineNo">166</span>    String MAXIMUM_CACHE_POOL_SIZE     = "CamelMaximumCachePoolSize";<a name="line.166"></a>
+<span class="sourceLineNo">167</span>    String MAXIMUM_ENDPOINT_CACHE_SIZE = "CamelMaximumEndpointCacheSize";<a name="line.167"></a>
+<span class="sourceLineNo">168</span>    String MESSAGE_HISTORY             = "CamelMessageHistory";<a name="line.168"></a>
+<span class="sourceLineNo">169</span>    String MULTICAST_INDEX             = "CamelMulticastIndex";<a name="line.169"></a>
+<span class="sourceLineNo">170</span>    String MULTICAST_COMPLETE          = "CamelMulticastComplete";<a name="line.170"></a>
+<span class="sourceLineNo">171</span><a name="line.171"></a>
+<span class="sourceLineNo">172</span>    String NOTIFY_EVENT = "CamelNotifyEvent";<a name="line.172"></a>
+<span class="sourceLineNo">173</span><a name="line.173"></a>
+<span class="sourceLineNo">174</span>    String ON_COMPLETION      = "CamelOnCompletion";<a name="line.174"></a>
+<span class="sourceLineNo">175</span>    String OVERRULE_FILE_NAME = "CamelOverruleFileName";<a name="line.175"></a>
+<span class="sourceLineNo">176</span><a name="line.176"></a>
+<span class="sourceLineNo">177</span>    String PARENT_UNIT_OF_WORK = "CamelParentUnitOfWork";<a name="line.177"></a>
+<span class="sourceLineNo">178</span>    String STREAM_CACHE_UNIT_OF_WORK = "CamelStreamCacheUnitOfWork";<a name="line.178"></a>
+<span class="sourceLineNo">179</span>    <a name="line.179"></a>
+<span class="sourceLineNo">180</span>    String RECIPIENT_LIST_ENDPOINT = "CamelRecipientListEndpoint";<a name="line.180"></a>
+<span class="sourceLineNo">181</span>    String RECEIVED_TIMESTAMP      = "CamelReceivedTimestamp";<a name="line.181"></a>
+<span class="sourceLineNo">182</span>    String REDELIVERED             = "CamelRedelivered";<a name="line.182"></a>
+<span class="sourceLineNo">183</span>    String REDELIVERY_COUNTER      = "CamelRedeliveryCounter";<a name="line.183"></a>
+<span class="sourceLineNo">184</span>    String REDELIVERY_MAX_COUNTER  = "CamelRedeliveryMaxCounter";<a name="line.184"></a>
+<span class="sourceLineNo">185</span>    String REDELIVERY_EXHAUSTED    = "CamelRedeliveryExhausted";<a name="line.185"></a>
+<span class="sourceLineNo">186</span>    String REDELIVERY_DELAY        = "CamelRedeliveryDelay";<a name="line.186"></a>
+<span class="sourceLineNo">187</span>    String ROLLBACK_ONLY           = "CamelRollbackOnly";<a name="line.187"></a>
+<span class="sourceLineNo">188</span>    String ROLLBACK_ONLY_LAST      = "CamelRollbackOnlyLast";<a name="line.188"></a>
+<span class="sourceLineNo">189</span>    String ROUTE_STOP              = "CamelRouteStop";<a name="line.189"></a>
+<span class="sourceLineNo">190</span><a name="line.190"></a>
+<span class="sourceLineNo">191</span>    String REUSE_SCRIPT_ENGINE = "CamelReuseScripteEngine";<a name="line.191"></a>
+<span class="sourceLineNo">192</span>    String COMPILE_SCRIPT = "CamelCompileScript";<a name="line.192"></a>
+<span class="sourceLineNo">193</span>    <a name="line.193"></a>
+<span class="sourceLineNo">194</span>    String SAXPARSER_FACTORY   = "CamelSAXParserFactory";<a name="line.194"></a>
+<span class="sourceLineNo">195</span><a name="line.195"></a>
+<span class="sourceLineNo">196</span>    String SCHEDULER_POLLED_MESSAGES = "CamelSchedulerPolledMessages";<a name="line.196"></a>
+<span class="sourceLineNo">197</span>    String SOAP_ACTION        = "CamelSoapAction";<a name="line.197"></a>
+<span class="sourceLineNo">198</span>    String SKIP_GZIP_ENCODING = "CamelSkipGzipEncoding";<a name="line.198"></a>
+<span class="sourceLineNo">199</span>    String SKIP_WWW_FORM_URLENCODED = "CamelSkipWwwFormUrlEncoding"; <a name="line.199"></a>
+<span class="sourceLineNo">200</span>    String SLIP_ENDPOINT      = "CamelSlipEndpoint";<a name="line.200"></a>
+<span class="sourceLineNo">201</span>    String SPLIT_INDEX        = "CamelSplitIndex";<a name="line.201"></a>
+<span class="sourceLineNo">202</span>    String SPLIT_COMPLETE     = "CamelSplitComplete";<a name="line.202"></a>
+<span class="sourceLineNo">203</span>    String SPLIT_SIZE         = "CamelSplitSize";<a name="line.203"></a>
+<span class="sourceLineNo">204</span><a name="line.204"></a>
+<span class="sourceLineNo">205</span>    String TIMER_COUNTER         = "CamelTimerCounter";<a name="line.205"></a>
+<span class="sourceLineNo">206</span>    String TIMER_FIRED_TIME      = "CamelTimerFiredTime";<a name="line.206"></a>
+<span class="sourceLineNo">207</span>    String TIMER_NAME            = "CamelTimerName";<a name="line.207"></a>
+<span class="sourceLineNo">208</span>    String TIMER_PERIOD          = "CamelTimerPeriod";<a name="line.208"></a>
+<span class="sourceLineNo">209</span>    String TIMER_TIME            = "CamelTimerTime";<a name="line.209"></a>
+<span class="sourceLineNo">210</span>    String TO_ENDPOINT           = "CamelToEndpoint";<a name="line.210"></a>
+<span class="sourceLineNo">211</span>    String TRACE_EVENT           = "CamelTraceEvent";<a name="line.211"></a>
+<span class="sourceLineNo">212</span>    String TRACE_EVENT_NODE_ID   = "CamelTraceEventNodeId";<a name="line.212"></a>
+<span class="sourceLineNo">213</span>    String TRACE_EVENT_TIMESTAMP = "CamelTraceEventTimestamp";<a name="line.213"></a>
+<span class="sourceLineNo">214</span>    String TRACE_EVENT_EXCHANGE  = "CamelTraceEventExchange";<a name="line.214"></a>
+<span class="sourceLineNo">215</span>    String TRY_ROUTE_BLOCK       = "TryRouteBlock";<a name="line.215"></a>
+<span class="sourceLineNo">216</span>    String TRANSFER_ENCODING     = "Transfer-Encoding";<a name="line.216"></a>
+<span class="sourceLineNo">217</span><a name="line.217"></a>
+<span class="sourceLineNo">218</span>    String UNIT_OF_WORK_EXHAUSTED    = "CamelUnitOfWorkExhausted";<a name="line.218"></a>
+<span class="sourceLineNo">219</span>    <a name="line.219"></a>
+<span class="sourceLineNo">220</span>    /**<a name="line.220"></a>
+<span class="sourceLineNo">221</span>     * @deprecated UNIT_OF_WORK_PROCESS_SYNC is not in use and will be removed in future Camel release<a name="line.221"></a>
+<span class="sourceLineNo">222</span>     */<a name="line.222"></a>
+<span class="sourceLineNo">223</span>    @Deprecated<a name="line.223"></a>
+<span class="sourceLineNo">224</span>    String UNIT_OF_WORK_PROCESS_SYNC = "CamelUnitOfWorkProcessSync";<a name="line.224"></a>
+<span class="sourceLineNo">225</span><a name="line.225"></a>
+<span class="sourceLineNo">226</span>    String XSLT_FILE_NAME   = "CamelXsltFileName";<a name="line.226"></a>
+<span class="sourceLineNo">227</span>    String XSLT_ERROR       = "CamelXsltError";<a name="line.227"></a>
+<span class="sourceLineNo">228</span>    String XSLT_FATAL_ERROR = "CamelXsltFatalError";<a name="line.228"></a>
+<span class="sourceLineNo">229</span>    String XSLT_WARNING     = "CamelXsltWarning";<a name="line.229"></a>
+<span class="sourceLineNo">230</span><a name="line.230"></a>
+<span class="sourceLineNo">231</span>    /**<a name="line.231"></a>
+<span class="sourceLineNo">232</span>     * Returns the {@link ExchangePattern} (MEP) of this exchange.<a name="line.232"></a>
+<span class="sourceLineNo">233</span>     *<a name="line.233"></a>
+<span class="sourceLineNo">234</span>     * @return the message exchange pattern of this exchange<a name="line.234"></a>
+<span class="sourceLineNo">235</span>     */<a name="line.235"></a>
+<span class="sourceLineNo">236</span>    ExchangePattern getPattern();<a name="line.236"></a>
+<span class="sourceLineNo">237</span><a name="line.237"></a>
+<span class="sourceLineNo">238</span>    /**<a name="line.238"></a>
+<span class="sourceLineNo">239</span>     * Allows the {@link ExchangePattern} (MEP) of this exchange to be customized.<a name="line.239"></a>
+<span class="sourceLineNo">240</span>     *<a name="line.240"></a>
+<span class="sourceLineNo">241</span>     * This typically won't be required as an exchange can be created with a specific MEP<a name="line.241"></a>
+<span class="sourceLineNo">242</span>     * by calling {@link Endpoint#createExchange(ExchangePattern)} but it is here just in case<a name="line.242"></a>
+<span class="sourceLineNo">243</span>     * it is needed.<a name="line.243"></a>
+<span class="sourceLineNo">244</span>     *<a name="line.244"></a>
+<span class="sourceLineNo">245</span>     * @param pattern  the pattern <a name="line.245"></a>
+<span class="sourceLineNo">246</span>     */<a name="line.246"></a>
+<span class="sourceLineNo">247</span>    void setPattern(ExchangePattern pattern);<a name="line.247"></a>
+<span class="sourceLineNo">248</span><a name="line.248"></a>
+<span class="sourceLineNo">249</span>    /**<a name="line.249"></a>
+<span class="sourceLineNo">250</span>     * Returns a property associated with this exchange by name<a name="line.250"></a>
+<span class="sourceLineNo">251</span>     *<a name="line.251"></a>
+<span class="sourceLineNo">252</span>     * @param name the name of the property<a name="line.252"></a>
+<span class="sourceLineNo">253</span>     * @return the value of the given property or &lt;tt&gt;null&lt;/tt&gt; if there is no property for<a name="line.253"></a>
+<span class="sourceLineNo">254</span>     *         the given name<a name="line.254"></a>
+<span class="sourceLineNo">255</span>     */<a name="line.255"></a>
+<span class="sourceLineNo">256</span>    Object getProperty(String name);<a name="line.256"></a>
+<span class="sourceLineNo">257</span><a name="line.257"></a>
+<span class="sourceLineNo">258</span>    /**<a name="line.258"></a>
+<span class="sourceLineNo">259</span>     * Returns a property associated with this exchange by name<a name="line.259"></a>
+<span class="sourceLineNo">260</span>     *<a name="line.260"></a>
+<span class="sourceLineNo">261</span>     * @param name the name of the property<a name="line.261"></a>
+<span class="sourceLineNo">262</span>     * @param defaultValue the default value to return if property was absent<a name="line.262"></a>
+<span class="sourceLineNo">263</span>     * @return the value of the given property or &lt;tt&gt;defaultValue&lt;/tt&gt; if there is no<a name="line.263"></a>
+<span class="sourceLineNo">264</span>     *         property for the given name<a name="line.264"></a>
+<span class="sourceLineNo">265</span>     */<a name="line.265"></a>
+<span class="sourceLineNo">266</span>    Object getProperty(String name, Object defaultValue);<a name="line.266"></a>
+<span class="sourceLineNo">267</span><a name="line.267"></a>
+<span class="sourceLineNo">268</span>    /**<a name="line.268"></a>
+<span class="sourceLineNo">269</span>     * Returns a property associated with this exchange by name and specifying<a name="line.269"></a>
+<span class="sourceLineNo">270</span>     * the type required<a name="line.270"></a>
+<span class="sourceLineNo">271</span>     *<a name="line.271"></a>
+<span class="sourceLineNo">272</span>     * @param name the name of the property<a name="line.272"></a>
+<span class="sourceLineNo">273</span>     * @param type the type of the property<a name="line.273"></a>
+<span class="sourceLineNo">274</span>     * @return the value of the given property or &lt;tt&gt;null&lt;/tt&gt; if there is no property for<a name="line.274"></a>
+<span class="sourceLineNo">275</span>     *         the given name or &lt;tt&gt;null&lt;/tt&gt; if it cannot be converted to the given type<a name="line.275"></a>
+<span class="sourceLineNo">276</span>     */<a name="line.276"></a>
+<span class="sourceLineNo">277</span>    &lt;T&gt; T getProperty(String name, Class&lt;T&gt; type);<a name="line.277"></a>
+<span class="sourceLineNo">278</span><a name="line.278"></a>
+<span class="sourceLineNo">279</span>    /**<a name="line.279"></a>
+<span class="sourceLineNo">280</span>     * Returns a property associated with this exchange by name and specifying<a name="line.280"></a>
+<span class="sourceLineNo">281</span>     * the type required<a name="line.281"></a>
+<span class="sourceLineNo">282</span>     *<a name="line.282"></a>
+<span class="sourceLineNo">283</span>     * @param name the name of the property<a name="line.283"></a>
+<span class="sourceLineNo">284</span>     * @param defaultValue the default value to return if property was absent<a name="line.284"></a>
+<span class="sourceLineNo">285</span>     * @param type the type of the property<a name="line.285"></a>
+<span class="sourceLineNo">286</span>     * @return the value of the given property or &lt;tt&gt;defaultValue&lt;/tt&gt; if there is no property for<a name="line.286"></a>
+<span class="sourceLineNo">287</span>     *         the given name or &lt;tt&gt;null&lt;/tt&gt; if it cannot be converted to the given type<a name="line.287"></a>
+<span class="sourceLineNo">288</span>     */<a name="line.288"></a>
+<span class="sourceLineNo">289</span>    &lt;T&gt; T getProperty(String name, Object defaultValue, Class&lt;T&gt; type);<a name="line.289"></a>
+<span class="sourceLineNo">290</span><a name="line.290"></a>
+<span class="sourceLineNo">291</span>    /**<a name="line.291"></a>
+<span class="sourceLineNo">292</span>     * Sets a property on the exchange<a name="line.292"></a>
+<span class="sourceLineNo">293</span>     *<a name="line.293"></a>
+<span class="sourceLineNo">294</span>     * @param name  of the property<a name="line.294"></a>
+<span class="sourceLineNo">295</span>     * @param value to associate with the name<a name="line.295"></a>
+<span class="sourceLineNo">296</span>     */<a name="line.296"></a>
+<span class="sourceLineNo">297</span>    void setProperty(String name, Object value);<a name="line.297"></a>
+<span class="sourceLineNo">298</span><a name="line.298"></a>
+<span class="sourceLineNo">299</span>    /**<a name="line.299"></a>
+<span class="sourceLineNo">300</span>     * Removes the given property on the exchange<a name="line.300"></a>
+<span class="sourceLineNo">301</span>     *<a name="line.301"></a>
+<span class="sourceLineNo">302</span>     * @param name of the property<a name="line.302"></a>
+<span class="sourceLineNo">303</span>     * @return the old value of the property<a name="line.303"></a>
+<span class="sourceLineNo">304</span>     */<a name="line.304"></a>
+<span class="sourceLineNo">305</span>    Object removeProperty(String name);<a name="line.305"></a>
+<span class="sourceLineNo">306</span><a name="line.306"></a>
+<span class="sourceLineNo">307</span>    /**<a name="line.307"></a>
+<span class="sourceLineNo">308</span>     * Remove all of the properties associated with the exchange matching a specific pattern<a name="line.308"></a>
+<span class="sourceLineNo">309</span>     *<a name="line.309"></a>
+<span class="sourceLineNo">310</span>     * @param pattern pattern of names<a name="line.310"></a>
+<span class="sourceLineNo">311</span>     * @return boolean whether any properties matched<a name="line.311"></a>
+<span class="sourceLineNo">312</span>     */<a name="line.312"></a>
+<span class="sourceLineNo">313</span>    boolean removeProperties(String pattern);<a name="line.313"></a>
+<span class="sourceLineNo">314</span>    <a name="line.314"></a>
+<span class="sourceLineNo">315</span>    /**<a name="line.315"></a>
+<span class="sourceLineNo">316</span>     * Removes the properties from this exchange that match the given &lt;tt&gt;pattern&lt;/tt&gt;, <a name="line.316"></a>
+<span class="sourceLineNo">317</span>     * except for the ones matching one ore more &lt;tt&gt;excludePatterns&lt;/tt&gt;<a name="line.317"></a>
+<span class="sourceLineNo">318</span>     * <a name="line.318"></a>
+<span class="sourceLineNo">319</span>     * @param pattern pattern of names that should be removed<a name="line.319"></a>
+<span class="sourceLineNo">320</span>     * @param excludePatterns one or more pattern of properties names that should be excluded (= preserved)<a name="line.320"></a>
+<span class="sourceLineNo">321</span>     * @return boolean whether any properties matched<a name="line.321"></a>
+<span class="sourceLineNo">322</span>     */ <a name="line.322"></a>
+<span class="sourceLineNo">323</span>    boolean removeProperties(String pattern, String... excludePatterns);<a name="line.323"></a>
+<span class="sourceLineNo">324</span>    <a name="line.324"></a>
+<span class="sourceLineNo">325</span>    /**<a name="line.325"></a>
+<span class="sourceLineNo">326</span>     * Returns all of the properties associated with the exchange<a name="line.326"></a>
+<span class="sourceLineNo">327</span>     *<a name="line.327"></a>
+<span class="sourceLineNo">328</span>     * @return all the headers in a Map<a name="line.328"></a>
+<span class="sourceLineNo">329</span>     */<a name="line.329"></a>
+<span class="sourceLineNo">330</span>    Map&lt;String, Object&gt; getProperties();<a name="line.330"></a>
+<span class="sourceLineNo">331</span><a name="line.331"></a>
+<span class="sourceLineNo">332</span>    /**<a name="line.332"></a>
+<span class="sourceLineNo">333</span>     * Returns whether any properties has been set<a name="line.333"></a>
+<span class="sourceLineNo">334</span>     *<a name="line.334"></a>
+<span class="sourceLineNo">335</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if any properties has been set<a name="line.335"></a>
+<span class="sourceLineNo">336</span>     */<a name="line.336"></a>
+<span class="sourceLineNo">337</span>    boolean hasProperties();<a name="line.337"></a>
+<span class="sourceLineNo">338</span><a name="line.338"></a>
+<span class="sourceLineNo">339</span>    /**<a name="line.339"></a>
+<span class="sourceLineNo">340</span>     * Returns the inbound request message<a name="line.340"></a>
+<span class="sourceLineNo">341</span>     *<a name="line.341"></a>
+<span class="sourceLineNo">342</span>     * @return the message<a name="line.342"></a>
+<span class="sourceLineNo">343</span>     */<a name="line.343"></a>
+<span class="sourceLineNo">344</span>    Message getIn();<a name="line.344"></a>
+<span class="sourceLineNo">345</span><a name="line.345"></a>
+<span class="sourceLineNo">346</span>    /**<a name="line.346"></a>
+<span class="sourceLineNo">347</span>     * Returns the inbound request message as the given type<a name="line.347"></a>
+<span class="sourceLineNo">348</span>     *<a name="line.348"></a>
+<span class="sourceLineNo">349</span>     * @param type the given type<a name="line.349"></a>
+<span class="sourceLineNo">350</span>     * @return the message as the given type or &lt;tt&gt;null&lt;/tt&gt; if not possible to covert to given type<a name="line.350"></a>
+<span class="sourceLineNo">351</span>     */<a name="line.351"></a>
+<span class="sourceLineNo">352</span>    &lt;T&gt; T getIn(Class&lt;T&gt; type);<a name="line.352"></a>
+<span class="sourceLineNo">353</span><a name="line.353"></a>
+<span class="sourceLineNo">354</span>    /**<a name="line.354"></a>
+<span class="sourceLineNo">355</span>     * Sets the inbound message instance<a name="line.355"></a>
+<span class="sourceLineNo">356</span>     *<a name="line.356"></a>
+<span class="sourceLineNo">357</span>     * @param in the inbound message<a name="line.357"></a>
+<span class="sourceLineNo">358</span>     */<a name="line.358"></a>
+<span class="sourceLineNo">359</span>    void setIn(Message in);<a name="line.359"></a>
+<span class="sourceLineNo">360</span><a name="line.360"></a>
+<span class="sourceLineNo">361</span>    /**<a name="line.361"></a>
+<span class="sourceLineNo">362</span>     * Returns the outbound message, lazily creating one if one has not already<a name="line.362"></a>
+<span class="sourceLineNo">363</span>     * been associated with this exchange.<a name="line.363"></a>
+<span class="sourceLineNo">364</span>     * &lt;p/&gt;<a name="line.364"></a>
+<span class="sourceLineNo">365</span>     * &lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; If you want to change the current message, then use {@link #getIn()} instead as it will<a name="line.365"></a>
+<span class="sourceLineNo">366</span>     * ensure headers etc. is kept and propagated when routing continues. Bottom line end users should rarely use<a name="line.366"></a>
+<span class="sourceLineNo">367</span>     * this method.<a name="line.367"></a>
+<span class="sourceLineNo">368</span>     * &lt;p/&gt;<a name="line.368"></a>
+<span class="sourceLineNo">369</span>     * &lt;br/&gt;If you want to test whether an OUT message have been set or not, use the {@link #hasOut()} method.<a name="line.369"></a>
+<span class="sourceLineNo">370</span>     * &lt;p/&gt;<a name="line.370"></a>
+<span class="sourceLineNo">371</span>     * See also the class java doc for this {@link Exchange} for more details and this<a name="line.371"></a>
+<span class="sourceLineNo">372</span>     * &lt;a href="http://camel.apache.org/using-getin-or-getout-methods-on-exchange.html"&gt;FAQ entry&lt;/a&gt;.<a name="line.372"></a>
+<span class="sourceLineNo">373</span>     *<a name="line.373"></a>
+<span class="sourceLineNo">374</span>     * @return the response<a name="line.374"></a>
+<span class="sourceLineNo">375</span>     * @see #getIn()<a name="line.375"></a>
+<span class="sourceLineNo">376</span>     */<a name="line.376"></a>
+<span class="sourceLineNo">377</span>    Message getOut();<a name="line.377"></a>
+<span class="sourceLineNo">378</span><a name="line.378"></a>
+<span class="sourceLineNo">379</span>    /**<a name="line.379"></a>
+<span class="sourceLineNo">380</span>     * Returns the outbound request message as the given type<a name="line.380"></a>
+<span class="sourceLineNo">381</span>     * &lt;p/&gt;<a name="line.381"></a>
+<span class="sourceLineNo">382</span>     * &lt;br/&gt;&lt;b&gt;Important:&lt;/b&gt; If you want to change the current message, then use {@link #getIn()} instead as it will<a name="line.382"></a>
+<span class="sourceLineNo">383</span>     * ensure headers etc. is kept and propagated when routing continues. Bottom line end users should rarely use<a name="line.383"></a>
+<span class="sourceLineNo">384</span>     * this method.<a name="line.384"></a>
+<span class="sourceLineNo">385</span>     * &lt;p/&gt;<a name="line.385"></a>
+<span class="sourceLineNo">386</span>     * &lt;br/&gt;If you want to test whether an OUT message have been set or not, use the {@link #hasOut()} method.<a name="line.386"></a>
+<span class="sourceLineNo">387</span>     * &lt;p/&gt;<a name="line.387"></a>
+<span class="sourceLineNo">388</span>     * See also the class java doc for this {@link Exchange} for more details and this<a name="line.388"></a>
+<span class="sourceLineNo">389</span>     * &lt;a href="http://camel.apache.org/using-getin-or-getout-methods-on-exchange.html"&gt;FAQ entry&lt;/a&gt;.<a name="line.389"></a>
+<span class="sourceLineNo">390</span>     *<a name="line.390"></a>
+<span class="sourceLineNo">391</span>     * @param type the given type<a name="line.391"></a>
+<span class="sourceLineNo">392</span>     * @return the message as the given type or &lt;tt&gt;null&lt;/tt&gt; if not possible to covert to given type<a name="line.392"></a>
+<span class="sourceLineNo">393</span>     * @see #getIn(Class)<a name="line.393"></a>
+<span class="sourceLineNo">394</span>     */<a name="line.394"></a>
+<span class="sourceLineNo">395</span>    &lt;T&gt; T getOut(Class&lt;T&gt; type);<a name="line.395"></a>
+<span class="sourceLineNo">396</span><a name="line.396"></a>
+<span class="sourceLineNo">397</span>    /**<a name="line.397"></a>
+<span class="sourceLineNo">398</span>     * Returns whether an OUT message has been set or not.<a name="line.398"></a>
+<span class="sourceLineNo">399</span>     *<a name="line.399"></a>
+<span class="sourceLineNo">400</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if an OUT message exists, &lt;tt&gt;false&lt;/tt&gt; otherwise.<a name="line.400"></a>
+<span class="sourceLineNo">401</span>     */<a name="line.401"></a>
+<span class="sourceLineNo">402</span>    boolean hasOut();<a name="line.402"></a>
+<span class="sourceLineNo">403</span><a name="line.403"></a>
+<span class="sourceLineNo">404</span>    /**<a name="line.404"></a>
+<span class="sourceLineNo">405</span>     * Sets the outbound message<a name="line.405"></a>
+<span class="sourceLineNo">406</span>     *<a name="line.406"></a>
+<span class="sourceLineNo">407</span>     * @param out the outbound message<a name="line.407"></a>
+<span class="sourceLineNo">408</span>     */<a name="line.408"></a>
+<span class="sourceLineNo">409</span>    void setOut(Message out);<a name="line.409"></a>
+<span class="sourceLineNo">410</span><a name="line.410"></a>
+<span class="sourceLineNo">411</span>    /**<a name="line.411"></a>
+<span class="sourceLineNo">412</span>     * Returns the exception associated with this exchange<a name="line.412"></a>
+<span class="sourceLineNo">413</span>     *<a name="line.413"></a>
+<span class="sourceLineNo">414</span>     * @return the exception (or null if no faults)<a name="line.414"></a>
+<span class="sourceLineNo">415</span>     */<a name="line.415"></a>
+<span class="sourceLineNo">416</span>    Exception getException();<a name="line.416"></a>
+<span class="sourceLineNo">417</span><a name="line.417"></a>
+<span class="sourceLineNo">418</span>    /**<a name="line.418"></a>
+<span class="sourceLineNo">419</span>     * Returns the exception associated with this exchange.<a name="line.419"></a>
+<span class="sourceLineNo">420</span>     * &lt;p/&gt;<a name="line.420"></a>
+<span class="sourceLineNo">421</span>     * Is used to get the caused exception that typically have been wrapped in some sort<a name="line.421"></a>
+<span class="sourceLineNo">422</span>     * of Camel wrapper exception<a name="line.422"></a>
+<span class="sourceLineNo">423</span>     * &lt;p/&gt;<a name="line.423"></a>
+<span class="sourceLineNo">424</span>     * The strategy is to look in the exception hierarchy to find the first given cause that matches the type.<a name="line.424"></a>
+<span class="sourceLineNo">425</span>     * Will start from the bottom (the real cause) and walk upwards.<a name="line.425"></a>
+<span class="sourceLineNo">426</span>     *<a name="line.426"></a>
+<span class="sourceLineNo">427</span>     * @param type the exception type<a name="line.427"></a>
+<span class="sourceLineNo">428</span>     * @return the exception (or &lt;tt&gt;null&lt;/tt&gt; if no caused exception matched)<a name="line.428"></a>
+<span class="sourceLineNo">429</span>     */<a name="line.429"></a>
+<span class="sourceLineNo">430</span>    &lt;T&gt; T getException(Class&lt;T&gt; type);<a name="line.430"></a>
+<span class="sourceLineNo">431</span><a name="line.431"></a>
+<span class="sourceLineNo">432</span>    /**<a name="line.432"></a>
+<span class="sourceLineNo">433</span>     * Sets the exception associated with this exchange<a name="line.433"></a>
+<span class="sourceLineNo">434</span>     * &lt;p/&gt;<a name="line.434"></a>
+<span class="sourceLineNo">435</span>     * Camel will wrap {@link Throwable} into {@link Exception} type to<a name="line.435"></a>
+<span class="sourceLineNo">436</span>     * accommodate for the {@link #getException()} method returning a plain {@link Exception} type.<a name="line.436"></a>
+<span class="sourceLineNo">437</span>     *<a name="line.437"></a>
+<span class="sourceLineNo">438</span>     * @param t  the caused exception<a name="line.438"></a>
+<span class="sourceLineNo">439</span>     */<a name="line.439"></a>
+<span class="sourceLineNo">440</span>    void setException(Throwable t);<a name="line.440"></a>
+<span class="sourceLineNo">441</span><a name="line.441"></a>
+<span class="sourceLineNo">442</span>    /**<a name="line.442"></a>
+<span class="sourceLineNo">443</span>     * Returns true if this exchange failed due to either an exception or fault<a name="line.443"></a>
+<span class="sourceLineNo">444</span>     *<a name="line.444"></a>
+<span class="sourceLineNo">445</span>     * @return true if this exchange failed due to either an exception or fault<a name="line.445"></a>
+<span class="sourceLineNo">446</span>     * @see Exchange#getException()<a name="line.446"></a>
+<span class="sourceLineNo">447</span>     * @see Message#setFault(boolean)<a name="line.447"></a>
+<span class="sourceLineNo">448</span>     * @see Message#isFault()<a name="line.448"></a>
+<span class="sourceLineNo">449</span>     */<a name="line.449"></a>
+<span class="sourceLineNo">450</span>    boolean isFailed();<a name="line.450"></a>
+<span class="sourceLineNo">451</span><a name="line.451"></a>
+<span class="sourceLineNo">452</span>    /**<a name="line.452"></a>
+<span class="sourceLineNo">453</span>     * Returns true if this exchange is transacted<a name="line.453"></a>
+<span class="sourceLineNo">454</span>     */<a name="line.454"></a>
+<span class="sourceLineNo">455</span>    boolean isTransacted();<a name="line.455"></a>
+<span class="sourceLineNo">456</span><a name="line.456"></a>
+<span class="sourceLineNo">457</span>    /**<a name="line.457"></a>
+<span class="sourceLineNo">458</span>     * Returns true if this exchange is an external initiated redelivered message (such as a JMS broker).<a name="line.458"></a>
+<span class="sourceLineNo">459</span>     * &lt;p/&gt;<a name="line.459"></a>
+<span class="sourceLineNo">460</span>     * &lt;b&gt;Important: &lt;/b&gt; It is not always possible to determine if the message is a redelivery<a name="line.460"></a>
+<span class="sourceLineNo">461</span>     * or not, and therefore &lt;tt&gt;null&lt;/tt&gt; is returned. Such an example would be a JDBC message.<a name="line.461"></a>
+<span class="sourceLineNo">462</span>     * However JMS brokers provides details if a message is redelivered.<a name="line.462"></a>
+<span class="sourceLineNo">463</span>     *<a name="line.463"></a>
+<span class="sourceLineNo">464</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if redelivered, &lt;tt&gt;false&lt;/tt&gt; if not, &lt;tt&gt;null&lt;/tt&gt; if not able to determine<a name="line.464"></a>
+<span class="sourceLineNo">465</span>     */<a name="line.465"></a>
+<span class="sourceLineNo">466</span>    Boolean isExternalRedelivered();<a name="line.466"></a>
+<span class="sourceLineNo">467</span><a name="line.467"></a>
+<span class="sourceLineNo">468</span>    /**<a name="line.468"></a>
+<span class="sourceLineNo">469</span>     * Returns true if this exchange is marked for rollback<a name="line.469"></a>
+<span class="sourceLineNo">470</span>     */<a name="line.470"></a>
+<span class="sourceLineNo">471</span>    boolean isRollbackOnly();<a name="line.471"></a>
+<span class="sourceLineNo">472</span><a name="line.472"></a>
+<span class="sourceLineNo">473</span>    /**<a name="line.473"></a>
+<span class="sourceLineNo">474</span>     * Returns the container so that a processor can resolve endpoints from URIs<a name="line.474"></a>
+<span class="sourceLineNo">475</span>     *<a name="line.475"></a>
+<span class="sourceLineNo">476</span>     * @return the container which owns this exchange<a name="line.476"></a>
+<span class="sourceLineNo">477</span>     */<a name="line.477"></a>
+<span class="sourceLineNo">478</span>    CamelContext getContext();<a name="line.478"></a>
+<span class="sourceLineNo">479</span><a name="line.479"></a>
+<span class="sourceLineNo">480</span>    /**<a name="line.480"></a>
+<span class="sourceLineNo">481</span>     * Creates a copy of the current message exchange so that it can be<a name="line.481"></a>
+<span class="sourceLineNo">482</span>     * forwarded to another destination<a name="line.482"></a>
+<span class="sourceLineNo">483</span>     * &lt;p/&gt;<a name="line.483"></a>
+<span class="sourceLineNo">484</span>     * Notice this operation invokes &lt;tt&gt;copy(false)&lt;/tt&gt;<a name="line.484"></a>
+<span class="sourceLineNo">485</span>     */<a name="line.485"></a>
+<span class="sourceLineNo">486</span>    Exchange copy();<a name="line.486"></a>
+<span class="sourceLineNo">487</span><a name="line.487"></a>
+<span class="sourceLineNo">488</span>    /**<a name="line.488"></a>
+<span class="sourceLineNo">489</span>     * Creates a copy of the current message exchange so that it can be<a name="line.489"></a>
+<span class="sourceLineNo">490</span>     * forwarded to another destination<a name="line.490"></a>
+<span class="sourceLineNo">491</span>     *<a name="line.491"></a>
+<span class="sourceLineNo">492</span>     * @param safeCopy whether to copy exchange properties and message headers safely to a new map instance,<a name="line.492"></a>
+<span class="sourceLineNo">493</span>     *                 or allow sharing the same map instances in the returned copy.<a name="line.493"></a>
+<span class="sourceLineNo">494</span>     */<a name="line.494"></a>
+<span class="sourceLineNo">495</span>    Exchange copy(boolean safeCopy);<a name="line.495"></a>
+<span class="sourceLineNo">496</span><a name="line.496"></a>
+<span class="sourceLineNo">497</span>    /**<a name="line.497"></a>
+<span class="sourceLineNo">498</span>     * Returns the endpoint which originated this message exchange if a consumer on an endpoint<a name="line.498"></a>
+<span class="sourceLineNo">499</span>     * created the message exchange, otherwise this property will be &lt;tt&gt;null&lt;/tt&gt;<a name="line.499"></a>
+<span class="sourceLineNo">500</span>     */<a name="line.500"></a>
+<span class="sourceLineNo">501</span>    Endpoint getFromEndpoint();<a name="line.501"></a>
+<span class="sourceLineNo">502</span><a name="line.502"></a>
+<span class="sourceLineNo">503</span>    /**<a name="line.503"></a>
+<span class="sourceLineNo">504</span>     * Sets the endpoint which originated this message exchange. This method<a name="line.504"></a>
+<span class="sourceLineNo">505</span>     * should typically only be called by {@link org.apache.camel.Endpoint} implementations<a name="line.505"></a>
+<span class="sourceLineNo">506</span>     *<a name="line.506"></a>
+<span class="sourceLineNo">507</span>     * @param fromEndpoint the endpoint which is originating this message exchange<a name="line.507"></a>
+<span class="sourceLineNo">508</span>     */<a name="line.508"></a>
+<span class="sourceLineNo">509</span>    void setFromEndpoint(Endpoint fromEndpoint);<a name="line.509"></a>
+<span class="sourceLineNo">510</span>    <a name="line.510"></a>
+<span class="sourceLineNo">511</span>    /**<a name="line.511"></a>
+<span class="sourceLineNo">512</span>     * Returns the route id which originated this message exchange if a route consumer on an endpoint<a name="line.512"></a>
+<span class="sourceLineNo">513</span>     * created the message exchange, otherwise this property will be &lt;tt&gt;null&lt;/tt&gt;<a name="line.513"></a>
+<span class="sourceLineNo">514</span>     */<a name="line.514"></a>
+<span class="sourceLineNo">515</span>    String getFromRouteId();<a name="line.515"></a>
+<span class="sourceLineNo">516</span><a name="line.516"></a>
+<span class="sourceLineNo">517</span>    /**<a name="line.517"></a>
+<span class="sourceLineNo">518</span>     * Sets the route id which originated this message exchange. This method<a name="line.518"></a>
+<span class="sourceLineNo">519</span>     * should typically only be called by the internal framework.<a name="line.519"></a>
+<span class="sourceLineNo">520</span>     *<a name="line.520"></a>
+<span class="sourceLineNo">521</span>     * @param fromRouteId the from route id<a name="line.521"></a>
+<span class="sourceLineNo">522</span>     */<a name="line.522"></a>
+<span class="sourceLineNo">523</span>    void setFromRouteId(String fromRouteId);<a name="line.523"></a>
+<span class="sourceLineNo">524</span><a name="line.524"></a>
+<span class="sourceLineNo">525</span>    /**<a name="line.525"></a>
+<span class="sourceLineNo">526</span>     * Returns the unit of work that this exchange belongs to; which may map to<a name="line.526"></a>
+<span class="sourceLineNo">527</span>     * zero, one or more physical transactions<a name="line.527"></a>
+<span class="sourceLineNo">528</span>     */<a name="line.528"></a>
+<span class="sourceLineNo">529</span>    UnitOfWork getUnitOfWork();<a name="line.529"></a>
+<span class="sourceLineNo">530</span><a name="line.530"></a>
+<span class="sourceLineNo">531</span>    /**<a name="line.531"></a>
+<span class="sourceLineNo">532</span>     * Sets the unit of work that this exchange belongs to; which may map to<a name="line.532"></a>
+<span class="sourceLineNo">533</span>     * zero, one or more physical transactions<a name="line.533"></a>
+<span class="sourceLineNo">534</span>     */<a name="line.534"></a>
+<span class="sourceLineNo">535</span>    void setUnitOfWork(UnitOfWork unitOfWork);<a name="line.535"></a>
+<span class="sourceLineNo">536</span><a name="line.536"></a>
+<span class="sourceLineNo">537</span>    /**<a name="line.537"></a>
+<span class="sourceLineNo">538</span>     * Returns the exchange id (unique)<a name="line.538"></a>
+<span class="sourceLineNo">539</span>     */<a name="line.539"></a>
+<span class="sourceLineNo">540</span>    String getExchangeId();<a name="line.540"></a>
+<span class="sourceLineNo">541</span><a name="line.541"></a>
+<span class="sourceLineNo">542</span>    /**<a name="line.542"></a>
+<span class="sourceLineNo">543</span>     * Set the exchange id<a name="line.543"></a>
+<span class="sourceLineNo">544</span>     */<a name="line.544"></a>
+<span class="sourceLineNo">545</span>    void setExchangeId(String id);<a name="line.545"></a>
+<span class="sourceLineNo">546</span><a name="line.546"></a>
+<span class="sourceLineNo">547</span>    /**<a name="line.547"></a>
+<span class="sourceLineNo">548</span>     * Adds a {@link org.apache.camel.spi.Synchronization} to be invoked as callback when<a name="line.548"></a>
+<span class="sourceLineNo">549</span>     * this exchange is completed.<a name="line.549"></a>
+<span class="sourceLineNo">550</span>     *<a name="line.550"></a>
+<span class="sourceLineNo">551</span>     * @param onCompletion  the callback to invoke on completion of this exchange<a name="line.551"></a>
+<span class="sourceLineNo">552</span>     */<a name="line.552"></a>
+<span class="sourceLineNo">553</span>    void addOnCompletion(Synchronization onCompletion);<a name="line.553"></a>
+<span class="sourceLineNo">554</span><a name="line.554"></a>
+<span class="sourceLineNo">555</span>    /**<a name="line.555"></a>
+<span class="sourceLineNo">556</span>     * Checks if the passed {@link org.apache.camel.spi.Synchronization} instance is<a name="line.556"></a>
+<span class="sourceLineNo">557</span>     * already contained on this exchange.<a name="line.557"></a>
+<span class="sourceLineNo">558</span>     *<a name="line.558"></a>
+<span class="sourceLineNo">559</span>     * @param onCompletion  the callback instance that is being checked for<a name="line.559"></a>
+<span class="sourceLineNo">560</span>     * @return &lt;tt&gt;true&lt;/tt&gt;, if callback instance is already contained on this exchange, else &lt;tt&gt;false&lt;/tt&gt;<a name="line.560"></a>
+<span class="sourceLineNo">561</span>     */<a name="line.561"></a>
+<span class="sourceLineNo">562</span>    boolean containsOnCompletion(Synchronization onCompletion);<a name="line.562"></a>
+<span class="sourceLineNo">563</span><a name="line.563"></a>
+<span class="sourceLineNo">564</span>    /**<a name="line.564"></a>
+<span class="sourceLineNo">565</span>     * Handover all the on completions from this exchange to the target exchange.<a name="line.565"></a>
+<span class="sourceLineNo">566</span>     *<a name="line.566"></a>
+<span class="sourceLineNo">567</span>     * @param target the target exchange<a name="line.567"></a>
+<span class="sourceLineNo">568</span>     */<a name="line.568"></a>
+<span class="sourceLineNo">569</span>    void handoverCompletions(Exchange target);<a name="line.569"></a>
+<span class="sourceLineNo">570</span><a name="line.570"></a>
+<span class="sourceLineNo">571</span>    /**<a name="line.571"></a>
+<span class="sourceLineNo">572</span>     * Handover all the on completions from this exchange<a name="line.572"></a>
+<span class="sourceLineNo">573</span>     *<a name="line.573"></a>
+<span class="sourceLineNo">574</span>     * @return the on completions<a name="line.574"></a>
+<span class="sourceLineNo">575</span>     */<a name="line.575"></a>
+<span class="sourceLineNo">576</span>    List&lt;Synchronization&gt; handoverCompletions();<a name="line.576"></a>
+<span class="sourceLineNo">577</span><a name="line.577"></a>
+<span class="sourceLineNo">578</span>}<a name="line.578"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

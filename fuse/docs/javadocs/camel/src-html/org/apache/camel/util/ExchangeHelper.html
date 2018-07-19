@@ -1,0 +1,995 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * contributor license agreements.  See the NOTICE file distributed with<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * this work for additional information regarding copyright ownership.<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * The ASF licenses this file to You under the Apache License, Version 2.0<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * (the "License"); you may not use this file except in compliance with<a name="line.6"></a>
+<span class="sourceLineNo">007</span> * the License.  You may obtain a copy of the License at<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *<a name="line.8"></a>
+<span class="sourceLineNo">009</span> *      http://www.apache.org/licenses/LICENSE-2.0<a name="line.9"></a>
+<span class="sourceLineNo">010</span> *<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * Unless required by applicable law or agreed to in writing, software<a name="line.11"></a>
+<span class="sourceLineNo">012</span> * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.12"></a>
+<span class="sourceLineNo">013</span> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * See the License for the specific language governing permissions and<a name="line.14"></a>
+<span class="sourceLineNo">015</span> * limitations under the License.<a name="line.15"></a>
+<span class="sourceLineNo">016</span> */<a name="line.16"></a>
+<span class="sourceLineNo">017</span>package org.apache.camel.util;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import java.util.ArrayList;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import java.util.HashMap;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import java.util.List;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import java.util.Map;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import java.util.concurrent.ConcurrentHashMap;<a name="line.23"></a>
+<span class="sourceLineNo">024</span>import java.util.concurrent.ExecutionException;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import java.util.concurrent.Future;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import java.util.concurrent.TimeUnit;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import java.util.concurrent.TimeoutException;<a name="line.27"></a>
+<span class="sourceLineNo">028</span><a name="line.28"></a>
+<span class="sourceLineNo">029</span>import org.apache.camel.CamelContext;<a name="line.29"></a>
+<span class="sourceLineNo">030</span>import org.apache.camel.CamelExchangeException;<a name="line.30"></a>
+<span class="sourceLineNo">031</span>import org.apache.camel.CamelExecutionException;<a name="line.31"></a>
+<span class="sourceLineNo">032</span>import org.apache.camel.Endpoint;<a name="line.32"></a>
+<span class="sourceLineNo">033</span>import org.apache.camel.Exchange;<a name="line.33"></a>
+<span class="sourceLineNo">034</span>import org.apache.camel.ExchangePattern;<a name="line.34"></a>
+<span class="sourceLineNo">035</span>import org.apache.camel.InvalidPayloadException;<a name="line.35"></a>
+<span class="sourceLineNo">036</span>import org.apache.camel.Message;<a name="line.36"></a>
+<span class="sourceLineNo">037</span>import org.apache.camel.MessageHistory;<a name="line.37"></a>
+<span class="sourceLineNo">038</span>import org.apache.camel.NoSuchBeanException;<a name="line.38"></a>
+<span class="sourceLineNo">039</span>import org.apache.camel.NoSuchEndpointException;<a name="line.39"></a>
+<span class="sourceLineNo">040</span>import org.apache.camel.NoSuchHeaderException;<a name="line.40"></a>
+<span class="sourceLineNo">041</span>import org.apache.camel.NoSuchPropertyException;<a name="line.41"></a>
+<span class="sourceLineNo">042</span>import org.apache.camel.NoTypeConversionAvailableException;<a name="line.42"></a>
+<span class="sourceLineNo">043</span>import org.apache.camel.TypeConversionException;<a name="line.43"></a>
+<span class="sourceLineNo">044</span>import org.apache.camel.TypeConverter;<a name="line.44"></a>
+<span class="sourceLineNo">045</span>import org.apache.camel.impl.DefaultExchange;<a name="line.45"></a>
+<span class="sourceLineNo">046</span>import org.apache.camel.impl.MessageSupport;<a name="line.46"></a>
+<span class="sourceLineNo">047</span>import org.apache.camel.spi.UnitOfWork;<a name="line.47"></a>
+<span class="sourceLineNo">048</span><a name="line.48"></a>
+<span class="sourceLineNo">049</span>/**<a name="line.49"></a>
+<span class="sourceLineNo">050</span> * Some helper methods for working with {@link Exchange} objects<a name="line.50"></a>
+<span class="sourceLineNo">051</span> *<a name="line.51"></a>
+<span class="sourceLineNo">052</span> * @version <a name="line.52"></a>
+<span class="sourceLineNo">053</span> */<a name="line.53"></a>
+<span class="sourceLineNo">054</span>public final class ExchangeHelper {<a name="line.54"></a>
+<span class="sourceLineNo">055</span><a name="line.55"></a>
+<span class="sourceLineNo">056</span>    /**<a name="line.56"></a>
+<span class="sourceLineNo">057</span>     * Utility classes should not have a public constructor.<a name="line.57"></a>
+<span class="sourceLineNo">058</span>     */<a name="line.58"></a>
+<span class="sourceLineNo">059</span>    private ExchangeHelper() {<a name="line.59"></a>
+<span class="sourceLineNo">060</span>    }<a name="line.60"></a>
+<span class="sourceLineNo">061</span><a name="line.61"></a>
+<span class="sourceLineNo">062</span>    /**<a name="line.62"></a>
+<span class="sourceLineNo">063</span>     * Extracts the Exchange.BINDING of the given type or null if not present<a name="line.63"></a>
+<span class="sourceLineNo">064</span>     *<a name="line.64"></a>
+<span class="sourceLineNo">065</span>     * @param exchange the message exchange<a name="line.65"></a>
+<span class="sourceLineNo">066</span>     * @param type     the expected binding type<a name="line.66"></a>
+<span class="sourceLineNo">067</span>     * @return the binding object of the given type or null if it could not be found or converted<a name="line.67"></a>
+<span class="sourceLineNo">068</span>     */<a name="line.68"></a>
+<span class="sourceLineNo">069</span>    public static &lt;T&gt; T getBinding(Exchange exchange, Class&lt;T&gt; type) {<a name="line.69"></a>
+<span class="sourceLineNo">070</span>        return exchange != null ? exchange.getProperty(Exchange.BINDING, type) : null;<a name="line.70"></a>
+<span class="sourceLineNo">071</span>    }<a name="line.71"></a>
+<span class="sourceLineNo">072</span><a name="line.72"></a>
+<span class="sourceLineNo">073</span>    /**<a name="line.73"></a>
+<span class="sourceLineNo">074</span>     * Attempts to resolve the endpoint for the given value<a name="line.74"></a>
+<span class="sourceLineNo">075</span>     *<a name="line.75"></a>
+<span class="sourceLineNo">076</span>     * @param exchange the message exchange being processed<a name="line.76"></a>
+<span class="sourceLineNo">077</span>     * @param value    the value which can be an {@link Endpoint} or an object<a name="line.77"></a>
+<span class="sourceLineNo">078</span>     *                 which provides a String representation of an endpoint via<a name="line.78"></a>
+<span class="sourceLineNo">079</span>     *                 {@link #toString()}<a name="line.79"></a>
+<span class="sourceLineNo">080</span>     * @return the endpoint<a name="line.80"></a>
+<span class="sourceLineNo">081</span>     * @throws NoSuchEndpointException if the endpoint cannot be resolved<a name="line.81"></a>
+<span class="sourceLineNo">082</span>     */<a name="line.82"></a>
+<span class="sourceLineNo">083</span>    public static Endpoint resolveEndpoint(Exchange exchange, Object value) throws NoSuchEndpointException {<a name="line.83"></a>
+<span class="sourceLineNo">084</span>        Endpoint endpoint;<a name="line.84"></a>
+<span class="sourceLineNo">085</span>        if (value instanceof Endpoint) {<a name="line.85"></a>
+<span class="sourceLineNo">086</span>            endpoint = (Endpoint) value;<a name="line.86"></a>
+<span class="sourceLineNo">087</span>        } else {<a name="line.87"></a>
+<span class="sourceLineNo">088</span>            String uri = value.toString().trim();<a name="line.88"></a>
+<span class="sourceLineNo">089</span>            endpoint = CamelContextHelper.getMandatoryEndpoint(exchange.getContext(), uri);<a name="line.89"></a>
+<span class="sourceLineNo">090</span>        }<a name="line.90"></a>
+<span class="sourceLineNo">091</span>        return endpoint;<a name="line.91"></a>
+<span class="sourceLineNo">092</span>    }<a name="line.92"></a>
+<span class="sourceLineNo">093</span><a name="line.93"></a>
+<span class="sourceLineNo">094</span>    /**<a name="line.94"></a>
+<span class="sourceLineNo">095</span>     * Gets the mandatory property of the exchange of the correct type<a name="line.95"></a>
+<span class="sourceLineNo">096</span>     *<a name="line.96"></a>
+<span class="sourceLineNo">097</span>     * @param exchange      the exchange<a name="line.97"></a>
+<span class="sourceLineNo">098</span>     * @param propertyName  the property name<a name="line.98"></a>
+<span class="sourceLineNo">099</span>     * @param type          the type<a name="line.99"></a>
+<span class="sourceLineNo">100</span>     * @return the property value<a name="line.100"></a>
+<span class="sourceLineNo">101</span>     * @throws TypeConversionException is thrown if error during type conversion<a name="line.101"></a>
+<span class="sourceLineNo">102</span>     * @throws NoSuchPropertyException is thrown if no property exists<a name="line.102"></a>
+<span class="sourceLineNo">103</span>     */<a name="line.103"></a>
+<span class="sourceLineNo">104</span>    public static &lt;T&gt; T getMandatoryProperty(Exchange exchange, String propertyName, Class&lt;T&gt; type) throws NoSuchPropertyException {<a name="line.104"></a>
+<span class="sourceLineNo">105</span>        T result = exchange.getProperty(propertyName, type);<a name="line.105"></a>
+<span class="sourceLineNo">106</span>        if (result != null) {<a name="line.106"></a>
+<span class="sourceLineNo">107</span>            return result;<a name="line.107"></a>
+<span class="sourceLineNo">108</span>        }<a name="line.108"></a>
+<span class="sourceLineNo">109</span>        throw new NoSuchPropertyException(exchange, propertyName, type);<a name="line.109"></a>
+<span class="sourceLineNo">110</span>    }<a name="line.110"></a>
+<span class="sourceLineNo">111</span><a name="line.111"></a>
+<span class="sourceLineNo">112</span>    /**<a name="line.112"></a>
+<span class="sourceLineNo">113</span>     * Gets the mandatory inbound header of the correct type<a name="line.113"></a>
+<span class="sourceLineNo">114</span>     *<a name="line.114"></a>
+<span class="sourceLineNo">115</span>     * @param exchange      the exchange<a name="line.115"></a>
+<span class="sourceLineNo">116</span>     * @param headerName    the header name<a name="line.116"></a>
+<span class="sourceLineNo">117</span>     * @param type          the type<a name="line.117"></a>
+<span class="sourceLineNo">118</span>     * @return the header value<a name="line.118"></a>
+<span class="sourceLineNo">119</span>     * @throws TypeConversionException is thrown if error during type conversion<a name="line.119"></a>
+<span class="sourceLineNo">120</span>     * @throws NoSuchHeaderException is thrown if no headers exists<a name="line.120"></a>
+<span class="sourceLineNo">121</span>     */<a name="line.121"></a>
+<span class="sourceLineNo">122</span>    public static &lt;T&gt; T getMandatoryHeader(Exchange exchange, String headerName, Class&lt;T&gt; type) throws TypeConversionException, NoSuchHeaderException {<a name="line.122"></a>
+<span class="sourceLineNo">123</span>        T answer = exchange.getIn().getHeader(headerName, type);<a name="line.123"></a>
+<span class="sourceLineNo">124</span>        if (answer == null) {<a name="line.124"></a>
+<span class="sourceLineNo">125</span>            throw new NoSuchHeaderException(exchange, headerName, type);<a name="line.125"></a>
+<span class="sourceLineNo">126</span>        }<a name="line.126"></a>
+<span class="sourceLineNo">127</span>        return answer;<a name="line.127"></a>
+<span class="sourceLineNo">128</span>    }<a name="line.128"></a>
+<span class="sourceLineNo">129</span><a name="line.129"></a>
+<span class="sourceLineNo">130</span>    /**<a name="line.130"></a>
+<span class="sourceLineNo">131</span>     * Returns the mandatory inbound message body of the correct type or throws<a name="line.131"></a>
+<span class="sourceLineNo">132</span>     * an exception if it is not present<a name="line.132"></a>
+<span class="sourceLineNo">133</span>     *<a name="line.133"></a>
+<span class="sourceLineNo">134</span>     * @param exchange the exchange<a name="line.134"></a>
+<span class="sourceLineNo">135</span>     * @return the body, is never &lt;tt&gt;null&lt;/tt&gt;<a name="line.135"></a>
+<span class="sourceLineNo">136</span>     * @throws InvalidPayloadException Is thrown if the body being &lt;tt&gt;null&lt;/tt&gt; or wrong class type<a name="line.136"></a>
+<span class="sourceLineNo">137</span>     * @deprecated use {@link org.apache.camel.Message#getMandatoryBody()}<a name="line.137"></a>
+<span class="sourceLineNo">138</span>     */<a name="line.138"></a>
+<span class="sourceLineNo">139</span>    @Deprecated<a name="line.139"></a>
+<span class="sourceLineNo">140</span>    public static Object getMandatoryInBody(Exchange exchange) throws InvalidPayloadException {<a name="line.140"></a>
+<span class="sourceLineNo">141</span>        return exchange.getIn().getMandatoryBody();<a name="line.141"></a>
+<span class="sourceLineNo">142</span>    }<a name="line.142"></a>
+<span class="sourceLineNo">143</span><a name="line.143"></a>
+<span class="sourceLineNo">144</span>    /**<a name="line.144"></a>
+<span class="sourceLineNo">145</span>     * Returns the mandatory inbound message body of the correct type or throws<a name="line.145"></a>
+<span class="sourceLineNo">146</span>     * an exception if it is not present<a name="line.146"></a>
+<span class="sourceLineNo">147</span>     * @deprecated use {@link org.apache.camel.Message#getMandatoryBody(Class)}<a name="line.147"></a>
+<span class="sourceLineNo">148</span>     */<a name="line.148"></a>
+<span class="sourceLineNo">149</span>    @Deprecated<a name="line.149"></a>
+<span class="sourceLineNo">150</span>    public static &lt;T&gt; T getMandatoryInBody(Exchange exchange, Class&lt;T&gt; type) throws InvalidPayloadException {<a name="line.150"></a>
+<span class="sourceLineNo">151</span>        return exchange.getIn().getMandatoryBody(type);<a name="line.151"></a>
+<span class="sourceLineNo">152</span>    }<a name="line.152"></a>
+<span class="sourceLineNo">153</span><a name="line.153"></a>
+<span class="sourceLineNo">154</span>    /**<a name="line.154"></a>
+<span class="sourceLineNo">155</span>     * Returns the mandatory outbound message body of the correct type or throws<a name="line.155"></a>
+<span class="sourceLineNo">156</span>     * an exception if it is not present<a name="line.156"></a>
+<span class="sourceLineNo">157</span>     * @deprecated use {@link org.apache.camel.Message#getMandatoryBody()}<a name="line.157"></a>
+<span class="sourceLineNo">158</span>     */<a name="line.158"></a>
+<span class="sourceLineNo">159</span>    @Deprecated<a name="line.159"></a>
+<span class="sourceLineNo">160</span>    public static Object getMandatoryOutBody(Exchange exchange) throws InvalidPayloadException {<a name="line.160"></a>
+<span class="sourceLineNo">161</span>        return exchange.getOut().getMandatoryBody();<a name="line.161"></a>
+<span class="sourceLineNo">162</span>    }<a name="line.162"></a>
+<span class="sourceLineNo">163</span><a name="line.163"></a>
+<span class="sourceLineNo">164</span>    /**<a name="line.164"></a>
+<span class="sourceLineNo">165</span>     * Returns the mandatory outbound message body of the correct type or throws<a name="line.165"></a>
+<span class="sourceLineNo">166</span>     * an exception if it is not present<a name="line.166"></a>
+<span class="sourceLineNo">167</span>     * @deprecated use {@link org.apache.camel.Message#getMandatoryBody(Class)}<a name="line.167"></a>
+<span class="sourceLineNo">168</span>     */<a name="line.168"></a>
+<span class="sourceLineNo">169</span>    @Deprecated<a name="line.169"></a>
+<span class="sourceLineNo">170</span>    public static &lt;T&gt; T getMandatoryOutBody(Exchange exchange, Class&lt;T&gt; type) throws InvalidPayloadException {<a name="line.170"></a>
+<span class="sourceLineNo">171</span>        return exchange.getOut().getMandatoryBody(type);<a name="line.171"></a>
+<span class="sourceLineNo">172</span>    }<a name="line.172"></a>
+<span class="sourceLineNo">173</span><a name="line.173"></a>
+<span class="sourceLineNo">174</span>    /**<a name="line.174"></a>
+<span class="sourceLineNo">175</span>     * Converts the value to the given expected type or throws an exception<a name="line.175"></a>
+<span class="sourceLineNo">176</span>     *<a name="line.176"></a>
+<span class="sourceLineNo">177</span>     * @return the converted value<a name="line.177"></a>
+<span class="sourceLineNo">178</span>     * @throws TypeConversionException is thrown if error during type conversion<a name="line.178"></a>
+<span class="sourceLineNo">179</span>     * @throws NoTypeConversionAvailableException} if no type converters exists to convert to the given type<a name="line.179"></a>
+<span class="sourceLineNo">180</span>     */<a name="line.180"></a>
+<span class="sourceLineNo">181</span>    public static &lt;T&gt; T convertToMandatoryType(Exchange exchange, Class&lt;T&gt; type, Object value)<a name="line.181"></a>
+<span class="sourceLineNo">182</span>        throws TypeConversionException, NoTypeConversionAvailableException {<a name="line.182"></a>
+<span class="sourceLineNo">183</span>        CamelContext camelContext = exchange.getContext();<a name="line.183"></a>
+<span class="sourceLineNo">184</span>        ObjectHelper.notNull(camelContext, "CamelContext of Exchange");<a name="line.184"></a>
+<span class="sourceLineNo">185</span>        TypeConverter converter = camelContext.getTypeConverter();<a name="line.185"></a>
+<span class="sourceLineNo">186</span>        if (converter != null) {<a name="line.186"></a>
+<span class="sourceLineNo">187</span>            return converter.mandatoryConvertTo(type, exchange, value);<a name="line.187"></a>
+<span class="sourceLineNo">188</span>        }<a name="line.188"></a>
+<span class="sourceLineNo">189</span>        throw new NoTypeConversionAvailableException(value, type);<a name="line.189"></a>
+<span class="sourceLineNo">190</span>    }<a name="line.190"></a>
+<span class="sourceLineNo">191</span><a name="line.191"></a>
+<span class="sourceLineNo">192</span>    /**<a name="line.192"></a>
+<span class="sourceLineNo">193</span>     * Converts the value to the given expected type<a name="line.193"></a>
+<span class="sourceLineNo">194</span>     *<a name="line.194"></a>
+<span class="sourceLineNo">195</span>     * @return the converted value<a name="line.195"></a>
+<span class="sourceLineNo">196</span>     * @throws org.apache.camel.TypeConversionException is thrown if error during type conversion<a name="line.196"></a>
+<span class="sourceLineNo">197</span>     */<a name="line.197"></a>
+<span class="sourceLineNo">198</span>    public static &lt;T&gt; T convertToType(Exchange exchange, Class&lt;T&gt; type, Object value) throws TypeConversionException {<a name="line.198"></a>
+<span class="sourceLineNo">199</span>        CamelContext camelContext = exchange.getContext();<a name="line.199"></a>
+<span class="sourceLineNo">200</span>        ObjectHelper.notNull(camelContext, "CamelContext of Exchange");<a name="line.200"></a>
+<span class="sourceLineNo">201</span>        TypeConverter converter = camelContext.getTypeConverter();<a name="line.201"></a>
+<span class="sourceLineNo">202</span>        if (converter != null) {<a name="line.202"></a>
+<span class="sourceLineNo">203</span>            return converter.convertTo(type, exchange, value);<a name="line.203"></a>
+<span class="sourceLineNo">204</span>        }<a name="line.204"></a>
+<span class="sourceLineNo">205</span>        return null;<a name="line.205"></a>
+<span class="sourceLineNo">206</span>    }<a name="line.206"></a>
+<span class="sourceLineNo">207</span><a name="line.207"></a>
+<span class="sourceLineNo">208</span>    /**<a name="line.208"></a>
+<span class="sourceLineNo">209</span>     * Creates a new instance and copies from the current message exchange so that it can be<a name="line.209"></a>
+<span class="sourceLineNo">210</span>     * forwarded to another destination as a new instance. Unlike regular copy this operation<a name="line.210"></a>
+<span class="sourceLineNo">211</span>     * will not share the same {@link org.apache.camel.spi.UnitOfWork} so its should be used<a name="line.211"></a>
+<span class="sourceLineNo">212</span>     * for async messaging, where the original and copied exchange are independent.<a name="line.212"></a>
+<span class="sourceLineNo">213</span>     *<a name="line.213"></a>
+<span class="sourceLineNo">214</span>     * @param exchange original copy of the exchange<a name="line.214"></a>
+<span class="sourceLineNo">215</span>     * @param handover whether the on completion callbacks should be handed over to the new copy.<a name="line.215"></a>
+<span class="sourceLineNo">216</span>     */<a name="line.216"></a>
+<span class="sourceLineNo">217</span>    public static Exchange createCorrelatedCopy(Exchange exchange, boolean handover) {<a name="line.217"></a>
+<span class="sourceLineNo">218</span>        return createCorrelatedCopy(exchange, handover, false);<a name="line.218"></a>
+<span class="sourceLineNo">219</span>    }<a name="line.219"></a>
+<span class="sourceLineNo">220</span><a name="line.220"></a>
+<span class="sourceLineNo">221</span>    /**<a name="line.221"></a>
+<span class="sourceLineNo">222</span>     * Creates a new instance and copies from the current message exchange so that it can be<a name="line.222"></a>
+<span class="sourceLineNo">223</span>     * forwarded to another destination as a new instance. Unlike regular copy this operation<a name="line.223"></a>
+<span class="sourceLineNo">224</span>     * will not share the same {@link org.apache.camel.spi.UnitOfWork} so its should be used<a name="line.224"></a>
+<span class="sourceLineNo">225</span>     * for async messaging, where the original and copied exchange are independent.<a name="line.225"></a>
+<span class="sourceLineNo">226</span>     *<a name="line.226"></a>
+<span class="sourceLineNo">227</span>     * @param exchange original copy of the exchange<a name="line.227"></a>
+<span class="sourceLineNo">228</span>     * @param handover whether the on completion callbacks should be handed over to the new copy.<a name="line.228"></a>
+<span class="sourceLineNo">229</span>     * @param useSameMessageId whether to use same message id on the copy message.<a name="line.229"></a>
+<span class="sourceLineNo">230</span>     */<a name="line.230"></a>
+<span class="sourceLineNo">231</span>    public static Exchange createCorrelatedCopy(Exchange exchange, boolean handover, boolean useSameMessageId) {<a name="line.231"></a>
+<span class="sourceLineNo">232</span>        String id = exchange.getExchangeId();<a name="line.232"></a>
+<span class="sourceLineNo">233</span><a name="line.233"></a>
+<span class="sourceLineNo">234</span>        // make sure to do a safe copy as the correlated copy can be routed independently of the source.<a name="line.234"></a>
+<span class="sourceLineNo">235</span>        Exchange copy = exchange.copy(true);<a name="line.235"></a>
+<span class="sourceLineNo">236</span>        // do not reuse message id on copy<a name="line.236"></a>
+<span class="sourceLineNo">237</span>        if (!useSameMessageId) {<a name="line.237"></a>
+<span class="sourceLineNo">238</span>            if (copy.hasOut()) {<a name="line.238"></a>
+<span class="sourceLineNo">239</span>                copy.getOut().setMessageId(null);<a name="line.239"></a>
+<span class="sourceLineNo">240</span>            }<a name="line.240"></a>
+<span class="sourceLineNo">241</span>            copy.getIn().setMessageId(null);<a name="line.241"></a>
+<span class="sourceLineNo">242</span>        }<a name="line.242"></a>
+<span class="sourceLineNo">243</span>        // do not share the unit of work<a name="line.243"></a>
+<span class="sourceLineNo">244</span>        copy.setUnitOfWork(null);<a name="line.244"></a>
+<span class="sourceLineNo">245</span>        // do not reuse the message id<a name="line.245"></a>
+<span class="sourceLineNo">246</span>        // hand over on completion to the copy if we got any<a name="line.246"></a>
+<span class="sourceLineNo">247</span>        UnitOfWork uow = exchange.getUnitOfWork();<a name="line.247"></a>
+<span class="sourceLineNo">248</span>        if (handover &amp;&amp; uow != null) {<a name="line.248"></a>
+<span class="sourceLineNo">249</span>            uow.handoverSynchronization(copy);<a name="line.249"></a>
+<span class="sourceLineNo">250</span>        }<a name="line.250"></a>
+<span class="sourceLineNo">251</span>        // set a correlation id so we can track back the original exchange<a name="line.251"></a>
+<span class="sourceLineNo">252</span>        copy.setProperty(Exchange.CORRELATION_ID, id);<a name="line.252"></a>
+<span class="sourceLineNo">253</span>        return copy;<a name="line.253"></a>
+<span class="sourceLineNo">254</span>    }<a name="line.254"></a>
+<span class="sourceLineNo">255</span><a name="line.255"></a>
+<span class="sourceLineNo">256</span>    /**<a name="line.256"></a>
+<span class="sourceLineNo">257</span>     * Creates a new instance and copies from the current message exchange so that it can be<a name="line.257"></a>
+<span class="sourceLineNo">258</span>     * forwarded to another destination as a new instance.<a name="line.258"></a>
+<span class="sourceLineNo">259</span>     *<a name="line.259"></a>
+<span class="sourceLineNo">260</span>     * @param exchange original copy of the exchange<a name="line.260"></a>
+<span class="sourceLineNo">261</span>     * @param preserveExchangeId whether or not the exchange id should be preserved<a name="line.261"></a>
+<span class="sourceLineNo">262</span>     * @return the copy<a name="line.262"></a>
+<span class="sourceLineNo">263</span>     */<a name="line.263"></a>
+<span class="sourceLineNo">264</span>    public static Exchange createCopy(Exchange exchange, boolean preserveExchangeId) {<a name="line.264"></a>
+<span class="sourceLineNo">265</span>        Exchange copy = exchange.copy();<a name="line.265"></a>
+<span class="sourceLineNo">266</span>        if (preserveExchangeId) {<a name="line.266"></a>
+<span class="sourceLineNo">267</span>            // must preserve exchange id<a name="line.267"></a>
+<span class="sourceLineNo">268</span>            copy.setExchangeId(exchange.getExchangeId());<a name="line.268"></a>
+<span class="sourceLineNo">269</span>        }<a name="line.269"></a>
+<span class="sourceLineNo">270</span>        return copy;<a name="line.270"></a>
+<span class="sourceLineNo">271</span>    }<a name="line.271"></a>
+<span class="sourceLineNo">272</span><a name="line.272"></a>
+<span class="sourceLineNo">273</span>    /**<a name="line.273"></a>
+<span class="sourceLineNo">274</span>     * Copies the results of a message exchange from the source exchange to the result exchange<a name="line.274"></a>
+<span class="sourceLineNo">275</span>     * which will copy the message contents, exchange properties and the exception.<a name="line.275"></a>
+<span class="sourceLineNo">276</span>     * Notice the {@link ExchangePattern} is &lt;b&gt;not&lt;/b&gt; copied/altered.<a name="line.276"></a>
+<span class="sourceLineNo">277</span>     *<a name="line.277"></a>
+<span class="sourceLineNo">278</span>     * @param result the result exchange which will have the output and error state added<a name="line.278"></a>
+<span class="sourceLineNo">279</span>     * @param source the source exchange which is not modified<a name="line.279"></a>
+<span class="sourceLineNo">280</span>     */<a name="line.280"></a>
+<span class="sourceLineNo">281</span>    public static void copyResults(Exchange result, Exchange source) {<a name="line.281"></a>
+<span class="sourceLineNo">282</span><a name="line.282"></a>
+<span class="sourceLineNo">283</span>        // --------------------------------------------------------------------<a name="line.283"></a>
+<span class="sourceLineNo">284</span>        //  TODO: merge logic with that of copyResultsPreservePattern()<a name="line.284"></a>
+<span class="sourceLineNo">285</span>        // --------------------------------------------------------------------<a name="line.285"></a>
+<span class="sourceLineNo">286</span><a name="line.286"></a>
+<span class="sourceLineNo">287</span>        if (result == source) {<a name="line.287"></a>
+<span class="sourceLineNo">288</span>            // we just need to ensure MEP is as expected (eg copy result to OUT if out capable)<a name="line.288"></a>
+<span class="sourceLineNo">289</span>            // and the result is not failed<a name="line.289"></a>
+<span class="sourceLineNo">290</span>            if (result.getPattern() == ExchangePattern.InOptionalOut) {<a name="line.290"></a>
+<span class="sourceLineNo">291</span>                // keep as is<a name="line.291"></a>
+<span class="sourceLineNo">292</span>            } else if (result.getPattern().isOutCapable() &amp;&amp; !result.hasOut() &amp;&amp; !result.isFailed()) {<a name="line.292"></a>
+<span class="sourceLineNo">293</span>                // copy IN to OUT as we expect a OUT response<a name="line.293"></a>
+<span class="sourceLineNo">294</span>                result.getOut().copyFrom(source.getIn());<a name="line.294"></a>
+<span class="sourceLineNo">295</span>            }<a name="line.295"></a>
+<span class="sourceLineNo">296</span>            return;<a name="line.296"></a>
+<span class="sourceLineNo">297</span>        }<a name="line.297"></a>
+<span class="sourceLineNo">298</span><a name="line.298"></a>
+<span class="sourceLineNo">299</span>        if (result != source) {<a name="line.299"></a>
+<span class="sourceLineNo">300</span>            result.setException(source.getException());<a name="line.300"></a>
+<span class="sourceLineNo">301</span>            if (source.hasOut()) {<a name="line.301"></a>
+<span class="sourceLineNo">302</span>                result.getOut().copyFrom(source.getOut());<a name="line.302"></a>
+<span class="sourceLineNo">303</span>            } else if (result.getPattern() == ExchangePattern.InOptionalOut) {<a name="line.303"></a>
+<span class="sourceLineNo">304</span>                // special case where the result is InOptionalOut and with no OUT response<a name="line.304"></a>
+<span class="sourceLineNo">305</span>                // so we should return null to indicate this fact<a name="line.305"></a>
+<span class="sourceLineNo">306</span>                result.setOut(null);<a name="line.306"></a>
+<span class="sourceLineNo">307</span>            } else {<a name="line.307"></a>
+<span class="sourceLineNo">308</span>                // no results so lets copy the last input<a name="line.308"></a>
+<span class="sourceLineNo">309</span>                // as the final processor on a pipeline might not<a name="line.309"></a>
+<span class="sourceLineNo">310</span>                // have created any OUT; such as a mock:endpoint<a name="line.310"></a>
+<span class="sourceLineNo">311</span>                // so lets assume the last IN is the OUT<a name="line.311"></a>
+<span class="sourceLineNo">312</span>                if (result.getPattern().isOutCapable()) {<a name="line.312"></a>
+<span class="sourceLineNo">313</span>                    // only set OUT if its OUT capable<a name="line.313"></a>
+<span class="sourceLineNo">314</span>                    result.getOut().copyFrom(source.getIn());<a name="line.314"></a>
+<span class="sourceLineNo">315</span>                } else {<a name="line.315"></a>
+<span class="sourceLineNo">316</span>                    // if not replace IN instead to keep the MEP<a name="line.316"></a>
+<span class="sourceLineNo">317</span>                    result.getIn().copyFrom(source.getIn());<a name="line.317"></a>
+<span class="sourceLineNo">318</span>                    // clear any existing OUT as the result is on the IN<a name="line.318"></a>
+<span class="sourceLineNo">319</span>                    if (result.hasOut()) {<a name="line.319"></a>
+<span class="sourceLineNo">320</span>                        result.setOut(null);<a name="line.320"></a>
+<span class="sourceLineNo">321</span>                    }<a name="line.321"></a>
+<span class="sourceLineNo">322</span>                }<a name="line.322"></a>
+<span class="sourceLineNo">323</span>            }<a name="line.323"></a>
+<span class="sourceLineNo">324</span><a name="line.324"></a>
+<span class="sourceLineNo">325</span>            if (source.hasProperties()) {<a name="line.325"></a>
+<span class="sourceLineNo">326</span>                result.getProperties().putAll(source.getProperties());<a name="line.326"></a>
+<span class="sourceLineNo">327</span>            }<a name="line.327"></a>
+<span class="sourceLineNo">328</span>        }<a name="line.328"></a>
+<span class="sourceLineNo">329</span>    }<a name="line.329"></a>
+<span class="sourceLineNo">330</span><a name="line.330"></a>
+<span class="sourceLineNo">331</span>    /**<a name="line.331"></a>
+<span class="sourceLineNo">332</span>     * Copies the &lt;code&gt;source&lt;/code&gt; exchange to &lt;code&gt;target&lt;/code&gt; exchange<a name="line.332"></a>
+<span class="sourceLineNo">333</span>     * preserving the {@link ExchangePattern} of &lt;code&gt;target&lt;/code&gt;.<a name="line.333"></a>
+<span class="sourceLineNo">334</span>     *<a name="line.334"></a>
+<span class="sourceLineNo">335</span>     * @param source source exchange.<a name="line.335"></a>
+<span class="sourceLineNo">336</span>     * @param result target exchange.<a name="line.336"></a>
+<span class="sourceLineNo">337</span>     */<a name="line.337"></a>
+<span class="sourceLineNo">338</span>    public static void copyResultsPreservePattern(Exchange result, Exchange source) {<a name="line.338"></a>
+<span class="sourceLineNo">339</span><a name="line.339"></a>
+<span class="sourceLineNo">340</span>        // --------------------------------------------------------------------<a name="line.340"></a>
+<span class="sourceLineNo">341</span>        //  TODO: merge logic with that of copyResults()<a name="line.341"></a>
+<span class="sourceLineNo">342</span>        // --------------------------------------------------------------------<a name="line.342"></a>
+<span class="sourceLineNo">343</span><a name="line.343"></a>
+<span class="sourceLineNo">344</span>        if (result == source) {<a name="line.344"></a>
+<span class="sourceLineNo">345</span>            // we just need to ensure MEP is as expected (eg copy result to OUT if out capable)<a name="line.345"></a>
+<span class="sourceLineNo">346</span>            // and the result is not failed<a name="line.346"></a>
+<span class="sourceLineNo">347</span>            if (result.getPattern() == ExchangePattern.InOptionalOut) {<a name="line.347"></a>
+<span class="sourceLineNo">348</span>                // keep as is<a name="line.348"></a>
+<span class="sourceLineNo">349</span>            } else if (result.getPattern().isOutCapable() &amp;&amp; !result.hasOut() &amp;&amp; !result.isFailed()) {<a name="line.349"></a>
+<span class="sourceLineNo">350</span>                // copy IN to OUT as we expect a OUT response<a name="line.350"></a>
+<span class="sourceLineNo">351</span>                result.getOut().copyFrom(source.getIn());<a name="line.351"></a>
+<span class="sourceLineNo">352</span>            }<a name="line.352"></a>
+<span class="sourceLineNo">353</span>            return;<a name="line.353"></a>
+<span class="sourceLineNo">354</span>        }<a name="line.354"></a>
+<span class="sourceLineNo">355</span><a name="line.355"></a>
+<span class="sourceLineNo">356</span>        // copy in message<a name="line.356"></a>
+<span class="sourceLineNo">357</span>        result.getIn().copyFrom(source.getIn());<a name="line.357"></a>
+<span class="sourceLineNo">358</span><a name="line.358"></a>
+<span class="sourceLineNo">359</span>        // copy out message<a name="line.359"></a>
+<span class="sourceLineNo">360</span>        if (source.hasOut()) {<a name="line.360"></a>
+<span class="sourceLineNo">361</span>            // exchange pattern sensitive<a name="line.361"></a>
+<span class="sourceLineNo">362</span>            Message resultMessage = source.getOut().isFault() ? result.getOut() : getResultMessage(result);<a name="line.362"></a>
+<span class="sourceLineNo">363</span>            resultMessage.copyFrom(source.getOut());<a name="line.363"></a>
+<span class="sourceLineNo">364</span>        }<a name="line.364"></a>
+<span class="sourceLineNo">365</span><a name="line.365"></a>
+<span class="sourceLineNo">366</span>        // copy exception<a name="line.366"></a>
+<span class="sourceLineNo">367</span>        result.setException(source.getException());<a name="line.367"></a>
+<span class="sourceLineNo">368</span><a name="line.368"></a>
+<span class="sourceLineNo">369</span>        // copy properties<a name="line.369"></a>
+<span class="sourceLineNo">370</span>        if (source.hasProperties()) {<a name="line.370"></a>
+<span class="sourceLineNo">371</span>            result.getProperties().putAll(source.getProperties());<a name="line.371"></a>
+<span class="sourceLineNo">372</span>        }<a name="line.372"></a>
+<span class="sourceLineNo">373</span>    }<a name="line.373"></a>
+<span class="sourceLineNo">374</span><a name="line.374"></a>
+<span class="sourceLineNo">375</span>    /**<a name="line.375"></a>
+<span class="sourceLineNo">376</span>     * Returns the message where to write results in an<a name="line.376"></a>
+<span class="sourceLineNo">377</span>     * exchange-pattern-sensitive way.<a name="line.377"></a>
+<span class="sourceLineNo">378</span>     *<a name="line.378"></a>
+<span class="sourceLineNo">379</span>     * @param exchange message exchange.<a name="line.379"></a>
+<span class="sourceLineNo">380</span>     * @return result message.<a name="line.380"></a>
+<span class="sourceLineNo">381</span>     */<a name="line.381"></a>
+<span class="sourceLineNo">382</span>    public static Message getResultMessage(Exchange exchange) {<a name="line.382"></a>
+<span class="sourceLineNo">383</span>        if (exchange.getPattern().isOutCapable()) {<a name="line.383"></a>
+<span class="sourceLineNo">384</span>            return exchange.getOut();<a name="line.384"></a>
+<span class="sourceLineNo">385</span>        } else {<a name="line.385"></a>
+<span class="sourceLineNo">386</span>            return exchange.getIn();<a name="line.386"></a>
+<span class="sourceLineNo">387</span>        }<a name="line.387"></a>
+<span class="sourceLineNo">388</span>    }<a name="line.388"></a>
+<span class="sourceLineNo">389</span><a name="line.389"></a>
+<span class="sourceLineNo">390</span>    /**<a name="line.390"></a>
+<span class="sourceLineNo">391</span>     * Returns true if the given exchange pattern (if defined) can support OUT messages<a name="line.391"></a>
+<span class="sourceLineNo">392</span>     *<a name="line.392"></a>
+<span class="sourceLineNo">393</span>     * @param exchange the exchange to interrogate<a name="line.393"></a>
+<span class="sourceLineNo">394</span>     * @return true if the exchange is defined as an {@link ExchangePattern} which supports<a name="line.394"></a>
+<span class="sourceLineNo">395</span>     *         OUT messages<a name="line.395"></a>
+<span class="sourceLineNo">396</span>     */<a name="line.396"></a>
+<span class="sourceLineNo">397</span>    public static boolean isOutCapable(Exchange exchange) {<a name="line.397"></a>
+<span class="sourceLineNo">398</span>        ExchangePattern pattern = exchange.getPattern();<a name="line.398"></a>
+<span class="sourceLineNo">399</span>        return pattern != null &amp;&amp; pattern.isOutCapable();<a name="line.399"></a>
+<span class="sourceLineNo">400</span>    }<a name="line.400"></a>
+<span class="sourceLineNo">401</span><a name="line.401"></a>
+<span class="sourceLineNo">402</span>    /**<a name="line.402"></a>
+<span class="sourceLineNo">403</span>     * Creates a new instance of the given type from the injector<a name="line.403"></a>
+<span class="sourceLineNo">404</span>     *<a name="line.404"></a>
+<span class="sourceLineNo">405</span>     * @param exchange the exchange<a name="line.405"></a>
+<span class="sourceLineNo">406</span>     * @param type     the given type<a name="line.406"></a>
+<span class="sourceLineNo">407</span>     * @return the created instance of the given type<a name="line.407"></a>
+<span class="sourceLineNo">408</span>     */<a name="line.408"></a>
+<span class="sourceLineNo">409</span>    public static &lt;T&gt; T newInstance(Exchange exchange, Class&lt;T&gt; type) {<a name="line.409"></a>
+<span class="sourceLineNo">410</span>        return exchange.getContext().getInjector().newInstance(type);<a name="line.410"></a>
+<span class="sourceLineNo">411</span>    }<a name="line.411"></a>
+<span class="sourceLineNo">412</span><a name="line.412"></a>
+<span class="sourceLineNo">413</span>    /**<a name="line.413"></a>
+<span class="sourceLineNo">414</span>     * Creates a Map of the variables which are made available to a script or template<a name="line.414"></a>
+<span class="sourceLineNo">415</span>     *<a name="line.415"></a>
+<span class="sourceLineNo">416</span>     * @param exchange the exchange to make available<a name="line.416"></a>
+<span class="sourceLineNo">417</span>     * @return a Map populated with the require variables<a name="line.417"></a>
+<span class="sourceLineNo">418</span>     */<a name="line.418"></a>
+<span class="sourceLineNo">419</span>    public static Map&lt;String, Object&gt; createVariableMap(Exchange exchange) {<a name="line.419"></a>
+<span class="sourceLineNo">420</span>        Map&lt;String, Object&gt; answer = new HashMap&lt;String, Object&gt;();<a name="line.420"></a>
+<span class="sourceLineNo">421</span>        populateVariableMap(exchange, answer);<a name="line.421"></a>
+<span class="sourceLineNo">422</span>        return answer;<a name="line.422"></a>
+<span class="sourceLineNo">423</span>    }<a name="line.423"></a>
+<span class="sourceLineNo">424</span><a name="line.424"></a>
+<span class="sourceLineNo">425</span>    /**<a name="line.425"></a>
+<span class="sourceLineNo">426</span>     * Populates the Map with the variables which are made available to a script or template<a name="line.426"></a>
+<span class="sourceLineNo">427</span>     *<a name="line.427"></a>
+<span class="sourceLineNo">428</span>     * @param exchange the exchange to make available<a name="line.428"></a>
+<span class="sourceLineNo">429</span>     * @param map      the map to populate<a name="line.429"></a>
+<span class="sourceLineNo">430</span>     */<a name="line.430"></a>
+<span class="sourceLineNo">431</span>    public static void populateVariableMap(Exchange exchange, Map&lt;String, Object&gt; map) {<a name="line.431"></a>
+<span class="sourceLineNo">432</span>        map.put("exchange", exchange);<a name="line.432"></a>
+<span class="sourceLineNo">433</span>        Message in = exchange.getIn();<a name="line.433"></a>
+<span class="sourceLineNo">434</span>        map.put("in", in);<a name="line.434"></a>
+<span class="sourceLineNo">435</span>        map.put("request", in);<a name="line.435"></a>
+<span class="sourceLineNo">436</span>        map.put("headers", in.getHeaders());<a name="line.436"></a>
+<span class="sourceLineNo">437</span>        map.put("body", in.getBody());<a name="line.437"></a>
+<span class="sourceLineNo">438</span>        if (isOutCapable(exchange)) {<a name="line.438"></a>
+<span class="sourceLineNo">439</span>            // if we are out capable then set out and response as well<a name="line.439"></a>
+<span class="sourceLineNo">440</span>            // however only grab OUT if it exists, otherwise reuse IN<a name="line.440"></a>
+<span class="sourceLineNo">441</span>            // this prevents side effects to alter the Exchange if we force creating an OUT message<a name="line.441"></a>
+<span class="sourceLineNo">442</span>            Message msg = exchange.hasOut() ? exchange.getOut() : exchange.getIn();<a name="line.442"></a>
+<span class="sourceLineNo">443</span>            map.put("out", msg);<a name="line.443"></a>
+<span class="sourceLineNo">444</span>            map.put("response", msg);<a name="line.444"></a>
+<span class="sourceLineNo">445</span>        }<a name="line.445"></a>
+<span class="sourceLineNo">446</span>        map.put("camelContext", exchange.getContext());<a name="line.446"></a>
+<span class="sourceLineNo">447</span>    }<a name="line.447"></a>
+<span class="sourceLineNo">448</span><a name="line.448"></a>
+<span class="sourceLineNo">449</span>    /**<a name="line.449"></a>
+<span class="sourceLineNo">450</span>     * Returns the MIME content type on the input message or null if one is not defined<a name="line.450"></a>
+<span class="sourceLineNo">451</span>     *<a name="line.451"></a>
+<span class="sourceLineNo">452</span>     * @param exchange the exchange<a name="line.452"></a>
+<span class="sourceLineNo">453</span>     * @return the MIME content type<a name="line.453"></a>
+<span class="sourceLineNo">454</span>     */<a name="line.454"></a>
+<span class="sourceLineNo">455</span>    public static String getContentType(Exchange exchange) {<a name="line.455"></a>
+<span class="sourceLineNo">456</span>        return MessageHelper.getContentType(exchange.getIn());<a name="line.456"></a>
+<span class="sourceLineNo">457</span>    }<a name="line.457"></a>
+<span class="sourceLineNo">458</span><a name="line.458"></a>
+<span class="sourceLineNo">459</span>    /**<a name="line.459"></a>
+<span class="sourceLineNo">460</span>     * Returns the MIME content encoding on the input message or null if one is not defined<a name="line.460"></a>
+<span class="sourceLineNo">461</span>     *<a name="line.461"></a>
+<span class="sourceLineNo">462</span>     * @param exchange the exchange<a name="line.462"></a>
+<span class="sourceLineNo">463</span>     * @return the MIME content encoding<a name="line.463"></a>
+<span class="sourceLineNo">464</span>     */<a name="line.464"></a>
+<span class="sourceLineNo">465</span>    public static String getContentEncoding(Exchange exchange) {<a name="line.465"></a>
+<span class="sourceLineNo">466</span>        return MessageHelper.getContentEncoding(exchange.getIn());<a name="line.466"></a>
+<span class="sourceLineNo">467</span>    }<a name="line.467"></a>
+<span class="sourceLineNo">468</span><a name="line.468"></a>
+<span class="sourceLineNo">469</span>    /**<a name="line.469"></a>
+<span class="sourceLineNo">470</span>     * Performs a lookup in the registry of the mandatory bean name and throws an exception if it could not be found<a name="line.470"></a>
+<span class="sourceLineNo">471</span>     *<a name="line.471"></a>
+<span class="sourceLineNo">472</span>     * @param exchange the exchange<a name="line.472"></a>
+<span class="sourceLineNo">473</span>     * @param name     the bean name<a name="line.473"></a>
+<span class="sourceLineNo">474</span>     * @return the bean<a name="line.474"></a>
+<span class="sourceLineNo">475</span>     * @throws NoSuchBeanException if no bean could be found in the registry<a name="line.475"></a>
+<span class="sourceLineNo">476</span>     */<a name="line.476"></a>
+<span class="sourceLineNo">477</span>    public static Object lookupMandatoryBean(Exchange exchange, String name) throws NoSuchBeanException {<a name="line.477"></a>
+<span class="sourceLineNo">478</span>        Object value = lookupBean(exchange, name);<a name="line.478"></a>
+<span class="sourceLineNo">479</span>        if (value == null) {<a name="line.479"></a>
+<span class="sourceLineNo">480</span>            throw new NoSuchBeanException(name);<a name="line.480"></a>
+<span class="sourceLineNo">481</span>        }<a name="line.481"></a>
+<span class="sourceLineNo">482</span>        return value;<a name="line.482"></a>
+<span class="sourceLineNo">483</span>    }<a name="line.483"></a>
+<span class="sourceLineNo">484</span><a name="line.484"></a>
+<span class="sourceLineNo">485</span>    /**<a name="line.485"></a>
+<span class="sourceLineNo">486</span>     * Performs a lookup in the registry of the mandatory bean name and throws an exception if it could not be found<a name="line.486"></a>
+<span class="sourceLineNo">487</span>     *<a name="line.487"></a>
+<span class="sourceLineNo">488</span>     * @param exchange the exchange<a name="line.488"></a>
+<span class="sourceLineNo">489</span>     * @param name     the bean name<a name="line.489"></a>
+<span class="sourceLineNo">490</span>     * @param type     the expected bean type<a name="line.490"></a>
+<span class="sourceLineNo">491</span>     * @return the bean<a name="line.491"></a>
+<span class="sourceLineNo">492</span>     * @throws NoSuchBeanException if no bean could be found in the registry<a name="line.492"></a>
+<span class="sourceLineNo">493</span>     */<a name="line.493"></a>
+<span class="sourceLineNo">494</span>    public static &lt;T&gt; T lookupMandatoryBean(Exchange exchange, String name, Class&lt;T&gt; type) {<a name="line.494"></a>
+<span class="sourceLineNo">495</span>        T value = lookupBean(exchange, name, type);<a name="line.495"></a>
+<span class="sourceLineNo">496</span>        if (value == null) {<a name="line.496"></a>
+<span class="sourceLineNo">497</span>            throw new NoSuchBeanException(name);<a name="line.497"></a>
+<span class="sourceLineNo">498</span>        }<a name="line.498"></a>
+<span class="sourceLineNo">499</span>        return value;<a name="line.499"></a>
+<span class="sourceLineNo">500</span>    }<a name="line.500"></a>
+<span class="sourceLineNo">501</span><a name="line.501"></a>
+<span class="sourceLineNo">502</span>    /**<a name="line.502"></a>
+<span class="sourceLineNo">503</span>     * Performs a lookup in the registry of the bean name<a name="line.503"></a>
+<span class="sourceLineNo">504</span>     *<a name="line.504"></a>
+<span class="sourceLineNo">505</span>     * @param exchange the exchange<a name="line.505"></a>
+<span class="sourceLineNo">506</span>     * @param name     the bean name<a name="line.506"></a>
+<span class="sourceLineNo">507</span>     * @return the bean, or &lt;tt&gt;null&lt;/tt&gt; if no bean could be found<a name="line.507"></a>
+<span class="sourceLineNo">508</span>     */<a name="line.508"></a>
+<span class="sourceLineNo">509</span>    public static Object lookupBean(Exchange exchange, String name) {<a name="line.509"></a>
+<span class="sourceLineNo">510</span>        return exchange.getContext().getRegistry().lookupByName(name);<a name="line.510"></a>
+<span class="sourceLineNo">511</span>    }<a name="line.511"></a>
+<span class="sourceLineNo">512</span><a name="line.512"></a>
+<span class="sourceLineNo">513</span>    /**<a name="line.513"></a>
+<span class="sourceLineNo">514</span>     * Performs a lookup in the registry of the bean name and type<a name="line.514"></a>
+<span class="sourceLineNo">515</span>     *<a name="line.515"></a>
+<span class="sourceLineNo">516</span>     * @param exchange the exchange<a name="line.516"></a>
+<span class="sourceLineNo">517</span>     * @param name     the bean name<a name="line.517"></a>
+<span class="sourceLineNo">518</span>     * @param type     the expected bean type<a name="line.518"></a>
+<span class="sourceLineNo">519</span>     * @return the bean, or &lt;tt&gt;null&lt;/tt&gt; if no bean could be found<a name="line.519"></a>
+<span class="sourceLineNo">520</span>     */<a name="line.520"></a>
+<span class="sourceLineNo">521</span>    public static &lt;T&gt; T lookupBean(Exchange exchange, String name, Class&lt;T&gt; type) {<a name="line.521"></a>
+<span class="sourceLineNo">522</span>        return exchange.getContext().getRegistry().lookupByNameAndType(name, type);<a name="line.522"></a>
+<span class="sourceLineNo">523</span>    }<a name="line.523"></a>
+<span class="sourceLineNo">524</span><a name="line.524"></a>
+<span class="sourceLineNo">525</span>    /**<a name="line.525"></a>
+<span class="sourceLineNo">526</span>     * Returns the first exchange in the given collection of exchanges which has the same exchange ID as the one given<a name="line.526"></a>
+<span class="sourceLineNo">527</span>     * or null if none could be found<a name="line.527"></a>
+<span class="sourceLineNo">528</span>     *<a name="line.528"></a>
+<span class="sourceLineNo">529</span>     * @param exchanges  the exchanges<a name="line.529"></a>
+<span class="sourceLineNo">530</span>     * @param exchangeId the exchangeId to find<a name="line.530"></a>
+<span class="sourceLineNo">531</span>     * @return matching exchange, or &lt;tt&gt;null&lt;/tt&gt; if none found<a name="line.531"></a>
+<span class="sourceLineNo">532</span>     */<a name="line.532"></a>
+<span class="sourceLineNo">533</span>    public static Exchange getExchangeById(Iterable&lt;Exchange&gt; exchanges, String exchangeId) {<a name="line.533"></a>
+<span class="sourceLineNo">534</span>        for (Exchange exchange : exchanges) {<a name="line.534"></a>
+<span class="sourceLineNo">535</span>            String id = exchange.getExchangeId();<a name="line.535"></a>
+<span class="sourceLineNo">536</span>            if (id != null &amp;&amp; id.equals(exchangeId)) {<a name="line.536"></a>
+<span class="sourceLineNo">537</span>                return exchange;<a name="line.537"></a>
+<span class="sourceLineNo">538</span>            }<a name="line.538"></a>
+<span class="sourceLineNo">539</span>        }<a name="line.539"></a>
+<span class="sourceLineNo">540</span>        return null;<a name="line.540"></a>
+<span class="sourceLineNo">541</span>    }<a name="line.541"></a>
+<span class="sourceLineNo">542</span><a name="line.542"></a>
+<span class="sourceLineNo">543</span>    /**<a name="line.543"></a>
+<span class="sourceLineNo">544</span>     * Prepares the exchanges for aggregation.<a name="line.544"></a>
+<span class="sourceLineNo">545</span>     * &lt;p/&gt;<a name="line.545"></a>
+<span class="sourceLineNo">546</span>     * This implementation will copy the OUT body to the IN body so when you do<a name="line.546"></a>
+<span class="sourceLineNo">547</span>     * aggregation the body is &lt;b&gt;only&lt;/b&gt; in the IN body to avoid confusing end users.<a name="line.547"></a>
+<span class="sourceLineNo">548</span>     *<a name="line.548"></a>
+<span class="sourceLineNo">549</span>     * @param oldExchange the old exchange<a name="line.549"></a>
+<span class="sourceLineNo">550</span>     * @param newExchange the new exchange<a name="line.550"></a>
+<span class="sourceLineNo">551</span>     */<a name="line.551"></a>
+<span class="sourceLineNo">552</span>    public static void prepareAggregation(Exchange oldExchange, Exchange newExchange) {<a name="line.552"></a>
+<span class="sourceLineNo">553</span>        // move body/header from OUT to IN<a name="line.553"></a>
+<span class="sourceLineNo">554</span>        if (oldExchange != null) {<a name="line.554"></a>
+<span class="sourceLineNo">555</span>            if (oldExchange.hasOut()) {<a name="line.555"></a>
+<span class="sourceLineNo">556</span>                oldExchange.setIn(oldExchange.getOut());<a name="line.556"></a>
+<span class="sourceLineNo">557</span>                oldExchange.setOut(null);<a name="line.557"></a>
+<span class="sourceLineNo">558</span>            }<a name="line.558"></a>
+<span class="sourceLineNo">559</span>        }<a name="line.559"></a>
+<span class="sourceLineNo">560</span><a name="line.560"></a>
+<span class="sourceLineNo">561</span>        if (newExchange != null) {<a name="line.561"></a>
+<span class="sourceLineNo">562</span>            if (newExchange.hasOut()) {<a name="line.562"></a>
+<span class="sourceLineNo">563</span>                newExchange.setIn(newExchange.getOut());<a name="line.563"></a>
+<span class="sourceLineNo">564</span>                newExchange.setOut(null);<a name="line.564"></a>
+<span class="sourceLineNo">565</span>            }<a name="line.565"></a>
+<span class="sourceLineNo">566</span>        }<a name="line.566"></a>
+<span class="sourceLineNo">567</span>    }<a name="line.567"></a>
+<span class="sourceLineNo">568</span><a name="line.568"></a>
+<span class="sourceLineNo">569</span>    /**<a name="line.569"></a>
+<span class="sourceLineNo">570</span>     * Checks whether the exchange has been failure handed<a name="line.570"></a>
+<span class="sourceLineNo">571</span>     *<a name="line.571"></a>
+<span class="sourceLineNo">572</span>     * @param exchange  the exchange<a name="line.572"></a>
+<span class="sourceLineNo">573</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if failure handled, &lt;tt&gt;false&lt;/tt&gt; otherwise<a name="line.573"></a>
+<span class="sourceLineNo">574</span>     */<a name="line.574"></a>
+<span class="sourceLineNo">575</span>    public static boolean isFailureHandled(Exchange exchange) {<a name="line.575"></a>
+<span class="sourceLineNo">576</span>        return exchange.getProperty(Exchange.FAILURE_HANDLED, false, Boolean.class);<a name="line.576"></a>
+<span class="sourceLineNo">577</span>    }<a name="line.577"></a>
+<span class="sourceLineNo">578</span><a name="line.578"></a>
+<span class="sourceLineNo">579</span>    /**<a name="line.579"></a>
+<span class="sourceLineNo">580</span>     * Checks whether the exchange {@link UnitOfWork} is exhausted<a name="line.580"></a>
+<span class="sourceLineNo">581</span>     *<a name="line.581"></a>
+<span class="sourceLineNo">582</span>     * @param exchange  the exchange<a name="line.582"></a>
+<span class="sourceLineNo">583</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if exhausted, &lt;tt&gt;false&lt;/tt&gt; otherwise<a name="line.583"></a>
+<span class="sourceLineNo">584</span>     */<a name="line.584"></a>
+<span class="sourceLineNo">585</span>    public static boolean isUnitOfWorkExhausted(Exchange exchange) {<a name="line.585"></a>
+<span class="sourceLineNo">586</span>        return exchange.getProperty(Exchange.UNIT_OF_WORK_EXHAUSTED, false, Boolean.class);<a name="line.586"></a>
+<span class="sourceLineNo">587</span>    }<a name="line.587"></a>
+<span class="sourceLineNo">588</span><a name="line.588"></a>
+<span class="sourceLineNo">589</span>    /**<a name="line.589"></a>
+<span class="sourceLineNo">590</span>     * Sets the exchange to be failure handled.<a name="line.590"></a>
+<span class="sourceLineNo">591</span>     *<a name="line.591"></a>
+<span class="sourceLineNo">592</span>     * @param exchange  the exchange<a name="line.592"></a>
+<span class="sourceLineNo">593</span>     */<a name="line.593"></a>
+<span class="sourceLineNo">594</span>    public static void setFailureHandled(Exchange exchange) {<a name="line.594"></a>
+<span class="sourceLineNo">595</span>        exchange.setProperty(Exchange.FAILURE_HANDLED, Boolean.TRUE);<a name="line.595"></a>
+<span class="sourceLineNo">596</span>        // clear exception since its failure handled<a name="line.596"></a>
+<span class="sourceLineNo">597</span>        exchange.setException(null);<a name="line.597"></a>
+<span class="sourceLineNo">598</span>    }<a name="line.598"></a>
+<span class="sourceLineNo">599</span><a name="line.599"></a>
+<span class="sourceLineNo">600</span>    /**<a name="line.600"></a>
+<span class="sourceLineNo">601</span>     * Checks whether the exchange is redelivery exhausted<a name="line.601"></a>
+<span class="sourceLineNo">602</span>     *<a name="line.602"></a>
+<span class="sourceLineNo">603</span>     * @param exchange  the exchange<a name="line.603"></a>
+<span class="sourceLineNo">604</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if exhausted, &lt;tt&gt;false&lt;/tt&gt; otherwise<a name="line.604"></a>
+<span class="sourceLineNo">605</span>     */<a name="line.605"></a>
+<span class="sourceLineNo">606</span>    public static boolean isRedeliveryExhausted(Exchange exchange) {<a name="line.606"></a>
+<span class="sourceLineNo">607</span>        return exchange.getProperty(Exchange.REDELIVERY_EXHAUSTED, false, Boolean.class);<a name="line.607"></a>
+<span class="sourceLineNo">608</span>    }<a name="line.608"></a>
+<span class="sourceLineNo">609</span><a name="line.609"></a>
+<span class="sourceLineNo">610</span>    /**<a name="line.610"></a>
+<span class="sourceLineNo">611</span>     * Checks whether the exchange {@link UnitOfWork} is redelivered<a name="line.611"></a>
+<span class="sourceLineNo">612</span>     *<a name="line.612"></a>
+<span class="sourceLineNo">613</span>     * @param exchange  the exchange<a name="line.613"></a>
+<span class="sourceLineNo">614</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if redelivered, &lt;tt&gt;false&lt;/tt&gt; otherwise<a name="line.614"></a>
+<span class="sourceLineNo">615</span>     */<a name="line.615"></a>
+<span class="sourceLineNo">616</span>    public static boolean isRedelivered(Exchange exchange) {<a name="line.616"></a>
+<span class="sourceLineNo">617</span>        return exchange.getIn().hasHeaders() &amp;&amp; exchange.getIn().getHeader(Exchange.REDELIVERED, false, Boolean.class);<a name="line.617"></a>
+<span class="sourceLineNo">618</span>    }<a name="line.618"></a>
+<span class="sourceLineNo">619</span><a name="line.619"></a>
+<span class="sourceLineNo">620</span>    /**<a name="line.620"></a>
+<span class="sourceLineNo">621</span>     * Checks whether the exchange {@link UnitOfWork} has been interrupted during processing<a name="line.621"></a>
+<span class="sourceLineNo">622</span>     *<a name="line.622"></a>
+<span class="sourceLineNo">623</span>     * @param exchange  the exchange<a name="line.623"></a>
+<span class="sourceLineNo">624</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if interrupted, &lt;tt&gt;false&lt;/tt&gt; otherwise<a name="line.624"></a>
+<span class="sourceLineNo">625</span>     */<a name="line.625"></a>
+<span class="sourceLineNo">626</span>    public static boolean isInterrupted(Exchange exchange) {<a name="line.626"></a>
+<span class="sourceLineNo">627</span>        return exchange.getException(InterruptedException.class) != null;<a name="line.627"></a>
+<span class="sourceLineNo">628</span>    }<a name="line.628"></a>
+<span class="sourceLineNo">629</span><a name="line.629"></a>
+<span class="sourceLineNo">630</span>    /**<a name="line.630"></a>
+<span class="sourceLineNo">631</span>     * Check whether or not stream caching is enabled for the given route or globally.<a name="line.631"></a>
+<span class="sourceLineNo">632</span>     *<a name="line.632"></a>
+<span class="sourceLineNo">633</span>     * @param exchange  the exchange<a name="line.633"></a>
+<span class="sourceLineNo">634</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if enabled, &lt;tt&gt;false&lt;/tt&gt; otherwise<a name="line.634"></a>
+<span class="sourceLineNo">635</span>     */<a name="line.635"></a>
+<span class="sourceLineNo">636</span>    public static boolean isStreamCachingEnabled(final Exchange exchange) {<a name="line.636"></a>
+<span class="sourceLineNo">637</span>        if (exchange.getFromRouteId() == null) {<a name="line.637"></a>
+<span class="sourceLineNo">638</span>            return exchange.getContext().getStreamCachingStrategy().isEnabled();<a name="line.638"></a>
+<span class="sourceLineNo">639</span>        } else {<a name="line.639"></a>
+<span class="sourceLineNo">640</span>            return exchange.getContext().getRoute(exchange.getFromRouteId()).getRouteContext().isStreamCaching();<a name="line.640"></a>
+<span class="sourceLineNo">641</span>        }<a name="line.641"></a>
+<span class="sourceLineNo">642</span>    }<a name="line.642"></a>
+<span class="sourceLineNo">643</span><a name="line.643"></a>
+<span class="sourceLineNo">644</span>    /**<a name="line.644"></a>
+<span class="sourceLineNo">645</span>     * Extracts the body from the given exchange.<a name="line.645"></a>
+<span class="sourceLineNo">646</span>     * &lt;p/&gt;<a name="line.646"></a>
+<span class="sourceLineNo">647</span>     * If the exchange pattern is provided it will try to honor it and retrieve the body<a name="line.647"></a>
+<span class="sourceLineNo">648</span>     * from either IN or OUT according to the pattern.<a name="line.648"></a>
+<span class="sourceLineNo">649</span>     *<a name="line.649"></a>
+<span class="sourceLineNo">650</span>     * @param exchange the exchange<a name="line.650"></a>
+<span class="sourceLineNo">651</span>     * @param pattern  exchange pattern if given, can be &lt;tt&gt;null&lt;/tt&gt;<a name="line.651"></a>
+<span class="sourceLineNo">652</span>     * @return the result body, can be &lt;tt&gt;null&lt;/tt&gt;.<a name="line.652"></a>
+<span class="sourceLineNo">653</span>     * @throws CamelExecutionException is thrown if the processing of the exchange failed<a name="line.653"></a>
+<span class="sourceLineNo">654</span>     */<a name="line.654"></a>
+<span class="sourceLineNo">655</span>    public static Object extractResultBody(Exchange exchange, ExchangePattern pattern) {<a name="line.655"></a>
+<span class="sourceLineNo">656</span>        Object answer = null;<a name="line.656"></a>
+<span class="sourceLineNo">657</span>        if (exchange != null) {<a name="line.657"></a>
+<span class="sourceLineNo">658</span>            // rethrow if there was an exception during execution<a name="line.658"></a>
+<span class="sourceLineNo">659</span>            if (exchange.getException() != null) {<a name="line.659"></a>
+<span class="sourceLineNo">660</span>                throw ObjectHelper.wrapCamelExecutionException(exchange, exchange.getException());<a name="line.660"></a>
+<span class="sourceLineNo">661</span>            }<a name="line.661"></a>
+<span class="sourceLineNo">662</span><a name="line.662"></a>
+<span class="sourceLineNo">663</span>            // result could have a fault message<a name="line.663"></a>
+<span class="sourceLineNo">664</span>            if (hasFaultMessage(exchange)) {<a name="line.664"></a>
+<span class="sourceLineNo">665</span>                Message msg = exchange.hasOut() ? exchange.getOut() : exchange.getIn();<a name="line.665"></a>
+<span class="sourceLineNo">666</span>                answer = msg.getBody();<a name="line.666"></a>
+<span class="sourceLineNo">667</span>                return answer;<a name="line.667"></a>
+<span class="sourceLineNo">668</span>            }<a name="line.668"></a>
+<span class="sourceLineNo">669</span><a name="line.669"></a>
+<span class="sourceLineNo">670</span>            // okay no fault then return the response according to the pattern<a name="line.670"></a>
+<span class="sourceLineNo">671</span>            // try to honor pattern if provided<a name="line.671"></a>
+<span class="sourceLineNo">672</span>            boolean notOut = pattern != null &amp;&amp; !pattern.isOutCapable();<a name="line.672"></a>
+<span class="sourceLineNo">673</span>            boolean hasOut = exchange.hasOut();<a name="line.673"></a>
+<span class="sourceLineNo">674</span>            if (hasOut &amp;&amp; !notOut) {<a name="line.674"></a>
+<span class="sourceLineNo">675</span>                // we have a response in out and the pattern is out capable<a name="line.675"></a>
+<span class="sourceLineNo">676</span>                answer = exchange.getOut().getBody();<a name="line.676"></a>
+<span class="sourceLineNo">677</span>            } else if (!hasOut &amp;&amp; exchange.getPattern() == ExchangePattern.InOptionalOut) {<a name="line.677"></a>
+<span class="sourceLineNo">678</span>                // special case where the result is InOptionalOut and with no OUT response<a name="line.678"></a>
+<span class="sourceLineNo">679</span>                // so we should return null to indicate this fact<a name="line.679"></a>
+<span class="sourceLineNo">680</span>                answer = null;<a name="line.680"></a>
+<span class="sourceLineNo">681</span>            } else {<a name="line.681"></a>
+<span class="sourceLineNo">682</span>                // use IN as the response<a name="line.682"></a>
+<span class="sourceLineNo">683</span>                answer = exchange.getIn().getBody();<a name="line.683"></a>
+<span class="sourceLineNo">684</span>            }<a name="line.684"></a>
+<span class="sourceLineNo">685</span>        }<a name="line.685"></a>
+<span class="sourceLineNo">686</span>        return answer;<a name="line.686"></a>
+<span class="sourceLineNo">687</span>    }<a name="line.687"></a>
+<span class="sourceLineNo">688</span><a name="line.688"></a>
+<span class="sourceLineNo">689</span>    /**<a name="line.689"></a>
+<span class="sourceLineNo">690</span>     * Tests whether the exchange has a fault message set and that its not null.<a name="line.690"></a>
+<span class="sourceLineNo">691</span>     *<a name="line.691"></a>
+<span class="sourceLineNo">692</span>     * @param exchange the exchange<a name="line.692"></a>
+<span class="sourceLineNo">693</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if fault message exists<a name="line.693"></a>
+<span class="sourceLineNo">694</span>     */<a name="line.694"></a>
+<span class="sourceLineNo">695</span>    public static boolean hasFaultMessage(Exchange exchange) {<a name="line.695"></a>
+<span class="sourceLineNo">696</span>        Message msg = exchange.hasOut() ? exchange.getOut() : exchange.getIn();<a name="line.696"></a>
+<span class="sourceLineNo">697</span>        return msg.isFault() &amp;&amp; msg.getBody() != null;<a name="line.697"></a>
+<span class="sourceLineNo">698</span>    }<a name="line.698"></a>
+<span class="sourceLineNo">699</span><a name="line.699"></a>
+<span class="sourceLineNo">700</span>    /**<a name="line.700"></a>
+<span class="sourceLineNo">701</span>     * Tests whether the exchange has already been handled by the error handler<a name="line.701"></a>
+<span class="sourceLineNo">702</span>     *<a name="line.702"></a>
+<span class="sourceLineNo">703</span>     * @param exchange the exchange<a name="line.703"></a>
+<span class="sourceLineNo">704</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if handled already by error handler, &lt;tt&gt;false&lt;/tt&gt; otherwise<a name="line.704"></a>
+<span class="sourceLineNo">705</span>     */<a name="line.705"></a>
+<span class="sourceLineNo">706</span>    public static boolean hasExceptionBeenHandledByErrorHandler(Exchange exchange) {<a name="line.706"></a>
+<span class="sourceLineNo">707</span>        return Boolean.TRUE.equals(exchange.getProperty(Exchange.ERRORHANDLER_HANDLED));<a name="line.707"></a>
+<span class="sourceLineNo">708</span>    }<a name="line.708"></a>
+<span class="sourceLineNo">709</span><a name="line.709"></a>
+<span class="sourceLineNo">710</span>    /**<a name="line.710"></a>
+<span class="sourceLineNo">711</span>     * Extracts the body from the given future, that represents a handle to an asynchronous exchange.<a name="line.711"></a>
+<span class="sourceLineNo">712</span>     * &lt;p/&gt;<a name="line.712"></a>
+<span class="sourceLineNo">713</span>     * Will wait until the future task is complete.<a name="line.713"></a>
+<span class="sourceLineNo">714</span>     *<a name="line.714"></a>
+<span class="sourceLineNo">715</span>     * @param context the camel context<a name="line.715"></a>
+<span class="sourceLineNo">716</span>     * @param future  the future handle<a name="line.716"></a>
+<span class="sourceLineNo">717</span>     * @param type    the expected body response type<a name="line.717"></a>
+<span class="sourceLineNo">718</span>     * @return the result body, can be &lt;tt&gt;null&lt;/tt&gt;.<a name="line.718"></a>
+<span class="sourceLineNo">719</span>     * @throws CamelExecutionException is thrown if the processing of the exchange failed<a name="line.719"></a>
+<span class="sourceLineNo">720</span>     */<a name="line.720"></a>
+<span class="sourceLineNo">721</span>    public static &lt;T&gt; T extractFutureBody(CamelContext context, Future&lt;Object&gt; future, Class&lt;T&gt; type) {<a name="line.721"></a>
+<span class="sourceLineNo">722</span>        try {<a name="line.722"></a>
+<span class="sourceLineNo">723</span>            return doExtractFutureBody(context, future.get(), type);<a name="line.723"></a>
+<span class="sourceLineNo">724</span>        } catch (InterruptedException e) {<a name="line.724"></a>
+<span class="sourceLineNo">725</span>            throw ObjectHelper.wrapRuntimeCamelException(e);<a name="line.725"></a>
+<span class="sourceLineNo">726</span>        } catch (ExecutionException e) {<a name="line.726"></a>
+<span class="sourceLineNo">727</span>            // execution failed due to an exception so rethrow the cause<a name="line.727"></a>
+<span class="sourceLineNo">728</span>            throw ObjectHelper.wrapCamelExecutionException(null, e.getCause());<a name="line.728"></a>
+<span class="sourceLineNo">729</span>        } finally {<a name="line.729"></a>
+<span class="sourceLineNo">730</span>            // its harmless to cancel if task is already completed<a name="line.730"></a>
+<span class="sourceLineNo">731</span>            // and in any case we do not want to get hold of the task a 2nd time<a name="line.731"></a>
+<span class="sourceLineNo">732</span>            // and its recommended to cancel according to Brian Goetz in his Java Concurrency in Practice book<a name="line.732"></a>
+<span class="sourceLineNo">733</span>            future.cancel(true);<a name="line.733"></a>
+<span class="sourceLineNo">734</span>        }<a name="line.734"></a>
+<span class="sourceLineNo">735</span>    }<a name="line.735"></a>
+<span class="sourceLineNo">736</span><a name="line.736"></a>
+<span class="sourceLineNo">737</span>    /**<a name="line.737"></a>
+<span class="sourceLineNo">738</span>     * Extracts the body from the given future, that represents a handle to an asynchronous exchange.<a name="line.738"></a>
+<span class="sourceLineNo">739</span>     * &lt;p/&gt;<a name="line.739"></a>
+<span class="sourceLineNo">740</span>     * Will wait for the future task to complete, but waiting at most the timeout value.<a name="line.740"></a>
+<span class="sourceLineNo">741</span>     *<a name="line.741"></a>
+<span class="sourceLineNo">742</span>     * @param context the camel context<a name="line.742"></a>
+<span class="sourceLineNo">743</span>     * @param future  the future handle<a name="line.743"></a>
+<span class="sourceLineNo">744</span>     * @param timeout timeout value<a name="line.744"></a>
+<span class="sourceLineNo">745</span>     * @param unit    timeout unit<a name="line.745"></a>
+<span class="sourceLineNo">746</span>     * @param type    the expected body response type<a name="line.746"></a>
+<span class="sourceLineNo">747</span>     * @return the result body, can be &lt;tt&gt;null&lt;/tt&gt;.<a name="line.747"></a>
+<span class="sourceLineNo">748</span>     * @throws CamelExecutionException is thrown if the processing of the exchange failed<a name="line.748"></a>
+<span class="sourceLineNo">749</span>     * @throws java.util.concurrent.TimeoutException is thrown if a timeout triggered<a name="line.749"></a>
+<span class="sourceLineNo">750</span>     */<a name="line.750"></a>
+<span class="sourceLineNo">751</span>    public static &lt;T&gt; T extractFutureBody(CamelContext context, Future&lt;Object&gt; future, long timeout, TimeUnit unit, Class&lt;T&gt; type) throws TimeoutException {<a name="line.751"></a>
+<span class="sourceLineNo">752</span>        try {<a name="line.752"></a>
+<span class="sourceLineNo">753</span>            if (timeout &gt; 0) {<a name="line.753"></a>
+<span class="sourceLineNo">754</span>                return doExtractFutureBody(context, future.get(timeout, unit), type);<a name="line.754"></a>
+<span class="sourceLineNo">755</span>            } else {<a name="line.755"></a>
+<span class="sourceLineNo">756</span>                return doExtractFutureBody(context, future.get(), type);<a name="line.756"></a>
+<span class="sourceLineNo">757</span>            }<a name="line.757"></a>
+<span class="sourceLineNo">758</span>        } catch (InterruptedException e) {<a name="line.758"></a>
+<span class="sourceLineNo">759</span>            // execution failed due interruption so rethrow the cause<a name="line.759"></a>
+<span class="sourceLineNo">760</span>            throw ObjectHelper.wrapCamelExecutionException(null, e);<a name="line.760"></a>
+<span class="sourceLineNo">761</span>        } catch (ExecutionException e) {<a name="line.761"></a>
+<span class="sourceLineNo">762</span>            // execution failed due to an exception so rethrow the cause<a name="line.762"></a>
+<span class="sourceLineNo">763</span>            throw ObjectHelper.wrapCamelExecutionException(null, e.getCause());<a name="line.763"></a>
+<span class="sourceLineNo">764</span>        } finally {<a name="line.764"></a>
+<span class="sourceLineNo">765</span>            // its harmless to cancel if task is already completed<a name="line.765"></a>
+<span class="sourceLineNo">766</span>            // and in any case we do not want to get hold of the task a 2nd time<a name="line.766"></a>
+<span class="sourceLineNo">767</span>            // and its recommended to cancel according to Brian Goetz in his Java Concurrency in Practice book<a name="line.767"></a>
+<span class="sourceLineNo">768</span>            future.cancel(true);<a name="line.768"></a>
+<span class="sourceLineNo">769</span>        }<a name="line.769"></a>
+<span class="sourceLineNo">770</span>    }<a name="line.770"></a>
+<span class="sourceLineNo">771</span><a name="line.771"></a>
+<span class="sourceLineNo">772</span>    private static &lt;T&gt; T doExtractFutureBody(CamelContext context, Object result, Class&lt;T&gt; type) {<a name="line.772"></a>
+<span class="sourceLineNo">773</span>        if (result == null) {<a name="line.773"></a>
+<span class="sourceLineNo">774</span>            return null;<a name="line.774"></a>
+<span class="sourceLineNo">775</span>        }<a name="line.775"></a>
+<span class="sourceLineNo">776</span>        if (type.isAssignableFrom(result.getClass())) {<a name="line.776"></a>
+<span class="sourceLineNo">777</span>            return type.cast(result);<a name="line.777"></a>
+<span class="sourceLineNo">778</span>        }<a name="line.778"></a>
+<span class="sourceLineNo">779</span>        if (result instanceof Exchange) {<a name="line.779"></a>
+<span class="sourceLineNo">780</span>            Exchange exchange = (Exchange) result;<a name="line.780"></a>
+<span class="sourceLineNo">781</span>            Object answer = ExchangeHelper.extractResultBody(exchange, exchange.getPattern());<a name="line.781"></a>
+<span class="sourceLineNo">782</span>            return context.getTypeConverter().convertTo(type, exchange, answer);<a name="line.782"></a>
+<span class="sourceLineNo">783</span>        }<a name="line.783"></a>
+<span class="sourceLineNo">784</span>        return context.getTypeConverter().convertTo(type, result);<a name="line.784"></a>
+<span class="sourceLineNo">785</span>    }<a name="line.785"></a>
+<span class="sourceLineNo">786</span><a name="line.786"></a>
+<span class="sourceLineNo">787</span>    /**<a name="line.787"></a>
+<span class="sourceLineNo">788</span>     * @deprecated use org.apache.camel.CamelExchangeException.createExceptionMessage instead<a name="line.788"></a>
+<span class="sourceLineNo">789</span>     */<a name="line.789"></a>
+<span class="sourceLineNo">790</span>    @Deprecated<a name="line.790"></a>
+<span class="sourceLineNo">791</span>    public static String createExceptionMessage(String message, Exchange exchange, Throwable cause) {<a name="line.791"></a>
+<span class="sourceLineNo">792</span>        return CamelExchangeException.createExceptionMessage(message, exchange, cause);<a name="line.792"></a>
+<span class="sourceLineNo">793</span>    }<a name="line.793"></a>
+<span class="sourceLineNo">794</span><a name="line.794"></a>
+<span class="sourceLineNo">795</span>    /**<a name="line.795"></a>
+<span class="sourceLineNo">796</span>     * Strategy to prepare results before next iterator or when we are complete,<a name="line.796"></a>
+<span class="sourceLineNo">797</span>     * which is done by copying OUT to IN, so there is only an IN as input<a name="line.797"></a>
+<span class="sourceLineNo">798</span>     * for the next iteration.<a name="line.798"></a>
+<span class="sourceLineNo">799</span>     *<a name="line.799"></a>
+<span class="sourceLineNo">800</span>     * @param exchange the exchange to prepare<a name="line.800"></a>
+<span class="sourceLineNo">801</span>     */<a name="line.801"></a>
+<span class="sourceLineNo">802</span>    public static void prepareOutToIn(Exchange exchange) {<a name="line.802"></a>
+<span class="sourceLineNo">803</span>        // we are routing using pipes and filters so we need to manually copy OUT to IN<a name="line.803"></a>
+<span class="sourceLineNo">804</span>        if (exchange.hasOut()) {<a name="line.804"></a>
+<span class="sourceLineNo">805</span>            exchange.setIn(exchange.getOut());<a name="line.805"></a>
+<span class="sourceLineNo">806</span>            exchange.setOut(null);<a name="line.806"></a>
+<span class="sourceLineNo">807</span>        }<a name="line.807"></a>
+<span class="sourceLineNo">808</span>    }<a name="line.808"></a>
+<span class="sourceLineNo">809</span><a name="line.809"></a>
+<span class="sourceLineNo">810</span>    /**<a name="line.810"></a>
+<span class="sourceLineNo">811</span>     * Gets both the messageId and exchangeId to be used for logging purposes.<a name="line.811"></a>
+<span class="sourceLineNo">812</span>     * &lt;p/&gt;<a name="line.812"></a>
+<span class="sourceLineNo">813</span>     * Logging both ids, can help to correlate exchanges which may be redelivered messages<a name="line.813"></a>
+<span class="sourceLineNo">814</span>     * from for example a JMS broker.<a name="line.814"></a>
+<span class="sourceLineNo">815</span>     *<a name="line.815"></a>
+<span class="sourceLineNo">816</span>     * @param exchange the exchange<a name="line.816"></a>
+<span class="sourceLineNo">817</span>     * @return a log message with both the messageId and exchangeId<a name="line.817"></a>
+<span class="sourceLineNo">818</span>     */<a name="line.818"></a>
+<span class="sourceLineNo">819</span>    public static String logIds(Exchange exchange) {<a name="line.819"></a>
+<span class="sourceLineNo">820</span>        String msgId = exchange.hasOut() ? exchange.getOut().getMessageId() : exchange.getIn().getMessageId();<a name="line.820"></a>
+<span class="sourceLineNo">821</span>        return "(MessageId: " + msgId + " on ExchangeId: " + exchange.getExchangeId()  + ")";<a name="line.821"></a>
+<span class="sourceLineNo">822</span>    }<a name="line.822"></a>
+<span class="sourceLineNo">823</span><a name="line.823"></a>
+<span class="sourceLineNo">824</span>    /**<a name="line.824"></a>
+<span class="sourceLineNo">825</span>     * Copies the exchange but the copy will be tied to the given context<a name="line.825"></a>
+<span class="sourceLineNo">826</span>     *<a name="line.826"></a>
+<span class="sourceLineNo">827</span>     * @param exchange  the source exchange<a name="line.827"></a>
+<span class="sourceLineNo">828</span>     * @param context   the camel context<a name="line.828"></a>
+<span class="sourceLineNo">829</span>     * @return a copy with the given camel context<a name="line.829"></a>
+<span class="sourceLineNo">830</span>     */<a name="line.830"></a>
+<span class="sourceLineNo">831</span>    public static Exchange copyExchangeAndSetCamelContext(Exchange exchange, CamelContext context) {<a name="line.831"></a>
+<span class="sourceLineNo">832</span>        return copyExchangeAndSetCamelContext(exchange, context, true);<a name="line.832"></a>
+<span class="sourceLineNo">833</span>    }<a name="line.833"></a>
+<span class="sourceLineNo">834</span><a name="line.834"></a>
+<span class="sourceLineNo">835</span>    /**<a name="line.835"></a>
+<span class="sourceLineNo">836</span>     * Copies the exchange but the copy will be tied to the given context<a name="line.836"></a>
+<span class="sourceLineNo">837</span>     *<a name="line.837"></a>
+<span class="sourceLineNo">838</span>     * @param exchange  the source exchange<a name="line.838"></a>
+<span class="sourceLineNo">839</span>     * @param context   the camel context<a name="line.839"></a>
+<span class="sourceLineNo">840</span>     * @param handover  whether to handover on completions from the source to the copy<a name="line.840"></a>
+<span class="sourceLineNo">841</span>     * @return a copy with the given camel context<a name="line.841"></a>
+<span class="sourceLineNo">842</span>     */<a name="line.842"></a>
+<span class="sourceLineNo">843</span>    public static Exchange copyExchangeAndSetCamelContext(Exchange exchange, CamelContext context, boolean handover) {<a name="line.843"></a>
+<span class="sourceLineNo">844</span>        DefaultExchange answer = new DefaultExchange(context, exchange.getPattern());<a name="line.844"></a>
+<span class="sourceLineNo">845</span>        if (exchange.hasProperties()) {<a name="line.845"></a>
+<span class="sourceLineNo">846</span>            answer.setProperties(safeCopy(exchange.getProperties()));<a name="line.846"></a>
+<span class="sourceLineNo">847</span>        }<a name="line.847"></a>
+<span class="sourceLineNo">848</span>        if (handover) {<a name="line.848"></a>
+<span class="sourceLineNo">849</span>            // Need to hand over the completion for async invocation<a name="line.849"></a>
+<span class="sourceLineNo">850</span>            exchange.handoverCompletions(answer);<a name="line.850"></a>
+<span class="sourceLineNo">851</span>        }<a name="line.851"></a>
+<span class="sourceLineNo">852</span>        answer.setIn(exchange.getIn().copy());<a name="line.852"></a>
+<span class="sourceLineNo">853</span>        if (exchange.hasOut()) {<a name="line.853"></a>
+<span class="sourceLineNo">854</span>            answer.setOut(exchange.getOut().copy());<a name="line.854"></a>
+<span class="sourceLineNo">855</span>        }<a name="line.855"></a>
+<span class="sourceLineNo">856</span>        answer.setException(exchange.getException());<a name="line.856"></a>
+<span class="sourceLineNo">857</span>        return answer;<a name="line.857"></a>
+<span class="sourceLineNo">858</span>    }<a name="line.858"></a>
+<span class="sourceLineNo">859</span><a name="line.859"></a>
+<span class="sourceLineNo">860</span>    /**<a name="line.860"></a>
+<span class="sourceLineNo">861</span>     * Replaces the existing message with the new message<a name="line.861"></a>
+<span class="sourceLineNo">862</span>     *<a name="line.862"></a>
+<span class="sourceLineNo">863</span>     * @param exchange  the exchange<a name="line.863"></a>
+<span class="sourceLineNo">864</span>     * @param newMessage the new message<a name="line.864"></a>
+<span class="sourceLineNo">865</span>     * @param outOnly    whether to replace the message as OUT message<a name="line.865"></a>
+<span class="sourceLineNo">866</span>     */<a name="line.866"></a>
+<span class="sourceLineNo">867</span>    public static void replaceMessage(Exchange exchange, Message newMessage, boolean outOnly) {<a name="line.867"></a>
+<span class="sourceLineNo">868</span>        Message old = exchange.hasOut() ? exchange.getOut() : exchange.getIn();<a name="line.868"></a>
+<span class="sourceLineNo">869</span>        if (outOnly || exchange.hasOut()) {<a name="line.869"></a>
+<span class="sourceLineNo">870</span>            exchange.setOut(newMessage);<a name="line.870"></a>
+<span class="sourceLineNo">871</span>        } else {<a name="line.871"></a>
+<span class="sourceLineNo">872</span>            exchange.setIn(newMessage);<a name="line.872"></a>
+<span class="sourceLineNo">873</span>        }<a name="line.873"></a>
+<span class="sourceLineNo">874</span><a name="line.874"></a>
+<span class="sourceLineNo">875</span>        // need to de-reference old from the exchange so it can be GC<a name="line.875"></a>
+<span class="sourceLineNo">876</span>        if (old instanceof MessageSupport) {<a name="line.876"></a>
+<span class="sourceLineNo">877</span>            ((MessageSupport) old).setExchange(null);<a name="line.877"></a>
+<span class="sourceLineNo">878</span>        }<a name="line.878"></a>
+<span class="sourceLineNo">879</span>    }<a name="line.879"></a>
+<span class="sourceLineNo">880</span><a name="line.880"></a>
+<span class="sourceLineNo">881</span>    /**<a name="line.881"></a>
+<span class="sourceLineNo">882</span>     * Gets the original IN {@link Message} this Unit of Work was started with.<a name="line.882"></a>
+<span class="sourceLineNo">883</span>     * &lt;p/&gt;<a name="line.883"></a>
+<span class="sourceLineNo">884</span>     * The original message is only returned if the option {@link org.apache.camel.RuntimeConfiguration#isAllowUseOriginalMessage()}<a name="line.884"></a>
+<span class="sourceLineNo">885</span>     * is enabled. If its disabled, then &lt;tt&gt;null&lt;/tt&gt; is returned.<a name="line.885"></a>
+<span class="sourceLineNo">886</span>     *<a name="line.886"></a>
+<span class="sourceLineNo">887</span>     * @return the original IN {@link Message}, or &lt;tt&gt;null&lt;/tt&gt; if using original message is disabled.<a name="line.887"></a>
+<span class="sourceLineNo">888</span>     */<a name="line.888"></a>
+<span class="sourceLineNo">889</span>    public static Message getOriginalInMessage(Exchange exchange) {<a name="line.889"></a>
+<span class="sourceLineNo">890</span>        Message answer = null;<a name="line.890"></a>
+<span class="sourceLineNo">891</span><a name="line.891"></a>
+<span class="sourceLineNo">892</span>        // try parent first<a name="line.892"></a>
+<span class="sourceLineNo">893</span>        UnitOfWork uow = exchange.getProperty(Exchange.PARENT_UNIT_OF_WORK, UnitOfWork.class);<a name="line.893"></a>
+<span class="sourceLineNo">894</span>        if (uow != null) {<a name="line.894"></a>
+<span class="sourceLineNo">895</span>            answer = uow.getOriginalInMessage();<a name="line.895"></a>
+<span class="sourceLineNo">896</span>        }<a name="line.896"></a>
+<span class="sourceLineNo">897</span>        // fallback to the current exchange<a name="line.897"></a>
+<span class="sourceLineNo">898</span>        if (answer == null) {<a name="line.898"></a>
+<span class="sourceLineNo">899</span>            uow = exchange.getUnitOfWork();<a name="line.899"></a>
+<span class="sourceLineNo">900</span>            if (uow != null) {<a name="line.900"></a>
+<span class="sourceLineNo">901</span>                answer = uow.getOriginalInMessage();<a name="line.901"></a>
+<span class="sourceLineNo">902</span>            }<a name="line.902"></a>
+<span class="sourceLineNo">903</span>        }<a name="line.903"></a>
+<span class="sourceLineNo">904</span>        return answer;<a name="line.904"></a>
+<span class="sourceLineNo">905</span>    }<a name="line.905"></a>
+<span class="sourceLineNo">906</span><a name="line.906"></a>
+<span class="sourceLineNo">907</span>    @SuppressWarnings("unchecked")<a name="line.907"></a>
+<span class="sourceLineNo">908</span>    private static Map&lt;String, Object&gt; safeCopy(Map&lt;String, Object&gt; properties) {<a name="line.908"></a>
+<span class="sourceLineNo">909</span>        if (properties == null) {<a name="line.909"></a>
+<span class="sourceLineNo">910</span>            return null;<a name="line.910"></a>
+<span class="sourceLineNo">911</span>        }<a name="line.911"></a>
+<span class="sourceLineNo">912</span><a name="line.912"></a>
+<span class="sourceLineNo">913</span>        Map&lt;String, Object&gt; answer = new ConcurrentHashMap&lt;String, Object&gt;(properties);<a name="line.913"></a>
+<span class="sourceLineNo">914</span><a name="line.914"></a>
+<span class="sourceLineNo">915</span>        // safe copy message history using a defensive copy<a name="line.915"></a>
+<span class="sourceLineNo">916</span>        List&lt;MessageHistory&gt; history = (List&lt;MessageHistory&gt;) answer.remove(Exchange.MESSAGE_HISTORY);<a name="line.916"></a>
+<span class="sourceLineNo">917</span>        if (history != null) {<a name="line.917"></a>
+<span class="sourceLineNo">918</span>            answer.put(Exchange.MESSAGE_HISTORY, new ArrayList&lt;MessageHistory&gt;(history));<a name="line.918"></a>
+<span class="sourceLineNo">919</span>        }<a name="line.919"></a>
+<span class="sourceLineNo">920</span><a name="line.920"></a>
+<span class="sourceLineNo">921</span>        return answer;<a name="line.921"></a>
+<span class="sourceLineNo">922</span>    }<a name="line.922"></a>
+<span class="sourceLineNo">923</span>}<a name="line.923"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * contributor license agreements.  See the NOTICE file distributed with<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * this work for additional information regarding copyright ownership.<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * The ASF licenses this file to You under the Apache License, Version 2.0<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * (the "License"); you may not use this file except in compliance with<a name="line.6"></a>
+<span class="sourceLineNo">007</span> * the License.  You may obtain a copy of the License at<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *<a name="line.8"></a>
+<span class="sourceLineNo">009</span> *      http://www.apache.org/licenses/LICENSE-2.0<a name="line.9"></a>
+<span class="sourceLineNo">010</span> *<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * Unless required by applicable law or agreed to in writing, software<a name="line.11"></a>
+<span class="sourceLineNo">012</span> * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.12"></a>
+<span class="sourceLineNo">013</span> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * See the License for the specific language governing permissions and<a name="line.14"></a>
+<span class="sourceLineNo">015</span> * limitations under the License.<a name="line.15"></a>
+<span class="sourceLineNo">016</span> */<a name="line.16"></a>
+<span class="sourceLineNo">017</span>package org.apache.camel.management;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import java.lang.reflect.Method;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import java.lang.reflect.Proxy;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import java.util.LinkedHashMap;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import java.util.LinkedHashSet;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import java.util.Map;<a name="line.23"></a>
+<span class="sourceLineNo">024</span>import java.util.Set;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import javax.management.Descriptor;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import javax.management.IntrospectionException;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import javax.management.JMException;<a name="line.27"></a>
+<span class="sourceLineNo">028</span>import javax.management.modelmbean.ModelMBeanAttributeInfo;<a name="line.28"></a>
+<span class="sourceLineNo">029</span>import javax.management.modelmbean.ModelMBeanInfo;<a name="line.29"></a>
+<span class="sourceLineNo">030</span>import javax.management.modelmbean.ModelMBeanInfoSupport;<a name="line.30"></a>
+<span class="sourceLineNo">031</span>import javax.management.modelmbean.ModelMBeanNotificationInfo;<a name="line.31"></a>
+<span class="sourceLineNo">032</span>import javax.management.modelmbean.ModelMBeanOperationInfo;<a name="line.32"></a>
+<span class="sourceLineNo">033</span><a name="line.33"></a>
+<span class="sourceLineNo">034</span>import org.apache.camel.CamelContext;<a name="line.34"></a>
+<span class="sourceLineNo">035</span>import org.apache.camel.Service;<a name="line.35"></a>
+<span class="sourceLineNo">036</span>import org.apache.camel.api.management.ManagedAttribute;<a name="line.36"></a>
+<span class="sourceLineNo">037</span>import org.apache.camel.api.management.ManagedNotification;<a name="line.37"></a>
+<span class="sourceLineNo">038</span>import org.apache.camel.api.management.ManagedNotifications;<a name="line.38"></a>
+<span class="sourceLineNo">039</span>import org.apache.camel.api.management.ManagedOperation;<a name="line.39"></a>
+<span class="sourceLineNo">040</span>import org.apache.camel.api.management.ManagedResource;<a name="line.40"></a>
+<span class="sourceLineNo">041</span>import org.apache.camel.util.IntrospectionSupport;<a name="line.41"></a>
+<span class="sourceLineNo">042</span>import org.apache.camel.util.LRUCache;<a name="line.42"></a>
+<span class="sourceLineNo">043</span>import org.apache.camel.util.LRUWeakCache;<a name="line.43"></a>
+<span class="sourceLineNo">044</span>import org.apache.camel.util.ObjectHelper;<a name="line.44"></a>
+<span class="sourceLineNo">045</span>import org.slf4j.Logger;<a name="line.45"></a>
+<span class="sourceLineNo">046</span>import org.slf4j.LoggerFactory;<a name="line.46"></a>
+<span class="sourceLineNo">047</span><a name="line.47"></a>
+<span class="sourceLineNo">048</span>/**<a name="line.48"></a>
+<span class="sourceLineNo">049</span> * A Camel specific {@link javax.management.MBeanInfo} assembler that reads the<a name="line.49"></a>
+<span class="sourceLineNo">050</span> * details from the {@link ManagedResource}, {@link ManagedAttribute}, {@link ManagedOperation},<a name="line.50"></a>
+<span class="sourceLineNo">051</span> * {@link ManagedNotification}, and {@link ManagedNotifications} annotations.<a name="line.51"></a>
+<span class="sourceLineNo">052</span> */<a name="line.52"></a>
+<span class="sourceLineNo">053</span>public class MBeanInfoAssembler implements Service {<a name="line.53"></a>
+<span class="sourceLineNo">054</span><a name="line.54"></a>
+<span class="sourceLineNo">055</span>    private static final Logger LOG = LoggerFactory.getLogger(MBeanInfoAssembler.class);<a name="line.55"></a>
+<span class="sourceLineNo">056</span><a name="line.56"></a>
+<span class="sourceLineNo">057</span>    // use a cache to speedup gathering JMX MBeanInfo for known classes<a name="line.57"></a>
+<span class="sourceLineNo">058</span>    // use a weak cache as we dont want the cache to keep around as it reference classes<a name="line.58"></a>
+<span class="sourceLineNo">059</span>    // which could prevent classloader to unload classes if being referenced from this cache<a name="line.59"></a>
+<span class="sourceLineNo">060</span>    private final LRUCache&lt;Class&lt;?&gt;, MBeanAttributesAndOperations&gt; cache = new LRUWeakCache&lt;Class&lt;?&gt;, MBeanAttributesAndOperations&gt;(1000);<a name="line.60"></a>
+<span class="sourceLineNo">061</span><a name="line.61"></a>
+<span class="sourceLineNo">062</span>    public MBeanInfoAssembler() {<a name="line.62"></a>
+<span class="sourceLineNo">063</span>    }<a name="line.63"></a>
+<span class="sourceLineNo">064</span><a name="line.64"></a>
+<span class="sourceLineNo">065</span>    @Deprecated<a name="line.65"></a>
+<span class="sourceLineNo">066</span>    public MBeanInfoAssembler(CamelContext camelContext) {<a name="line.66"></a>
+<span class="sourceLineNo">067</span>    }<a name="line.67"></a>
+<span class="sourceLineNo">068</span><a name="line.68"></a>
+<span class="sourceLineNo">069</span>    @Override<a name="line.69"></a>
+<span class="sourceLineNo">070</span>    public void start() throws Exception {<a name="line.70"></a>
+<span class="sourceLineNo">071</span>        // noop<a name="line.71"></a>
+<span class="sourceLineNo">072</span>    }<a name="line.72"></a>
+<span class="sourceLineNo">073</span><a name="line.73"></a>
+<span class="sourceLineNo">074</span>    @Override<a name="line.74"></a>
+<span class="sourceLineNo">075</span>    public void stop() throws Exception {<a name="line.75"></a>
+<span class="sourceLineNo">076</span>        if (LOG.isDebugEnabled()) {<a name="line.76"></a>
+<span class="sourceLineNo">077</span>            LOG.debug("Clearing cache[size={}, hits={}, misses={}, evicted={}]", new Object[]{cache.size(), cache.getHits(), cache.getMisses(), cache.getEvicted()});<a name="line.77"></a>
+<span class="sourceLineNo">078</span>        }<a name="line.78"></a>
+<span class="sourceLineNo">079</span>        cache.clear();<a name="line.79"></a>
+<span class="sourceLineNo">080</span>    }<a name="line.80"></a>
+<span class="sourceLineNo">081</span><a name="line.81"></a>
+<span class="sourceLineNo">082</span>    /**<a name="line.82"></a>
+<span class="sourceLineNo">083</span>     * Structure to hold cached mbean attributes and operations for a given class.<a name="line.83"></a>
+<span class="sourceLineNo">084</span>     */<a name="line.84"></a>
+<span class="sourceLineNo">085</span>    private static final class MBeanAttributesAndOperations {<a name="line.85"></a>
+<span class="sourceLineNo">086</span>        private Map&lt;String, ManagedAttributeInfo&gt; attributes;<a name="line.86"></a>
+<span class="sourceLineNo">087</span>        private Set&lt;ManagedOperationInfo&gt; operations;<a name="line.87"></a>
+<span class="sourceLineNo">088</span>    }<a name="line.88"></a>
+<span class="sourceLineNo">089</span><a name="line.89"></a>
+<span class="sourceLineNo">090</span>    /**<a name="line.90"></a>
+<span class="sourceLineNo">091</span>     * Gets the {@link ModelMBeanInfo} for the given managed bean<a name="line.91"></a>
+<span class="sourceLineNo">092</span>     *<a name="line.92"></a>
+<span class="sourceLineNo">093</span>     * @param defaultManagedBean  the default managed bean<a name="line.93"></a>
+<span class="sourceLineNo">094</span>     * @param customManagedBean   an optional custom managed bean<a name="line.94"></a>
+<span class="sourceLineNo">095</span>     * @param objectName   the object name<a name="line.95"></a>
+<span class="sourceLineNo">096</span>     * @return the model info, or &lt;tt&gt;null&lt;/tt&gt; if not possible to create, for example due the managed bean is a proxy class<a name="line.96"></a>
+<span class="sourceLineNo">097</span>     * @throws JMException is thrown if error creating the model info<a name="line.97"></a>
+<span class="sourceLineNo">098</span>     */<a name="line.98"></a>
+<span class="sourceLineNo">099</span>    public ModelMBeanInfo getMBeanInfo(Object defaultManagedBean, Object customManagedBean, String objectName) throws JMException {<a name="line.99"></a>
+<span class="sourceLineNo">100</span>        // skip proxy classes<a name="line.100"></a>
+<span class="sourceLineNo">101</span>        if (defaultManagedBean != null &amp;&amp; Proxy.isProxyClass(defaultManagedBean.getClass())) {<a name="line.101"></a>
+<span class="sourceLineNo">102</span>            LOG.trace("Skip creating ModelMBeanInfo due proxy class {}", defaultManagedBean.getClass());<a name="line.102"></a>
+<span class="sourceLineNo">103</span>            return null;<a name="line.103"></a>
+<span class="sourceLineNo">104</span>        }<a name="line.104"></a>
+<span class="sourceLineNo">105</span><a name="line.105"></a>
+<span class="sourceLineNo">106</span>        // maps and lists to contain information about attributes and operations<a name="line.106"></a>
+<span class="sourceLineNo">107</span>        Map&lt;String, ManagedAttributeInfo&gt; attributes = new LinkedHashMap&lt;String, ManagedAttributeInfo&gt;();<a name="line.107"></a>
+<span class="sourceLineNo">108</span>        Set&lt;ManagedOperationInfo&gt; operations = new LinkedHashSet&lt;ManagedOperationInfo&gt;();<a name="line.108"></a>
+<span class="sourceLineNo">109</span>        Set&lt;ModelMBeanAttributeInfo&gt; mBeanAttributes = new LinkedHashSet&lt;ModelMBeanAttributeInfo&gt;();<a name="line.109"></a>
+<span class="sourceLineNo">110</span>        Set&lt;ModelMBeanOperationInfo&gt; mBeanOperations = new LinkedHashSet&lt;ModelMBeanOperationInfo&gt;();<a name="line.110"></a>
+<span class="sourceLineNo">111</span>        Set&lt;ModelMBeanNotificationInfo&gt; mBeanNotifications = new LinkedHashSet&lt;ModelMBeanNotificationInfo&gt;();<a name="line.111"></a>
+<span class="sourceLineNo">112</span><a name="line.112"></a>
+<span class="sourceLineNo">113</span>        // extract details from default managed bean<a name="line.113"></a>
+<span class="sourceLineNo">114</span>        if (defaultManagedBean != null) {<a name="line.114"></a>
+<span class="sourceLineNo">115</span>            extractAttributesAndOperations(defaultManagedBean.getClass(), attributes, operations);<a name="line.115"></a>
+<span class="sourceLineNo">116</span>            extractMbeanAttributes(defaultManagedBean, attributes, mBeanAttributes, mBeanOperations);<a name="line.116"></a>
+<span class="sourceLineNo">117</span>            extractMbeanOperations(defaultManagedBean, operations, mBeanOperations);<a name="line.117"></a>
+<span class="sourceLineNo">118</span>            extractMbeanNotifications(defaultManagedBean, mBeanNotifications);<a name="line.118"></a>
+<span class="sourceLineNo">119</span>        }<a name="line.119"></a>
+<span class="sourceLineNo">120</span><a name="line.120"></a>
+<span class="sourceLineNo">121</span>        // extract details from custom managed bean<a name="line.121"></a>
+<span class="sourceLineNo">122</span>        if (customManagedBean != null) {<a name="line.122"></a>
+<span class="sourceLineNo">123</span>            extractAttributesAndOperations(customManagedBean.getClass(), attributes, operations);<a name="line.123"></a>
+<span class="sourceLineNo">124</span>            extractMbeanAttributes(customManagedBean, attributes, mBeanAttributes, mBeanOperations);<a name="line.124"></a>
+<span class="sourceLineNo">125</span>            extractMbeanOperations(customManagedBean, operations, mBeanOperations);<a name="line.125"></a>
+<span class="sourceLineNo">126</span>            extractMbeanNotifications(customManagedBean, mBeanNotifications);<a name="line.126"></a>
+<span class="sourceLineNo">127</span>        }<a name="line.127"></a>
+<span class="sourceLineNo">128</span><a name="line.128"></a>
+<span class="sourceLineNo">129</span>        // create the ModelMBeanInfo<a name="line.129"></a>
+<span class="sourceLineNo">130</span>        String name = getName(customManagedBean != null ? customManagedBean : defaultManagedBean, objectName);<a name="line.130"></a>
+<span class="sourceLineNo">131</span>        String description = getDescription(customManagedBean != null ? customManagedBean : defaultManagedBean, objectName);<a name="line.131"></a>
+<span class="sourceLineNo">132</span>        ModelMBeanAttributeInfo[] arrayAttributes = mBeanAttributes.toArray(new ModelMBeanAttributeInfo[mBeanAttributes.size()]);<a name="line.132"></a>
+<span class="sourceLineNo">133</span>        ModelMBeanOperationInfo[] arrayOperations = mBeanOperations.toArray(new ModelMBeanOperationInfo[mBeanOperations.size()]);<a name="line.133"></a>
+<span class="sourceLineNo">134</span>        ModelMBeanNotificationInfo[] arrayNotifications = mBeanNotifications.toArray(new ModelMBeanNotificationInfo[mBeanNotifications.size()]);<a name="line.134"></a>
+<span class="sourceLineNo">135</span><a name="line.135"></a>
+<span class="sourceLineNo">136</span>        ModelMBeanInfo info = new ModelMBeanInfoSupport(name, description, arrayAttributes, null, arrayOperations, arrayNotifications);<a name="line.136"></a>
+<span class="sourceLineNo">137</span>        LOG.trace("Created ModelMBeanInfo {}", info);<a name="line.137"></a>
+<span class="sourceLineNo">138</span>        return info;<a name="line.138"></a>
+<span class="sourceLineNo">139</span>    }<a name="line.139"></a>
+<span class="sourceLineNo">140</span><a name="line.140"></a>
+<span class="sourceLineNo">141</span>    private void extractAttributesAndOperations(Class&lt;?&gt; managedClass, Map&lt;String, ManagedAttributeInfo&gt; attributes, Set&lt;ManagedOperationInfo&gt; operations) {<a name="line.141"></a>
+<span class="sourceLineNo">142</span>        MBeanAttributesAndOperations cached = cache.get(managedClass);<a name="line.142"></a>
+<span class="sourceLineNo">143</span>        if (cached == null) {<a name="line.143"></a>
+<span class="sourceLineNo">144</span>            doExtractAttributesAndOperations(managedClass, attributes, operations);<a name="line.144"></a>
+<span class="sourceLineNo">145</span>            cached = new MBeanAttributesAndOperations();<a name="line.145"></a>
+<span class="sourceLineNo">146</span>            cached.attributes = new LinkedHashMap&lt;String, ManagedAttributeInfo&gt;(attributes);<a name="line.146"></a>
+<span class="sourceLineNo">147</span>            cached.operations = new LinkedHashSet&lt;ManagedOperationInfo&gt;(operations);<a name="line.147"></a>
+<span class="sourceLineNo">148</span><a name="line.148"></a>
+<span class="sourceLineNo">149</span>            // clear before we re-add them<a name="line.149"></a>
+<span class="sourceLineNo">150</span>            attributes.clear();<a name="line.150"></a>
+<span class="sourceLineNo">151</span>            operations.clear();<a name="line.151"></a>
+<span class="sourceLineNo">152</span><a name="line.152"></a>
+<span class="sourceLineNo">153</span>            // add to cache<a name="line.153"></a>
+<span class="sourceLineNo">154</span>            cache.put(managedClass, cached);<a name="line.154"></a>
+<span class="sourceLineNo">155</span>        }<a name="line.155"></a>
+<span class="sourceLineNo">156</span><a name="line.156"></a>
+<span class="sourceLineNo">157</span>        attributes.putAll(cached.attributes);<a name="line.157"></a>
+<span class="sourceLineNo">158</span>        operations.addAll(cached.operations);<a name="line.158"></a>
+<span class="sourceLineNo">159</span>    }<a name="line.159"></a>
+<span class="sourceLineNo">160</span><a name="line.160"></a>
+<span class="sourceLineNo">161</span>    private void doExtractAttributesAndOperations(Class&lt;?&gt; managedClass, Map&lt;String, ManagedAttributeInfo&gt; attributes, Set&lt;ManagedOperationInfo&gt; operations) {<a name="line.161"></a>
+<span class="sourceLineNo">162</span>        // extract the class<a name="line.162"></a>
+<span class="sourceLineNo">163</span>        doDoExtractAttributesAndOperations(managedClass, attributes, operations);<a name="line.163"></a>
+<span class="sourceLineNo">164</span><a name="line.164"></a>
+<span class="sourceLineNo">165</span>        // and then any sub classes<a name="line.165"></a>
+<span class="sourceLineNo">166</span>        if (managedClass.getSuperclass() != null) {<a name="line.166"></a>
+<span class="sourceLineNo">167</span>            Class&lt;?&gt; clazz = managedClass.getSuperclass();<a name="line.167"></a>
+<span class="sourceLineNo">168</span>            // skip any JDK classes<a name="line.168"></a>
+<span class="sourceLineNo">169</span>            if (!clazz.getName().startsWith("java")) {<a name="line.169"></a>
+<span class="sourceLineNo">170</span>                LOG.trace("Extracting attributes and operations from sub class: {}", clazz);<a name="line.170"></a>
+<span class="sourceLineNo">171</span>                doExtractAttributesAndOperations(clazz, attributes, operations);<a name="line.171"></a>
+<span class="sourceLineNo">172</span>            }<a name="line.172"></a>
+<span class="sourceLineNo">173</span>        }<a name="line.173"></a>
+<span class="sourceLineNo">174</span><a name="line.174"></a>
+<span class="sourceLineNo">175</span>        // and then any additional interfaces (as interfaces can be annotated as well)<a name="line.175"></a>
+<span class="sourceLineNo">176</span>        if (managedClass.getInterfaces() != null) {<a name="line.176"></a>
+<span class="sourceLineNo">177</span>            for (Class&lt;?&gt; clazz : managedClass.getInterfaces()) {<a name="line.177"></a>
+<span class="sourceLineNo">178</span>                // recursive as there may be multiple interfaces<a name="line.178"></a>
+<span class="sourceLineNo">179</span>                if (clazz.getName().startsWith("java")) {<a name="line.179"></a>
+<span class="sourceLineNo">180</span>                    // skip any JDK classes<a name="line.180"></a>
+<span class="sourceLineNo">181</span>                    continue;<a name="line.181"></a>
+<span class="sourceLineNo">182</span>                }<a name="line.182"></a>
+<span class="sourceLineNo">183</span>                LOG.trace("Extracting attributes and operations from implemented interface: {}", clazz);<a name="line.183"></a>
+<span class="sourceLineNo">184</span>                doExtractAttributesAndOperations(clazz, attributes, operations);<a name="line.184"></a>
+<span class="sourceLineNo">185</span>            }<a name="line.185"></a>
+<span class="sourceLineNo">186</span>        }<a name="line.186"></a>
+<span class="sourceLineNo">187</span>    }<a name="line.187"></a>
+<span class="sourceLineNo">188</span><a name="line.188"></a>
+<span class="sourceLineNo">189</span>    private void doDoExtractAttributesAndOperations(Class&lt;?&gt; managedClass, Map&lt;String, ManagedAttributeInfo&gt; attributes, Set&lt;ManagedOperationInfo&gt; operations) {<a name="line.189"></a>
+<span class="sourceLineNo">190</span>        LOG.trace("Extracting attributes and operations from class: {}", managedClass);<a name="line.190"></a>
+<span class="sourceLineNo">191</span><a name="line.191"></a>
+<span class="sourceLineNo">192</span>        // introspect the class, and leverage the cache to have better performance<a name="line.192"></a>
+<span class="sourceLineNo">193</span>        IntrospectionSupport.ClassInfo cache = IntrospectionSupport.cacheClass(managedClass);<a name="line.193"></a>
+<span class="sourceLineNo">194</span><a name="line.194"></a>
+<span class="sourceLineNo">195</span>        for (IntrospectionSupport.MethodInfo cacheInfo : cache.methods) {<a name="line.195"></a>
+<span class="sourceLineNo">196</span>            // must be from declaring class<a name="line.196"></a>
+<span class="sourceLineNo">197</span>            if (cacheInfo.method.getDeclaringClass() != managedClass) {<a name="line.197"></a>
+<span class="sourceLineNo">198</span>                continue;<a name="line.198"></a>
+<span class="sourceLineNo">199</span>            }<a name="line.199"></a>
+<span class="sourceLineNo">200</span><a name="line.200"></a>
+<span class="sourceLineNo">201</span>            LOG.trace("Extracting attributes and operations from method: {}", cacheInfo.method);<a name="line.201"></a>
+<span class="sourceLineNo">202</span>            ManagedAttribute ma = cacheInfo.method.getAnnotation(ManagedAttribute.class);<a name="line.202"></a>
+<span class="sourceLineNo">203</span>            if (ma != null) {<a name="line.203"></a>
+<span class="sourceLineNo">204</span>                String key;<a name="line.204"></a>
+<span class="sourceLineNo">205</span>                String desc = ma.description();<a name="line.205"></a>
+<span class="sourceLineNo">206</span>                Method getter = null;<a name="line.206"></a>
+<span class="sourceLineNo">207</span>                Method setter = null;<a name="line.207"></a>
+<span class="sourceLineNo">208</span>                boolean mask = ma.mask();<a name="line.208"></a>
+<span class="sourceLineNo">209</span><a name="line.209"></a>
+<span class="sourceLineNo">210</span>                if (cacheInfo.isGetter) {<a name="line.210"></a>
+<span class="sourceLineNo">211</span>                    key = cacheInfo.getterOrSetterShorthandName;<a name="line.211"></a>
+<span class="sourceLineNo">212</span>                    getter = cacheInfo.method;<a name="line.212"></a>
+<span class="sourceLineNo">213</span>                } else if (cacheInfo.isSetter) {<a name="line.213"></a>
+<span class="sourceLineNo">214</span>                    key = cacheInfo.getterOrSetterShorthandName;<a name="line.214"></a>
+<span class="sourceLineNo">215</span>                    setter = cacheInfo.method;<a name="line.215"></a>
+<span class="sourceLineNo">216</span>                } else {<a name="line.216"></a>
+<span class="sourceLineNo">217</span>                    throw new IllegalArgumentException("@ManagedAttribute can only be used on Java bean methods, was: " + cacheInfo.method + " on bean: " + managedClass);<a name="line.217"></a>
+<span class="sourceLineNo">218</span>                }<a name="line.218"></a>
+<span class="sourceLineNo">219</span><a name="line.219"></a>
+<span class="sourceLineNo">220</span>                // they key must be capitalized<a name="line.220"></a>
+<span class="sourceLineNo">221</span>                key = ObjectHelper.capitalize(key);<a name="line.221"></a>
+<span class="sourceLineNo">222</span><a name="line.222"></a>
+<span class="sourceLineNo">223</span>                // lookup first<a name="line.223"></a>
+<span class="sourceLineNo">224</span>                ManagedAttributeInfo info = attributes.get(key);<a name="line.224"></a>
+<span class="sourceLineNo">225</span>                if (info == null) {<a name="line.225"></a>
+<span class="sourceLineNo">226</span>                    info = new ManagedAttributeInfo(key, desc);<a name="line.226"></a>
+<span class="sourceLineNo">227</span>                }<a name="line.227"></a>
+<span class="sourceLineNo">228</span>                if (getter != null) {<a name="line.228"></a>
+<span class="sourceLineNo">229</span>                    info.setGetter(getter);<a name="line.229"></a>
+<span class="sourceLineNo">230</span>                }<a name="line.230"></a>
+<span class="sourceLineNo">231</span>                if (setter != null) {<a name="line.231"></a>
+<span class="sourceLineNo">232</span>                    info.setSetter(setter);<a name="line.232"></a>
+<span class="sourceLineNo">233</span>                }<a name="line.233"></a>
+<span class="sourceLineNo">234</span>                info.setMask(mask);<a name="line.234"></a>
+<span class="sourceLineNo">235</span><a name="line.235"></a>
+<span class="sourceLineNo">236</span>                attributes.put(key, info);<a name="line.236"></a>
+<span class="sourceLineNo">237</span>            }<a name="line.237"></a>
+<span class="sourceLineNo">238</span><a name="line.238"></a>
+<span class="sourceLineNo">239</span>            // operations<a name="line.239"></a>
+<span class="sourceLineNo">240</span>            ManagedOperation mo = cacheInfo.method.getAnnotation(ManagedOperation.class);<a name="line.240"></a>
+<span class="sourceLineNo">241</span>            if (mo != null) {<a name="line.241"></a>
+<span class="sourceLineNo">242</span>                String desc = mo.description();<a name="line.242"></a>
+<span class="sourceLineNo">243</span>                Method operation = cacheInfo.method;<a name="line.243"></a>
+<span class="sourceLineNo">244</span>                boolean mask = mo.mask();<a name="line.244"></a>
+<span class="sourceLineNo">245</span>                operations.add(new ManagedOperationInfo(desc, operation, mask));<a name="line.245"></a>
+<span class="sourceLineNo">246</span>            }<a name="line.246"></a>
+<span class="sourceLineNo">247</span>        }<a name="line.247"></a>
+<span class="sourceLineNo">248</span>    }<a name="line.248"></a>
+<span class="sourceLineNo">249</span><a name="line.249"></a>
+<span class="sourceLineNo">250</span>    private void extractMbeanAttributes(Object managedBean, Map&lt;String, ManagedAttributeInfo&gt; attributes,<a name="line.250"></a>
+<span class="sourceLineNo">251</span>                                        Set&lt;ModelMBeanAttributeInfo&gt; mBeanAttributes, Set&lt;ModelMBeanOperationInfo&gt; mBeanOperations) throws IntrospectionException {<a name="line.251"></a>
+<span class="sourceLineNo">252</span><a name="line.252"></a>
+<span class="sourceLineNo">253</span>        for (ManagedAttributeInfo info : attributes.values()) {<a name="line.253"></a>
+<span class="sourceLineNo">254</span>            ModelMBeanAttributeInfo mbeanAttribute = new ModelMBeanAttributeInfo(info.getKey(), info.getDescription(), info.getGetter(), info.getSetter());<a name="line.254"></a>
+<span class="sourceLineNo">255</span><a name="line.255"></a>
+<span class="sourceLineNo">256</span>            // add missing attribute descriptors, this is needed to have attributes accessible<a name="line.256"></a>
+<span class="sourceLineNo">257</span>            Descriptor desc = mbeanAttribute.getDescriptor();<a name="line.257"></a>
+<span class="sourceLineNo">258</span><a name="line.258"></a>
+<span class="sourceLineNo">259</span>            desc.setField("mask", info.isMask() ? "true" : "false");<a name="line.259"></a>
+<span class="sourceLineNo">260</span>            if (info.getGetter() != null) {<a name="line.260"></a>
+<span class="sourceLineNo">261</span>                desc.setField("getMethod", info.getGetter().getName());<a name="line.261"></a>
+<span class="sourceLineNo">262</span>                // attribute must also be added as mbean operation<a name="line.262"></a>
+<span class="sourceLineNo">263</span>                ModelMBeanOperationInfo mbeanOperation = new ModelMBeanOperationInfo(info.getKey(), info.getGetter());<a name="line.263"></a>
+<span class="sourceLineNo">264</span>                Descriptor opDesc = mbeanOperation.getDescriptor();<a name="line.264"></a>
+<span class="sourceLineNo">265</span>                opDesc.setField("mask", info.isMask() ? "true" : "false");<a name="line.265"></a>
+<span class="sourceLineNo">266</span>                mbeanOperation.setDescriptor(opDesc);<a name="line.266"></a>
+<span class="sourceLineNo">267</span>                mBeanOperations.add(mbeanOperation);<a name="line.267"></a>
+<span class="sourceLineNo">268</span>            }<a name="line.268"></a>
+<span class="sourceLineNo">269</span>            if (info.getSetter() != null) {<a name="line.269"></a>
+<span class="sourceLineNo">270</span>                desc.setField("setMethod", info.getSetter().getName());<a name="line.270"></a>
+<span class="sourceLineNo">271</span>                // attribute must also be added as mbean operation<a name="line.271"></a>
+<span class="sourceLineNo">272</span>                ModelMBeanOperationInfo mbeanOperation = new ModelMBeanOperationInfo(info.getKey(), info.getSetter());<a name="line.272"></a>
+<span class="sourceLineNo">273</span>                mBeanOperations.add(mbeanOperation);<a name="line.273"></a>
+<span class="sourceLineNo">274</span>            }<a name="line.274"></a>
+<span class="sourceLineNo">275</span>            mbeanAttribute.setDescriptor(desc);<a name="line.275"></a>
+<span class="sourceLineNo">276</span><a name="line.276"></a>
+<span class="sourceLineNo">277</span>            mBeanAttributes.add(mbeanAttribute);<a name="line.277"></a>
+<span class="sourceLineNo">278</span>            LOG.trace("Assembled attribute: {}", mbeanAttribute);<a name="line.278"></a>
+<span class="sourceLineNo">279</span>        }<a name="line.279"></a>
+<span class="sourceLineNo">280</span>    }<a name="line.280"></a>
+<span class="sourceLineNo">281</span><a name="line.281"></a>
+<span class="sourceLineNo">282</span>    private void extractMbeanOperations(Object managedBean, Set&lt;ManagedOperationInfo&gt; operations, Set&lt;ModelMBeanOperationInfo&gt; mBeanOperations) {<a name="line.282"></a>
+<span class="sourceLineNo">283</span>        for (ManagedOperationInfo info : operations) {<a name="line.283"></a>
+<span class="sourceLineNo">284</span>            ModelMBeanOperationInfo mbean = new ModelMBeanOperationInfo(info.getDescription(), info.getOperation());<a name="line.284"></a>
+<span class="sourceLineNo">285</span>            Descriptor opDesc = mbean.getDescriptor();<a name="line.285"></a>
+<span class="sourceLineNo">286</span>            opDesc.setField("mask", info.isMask() ? "true" : "false");<a name="line.286"></a>
+<span class="sourceLineNo">287</span>            mbean.setDescriptor(opDesc);<a name="line.287"></a>
+<span class="sourceLineNo">288</span>            mBeanOperations.add(mbean);<a name="line.288"></a>
+<span class="sourceLineNo">289</span>            LOG.trace("Assembled operation: {}", mbean);<a name="line.289"></a>
+<span class="sourceLineNo">290</span>        }<a name="line.290"></a>
+<span class="sourceLineNo">291</span>    }<a name="line.291"></a>
+<span class="sourceLineNo">292</span><a name="line.292"></a>
+<span class="sourceLineNo">293</span>    private void extractMbeanNotifications(Object managedBean, Set&lt;ModelMBeanNotificationInfo&gt; mBeanNotifications) {<a name="line.293"></a>
+<span class="sourceLineNo">294</span>        ManagedNotifications notifications = managedBean.getClass().getAnnotation(ManagedNotifications.class);<a name="line.294"></a>
+<span class="sourceLineNo">295</span>        if (notifications != null) {<a name="line.295"></a>
+<span class="sourceLineNo">296</span>            for (ManagedNotification notification : notifications.value()) {<a name="line.296"></a>
+<span class="sourceLineNo">297</span>                ModelMBeanNotificationInfo info = new ModelMBeanNotificationInfo(notification.notificationTypes(), notification.name(), notification.description());<a name="line.297"></a>
+<span class="sourceLineNo">298</span>                mBeanNotifications.add(info);<a name="line.298"></a>
+<span class="sourceLineNo">299</span>                LOG.trace("Assembled notification: {}", info);<a name="line.299"></a>
+<span class="sourceLineNo">300</span>            }<a name="line.300"></a>
+<span class="sourceLineNo">301</span>        }<a name="line.301"></a>
+<span class="sourceLineNo">302</span>    }<a name="line.302"></a>
+<span class="sourceLineNo">303</span><a name="line.303"></a>
+<span class="sourceLineNo">304</span>    private String getDescription(Object managedBean, String objectName) {<a name="line.304"></a>
+<span class="sourceLineNo">305</span>        ManagedResource mr = ObjectHelper.getAnnotation(managedBean, ManagedResource.class);<a name="line.305"></a>
+<span class="sourceLineNo">306</span>        return mr != null ? mr.description() : "";<a name="line.306"></a>
+<span class="sourceLineNo">307</span>    }<a name="line.307"></a>
+<span class="sourceLineNo">308</span><a name="line.308"></a>
+<span class="sourceLineNo">309</span>    private String getName(Object managedBean, String objectName) {<a name="line.309"></a>
+<span class="sourceLineNo">310</span>        return managedBean.getClass().getName();<a name="line.310"></a>
+<span class="sourceLineNo">311</span>    }<a name="line.311"></a>
+<span class="sourceLineNo">312</span><a name="line.312"></a>
+<span class="sourceLineNo">313</span>    private static final class ManagedAttributeInfo {<a name="line.313"></a>
+<span class="sourceLineNo">314</span>        private String key;<a name="line.314"></a>
+<span class="sourceLineNo">315</span>        private String description;<a name="line.315"></a>
+<span class="sourceLineNo">316</span>        private Method getter;<a name="line.316"></a>
+<span class="sourceLineNo">317</span>        private Method setter;<a name="line.317"></a>
+<span class="sourceLineNo">318</span>        private boolean mask;<a name="line.318"></a>
+<span class="sourceLineNo">319</span><a name="line.319"></a>
+<span class="sourceLineNo">320</span>        private ManagedAttributeInfo(String key, String description) {<a name="line.320"></a>
+<span class="sourceLineNo">321</span>            this.key = key;<a name="line.321"></a>
+<span class="sourceLineNo">322</span>            this.description = description;<a name="line.322"></a>
+<span class="sourceLineNo">323</span>        }<a name="line.323"></a>
+<span class="sourceLineNo">324</span><a name="line.324"></a>
+<span class="sourceLineNo">325</span>        public String getKey() {<a name="line.325"></a>
+<span class="sourceLineNo">326</span>            return key;<a name="line.326"></a>
+<span class="sourceLineNo">327</span>        }<a name="line.327"></a>
+<span class="sourceLineNo">328</span><a name="line.328"></a>
+<span class="sourceLineNo">329</span>        public String getDescription() {<a name="line.329"></a>
+<span class="sourceLineNo">330</span>            return description;<a name="line.330"></a>
+<span class="sourceLineNo">331</span>        }<a name="line.331"></a>
+<span class="sourceLineNo">332</span><a name="line.332"></a>
+<span class="sourceLineNo">333</span>        public Method getGetter() {<a name="line.333"></a>
+<span class="sourceLineNo">334</span>            return getter;<a name="line.334"></a>
+<span class="sourceLineNo">335</span>        }<a name="line.335"></a>
+<span class="sourceLineNo">336</span><a name="line.336"></a>
+<span class="sourceLineNo">337</span>        public void setGetter(Method getter) {<a name="line.337"></a>
+<span class="sourceLineNo">338</span>            this.getter = getter;<a name="line.338"></a>
+<span class="sourceLineNo">339</span>        }<a name="line.339"></a>
+<span class="sourceLineNo">340</span><a name="line.340"></a>
+<span class="sourceLineNo">341</span>        public Method getSetter() {<a name="line.341"></a>
+<span class="sourceLineNo">342</span>            return setter;<a name="line.342"></a>
+<span class="sourceLineNo">343</span>        }<a name="line.343"></a>
+<span class="sourceLineNo">344</span><a name="line.344"></a>
+<span class="sourceLineNo">345</span>        public void setSetter(Method setter) {<a name="line.345"></a>
+<span class="sourceLineNo">346</span>            this.setter = setter;<a name="line.346"></a>
+<span class="sourceLineNo">347</span>        }<a name="line.347"></a>
+<span class="sourceLineNo">348</span><a name="line.348"></a>
+<span class="sourceLineNo">349</span>        public boolean isMask() {<a name="line.349"></a>
+<span class="sourceLineNo">350</span>            return mask;<a name="line.350"></a>
+<span class="sourceLineNo">351</span>        }<a name="line.351"></a>
+<span class="sourceLineNo">352</span><a name="line.352"></a>
+<span class="sourceLineNo">353</span>        public void setMask(boolean mask) {<a name="line.353"></a>
+<span class="sourceLineNo">354</span>            this.mask = mask;<a name="line.354"></a>
+<span class="sourceLineNo">355</span>        }<a name="line.355"></a>
+<span class="sourceLineNo">356</span><a name="line.356"></a>
+<span class="sourceLineNo">357</span>        @Override<a name="line.357"></a>
+<span class="sourceLineNo">358</span>        public String toString() {<a name="line.358"></a>
+<span class="sourceLineNo">359</span>            return "ManagedAttributeInfo: [" + key + " + getter: " + getter + ", setter: " + setter + "]";<a name="line.359"></a>
+<span class="sourceLineNo">360</span>        }<a name="line.360"></a>
+<span class="sourceLineNo">361</span>    }<a name="line.361"></a>
+<span class="sourceLineNo">362</span><a name="line.362"></a>
+<span class="sourceLineNo">363</span>    private static final class ManagedOperationInfo {<a name="line.363"></a>
+<span class="sourceLineNo">364</span>        private final String description;<a name="line.364"></a>
+<span class="sourceLineNo">365</span>        private final Method operation;<a name="line.365"></a>
+<span class="sourceLineNo">366</span>        private final boolean mask;<a name="line.366"></a>
+<span class="sourceLineNo">367</span><a name="line.367"></a>
+<span class="sourceLineNo">368</span>        private ManagedOperationInfo(String description, Method operation, boolean mask) {<a name="line.368"></a>
+<span class="sourceLineNo">369</span>            this.description = description;<a name="line.369"></a>
+<span class="sourceLineNo">370</span>            this.operation = operation;<a name="line.370"></a>
+<span class="sourceLineNo">371</span>            this.mask = mask;<a name="line.371"></a>
+<span class="sourceLineNo">372</span>        }<a name="line.372"></a>
+<span class="sourceLineNo">373</span><a name="line.373"></a>
+<span class="sourceLineNo">374</span>        public String getDescription() {<a name="line.374"></a>
+<span class="sourceLineNo">375</span>            return description;<a name="line.375"></a>
+<span class="sourceLineNo">376</span>        }<a name="line.376"></a>
+<span class="sourceLineNo">377</span><a name="line.377"></a>
+<span class="sourceLineNo">378</span>        public Method getOperation() {<a name="line.378"></a>
+<span class="sourceLineNo">379</span>            return operation;<a name="line.379"></a>
+<span class="sourceLineNo">380</span>        }<a name="line.380"></a>
+<span class="sourceLineNo">381</span><a name="line.381"></a>
+<span class="sourceLineNo">382</span>        public boolean isMask() {<a name="line.382"></a>
+<span class="sourceLineNo">383</span>            return mask;<a name="line.383"></a>
+<span class="sourceLineNo">384</span>        }<a name="line.384"></a>
+<span class="sourceLineNo">385</span><a name="line.385"></a>
+<span class="sourceLineNo">386</span>        @Override<a name="line.386"></a>
+<span class="sourceLineNo">387</span>        public String toString() {<a name="line.387"></a>
+<span class="sourceLineNo">388</span>            return "ManagedOperationInfo: [" + operation + "]";<a name="line.388"></a>
+<span class="sourceLineNo">389</span>        }<a name="line.389"></a>
+<span class="sourceLineNo">390</span>    }<a name="line.390"></a>
+<span class="sourceLineNo">391</span><a name="line.391"></a>
+<span class="sourceLineNo">392</span>}<a name="line.392"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

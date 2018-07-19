@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/io.fabric8.agent.commands.metadata.ProfileMetadata">
+    <OCD id="io.fabric8.agent.commands.metadata.ProfileMetadata" name="%io.fabric8.agent.commands.metadata.ProfileMetadata.name" description="%io.fabric8.agent.commands.metadata.ProfileMetadata.description">
+        <AD id="metaTypeFolder" type="String" default="${runtime.home}/metatype" name="%io.fabric8.agent.commands.metadata.ProfileMetadata.metaTypeFolder.name" description="%io.fabric8.agent.commands.metadata.ProfileMetadata.metaTypeFolder.description"/>
+    </OCD>
+    <Designate pid="io.fabric8.agent.commands.metadata.ProfileMetadata">
+        <Object ocdref="io.fabric8.agent.commands.metadata.ProfileMetadata"/>
+    </Designate>
+</metatype:MetaData>

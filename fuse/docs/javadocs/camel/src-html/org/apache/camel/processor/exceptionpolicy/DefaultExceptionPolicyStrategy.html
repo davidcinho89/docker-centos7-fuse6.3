@@ -1,0 +1,324 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * contributor license agreements.  See the NOTICE file distributed with<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * this work for additional information regarding copyright ownership.<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * The ASF licenses this file to You under the Apache License, Version 2.0<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * (the "License"); you may not use this file except in compliance with<a name="line.6"></a>
+<span class="sourceLineNo">007</span> * the License.  You may obtain a copy of the License at<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *<a name="line.8"></a>
+<span class="sourceLineNo">009</span> *      http://www.apache.org/licenses/LICENSE-2.0<a name="line.9"></a>
+<span class="sourceLineNo">010</span> *<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * Unless required by applicable law or agreed to in writing, software<a name="line.11"></a>
+<span class="sourceLineNo">012</span> * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.12"></a>
+<span class="sourceLineNo">013</span> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * See the License for the specific language governing permissions and<a name="line.14"></a>
+<span class="sourceLineNo">015</span> * limitations under the License.<a name="line.15"></a>
+<span class="sourceLineNo">016</span> */<a name="line.16"></a>
+<span class="sourceLineNo">017</span>package org.apache.camel.processor.exceptionpolicy;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import java.util.Iterator;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import java.util.LinkedHashMap;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import java.util.Map;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import java.util.Set;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import java.util.TreeMap;<a name="line.23"></a>
+<span class="sourceLineNo">024</span><a name="line.24"></a>
+<span class="sourceLineNo">025</span>import org.apache.camel.Exchange;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import org.apache.camel.model.OnExceptionDefinition;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import org.apache.camel.model.ProcessorDefinitionHelper;<a name="line.27"></a>
+<span class="sourceLineNo">028</span>import org.apache.camel.model.RouteDefinition;<a name="line.28"></a>
+<span class="sourceLineNo">029</span>import org.apache.camel.util.ObjectHelper;<a name="line.29"></a>
+<span class="sourceLineNo">030</span>import org.slf4j.Logger;<a name="line.30"></a>
+<span class="sourceLineNo">031</span>import org.slf4j.LoggerFactory;<a name="line.31"></a>
+<span class="sourceLineNo">032</span><a name="line.32"></a>
+<span class="sourceLineNo">033</span>/**<a name="line.33"></a>
+<span class="sourceLineNo">034</span> * The default strategy used in Camel to resolve the {@link org.apache.camel.model.OnExceptionDefinition} that should<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * handle the thrown exception.<a name="line.35"></a>
+<span class="sourceLineNo">036</span> * &lt;p/&gt;<a name="line.36"></a>
+<span class="sourceLineNo">037</span> * &lt;b&gt;Selection strategy:&lt;/b&gt;<a name="line.37"></a>
+<span class="sourceLineNo">038</span> * &lt;br/&gt;This strategy applies the following rules:<a name="line.38"></a>
+<span class="sourceLineNo">039</span> * &lt;ul&gt;<a name="line.39"></a>
+<span class="sourceLineNo">040</span> * &lt;li&gt;Will walk the exception hierarchy from bottom upwards till the thrown exception, meaning that the most outer caused<a name="line.40"></a>
+<span class="sourceLineNo">041</span> * by is selected first, ending with the thrown exception itself. The method {@link #createExceptionIterator(Throwable)}<a name="line.41"></a>
+<span class="sourceLineNo">042</span> * provides the Iterator used for the walking.&lt;/li&gt;<a name="line.42"></a>
+<span class="sourceLineNo">043</span> * &lt;li&gt;The exception type must be configured with an Exception that is an instance of the thrown exception, this<a name="line.43"></a>
+<span class="sourceLineNo">044</span> * is tested using the {@link #filter(org.apache.camel.model.OnExceptionDefinition, Class, Throwable)} method.<a name="line.44"></a>
+<span class="sourceLineNo">045</span> * By default the filter uses &lt;tt&gt;instanceof&lt;/tt&gt; test.&lt;/li&gt;<a name="line.45"></a>
+<span class="sourceLineNo">046</span> * &lt;li&gt;If the exception type has &lt;b&gt;exactly&lt;/b&gt; the thrown exception then its selected as its an exact match&lt;/li&gt;<a name="line.46"></a>
+<span class="sourceLineNo">047</span> * &lt;li&gt;Otherwise the type that has an exception that is the closets super of the thrown exception is selected<a name="line.47"></a>
+<span class="sourceLineNo">048</span> * (recurring up the exception hierarchy)&lt;/li&gt;<a name="line.48"></a>
+<span class="sourceLineNo">049</span> * &lt;/ul&gt;<a name="line.49"></a>
+<span class="sourceLineNo">050</span> * &lt;p/&gt;<a name="line.50"></a>
+<span class="sourceLineNo">051</span> * &lt;b&gt;Fine grained matching:&lt;/b&gt;<a name="line.51"></a>
+<span class="sourceLineNo">052</span> * &lt;br/&gt; If the {@link OnExceptionDefinition} has a when defined with an expression the type is also matches against<a name="line.52"></a>
+<span class="sourceLineNo">053</span> * the current exchange using the {@link #matchesWhen(org.apache.camel.model.OnExceptionDefinition, org.apache.camel.Exchange)}<a name="line.53"></a>
+<span class="sourceLineNo">054</span> * method. This can be used to for more fine grained matching, so you can e.g. define multiple sets of<a name="line.54"></a>
+<span class="sourceLineNo">055</span> * exception types with the same exception class(es) but have a predicate attached to select which to select at runtime.<a name="line.55"></a>
+<span class="sourceLineNo">056</span> */<a name="line.56"></a>
+<span class="sourceLineNo">057</span>public class DefaultExceptionPolicyStrategy implements ExceptionPolicyStrategy {<a name="line.57"></a>
+<span class="sourceLineNo">058</span><a name="line.58"></a>
+<span class="sourceLineNo">059</span>    private static final Logger LOG = LoggerFactory.getLogger(DefaultExceptionPolicyStrategy.class);<a name="line.59"></a>
+<span class="sourceLineNo">060</span><a name="line.60"></a>
+<span class="sourceLineNo">061</span>    public OnExceptionDefinition getExceptionPolicy(Map&lt;ExceptionPolicyKey, OnExceptionDefinition&gt; exceptionPolicies,<a name="line.61"></a>
+<span class="sourceLineNo">062</span>                                                    Exchange exchange, Throwable exception) {<a name="line.62"></a>
+<span class="sourceLineNo">063</span><a name="line.63"></a>
+<span class="sourceLineNo">064</span>        Map&lt;Integer, OnExceptionDefinition&gt; candidates = new TreeMap&lt;Integer, OnExceptionDefinition&gt;();<a name="line.64"></a>
+<span class="sourceLineNo">065</span>        Map&lt;ExceptionPolicyKey, OnExceptionDefinition&gt; routeScoped = new LinkedHashMap&lt;ExceptionPolicyKey, OnExceptionDefinition&gt;();<a name="line.65"></a>
+<span class="sourceLineNo">066</span>        Map&lt;ExceptionPolicyKey, OnExceptionDefinition&gt; contextScoped = new LinkedHashMap&lt;ExceptionPolicyKey, OnExceptionDefinition&gt;();<a name="line.66"></a>
+<span class="sourceLineNo">067</span><a name="line.67"></a>
+<span class="sourceLineNo">068</span>        // split policies into route and context scoped<a name="line.68"></a>
+<span class="sourceLineNo">069</span>        initRouteAndContextScopedExceptionPolicies(exceptionPolicies, routeScoped, contextScoped);<a name="line.69"></a>
+<span class="sourceLineNo">070</span><a name="line.70"></a>
+<span class="sourceLineNo">071</span>        // at first check route scoped as we prefer them over context scoped<a name="line.71"></a>
+<span class="sourceLineNo">072</span>        // recursive up the tree using the iterator<a name="line.72"></a>
+<span class="sourceLineNo">073</span>        boolean exactMatch = false;<a name="line.73"></a>
+<span class="sourceLineNo">074</span>        Iterator&lt;Throwable&gt; it = createExceptionIterator(exception);<a name="line.74"></a>
+<span class="sourceLineNo">075</span>        while (!exactMatch &amp;&amp; it.hasNext()) {<a name="line.75"></a>
+<span class="sourceLineNo">076</span>            // we should stop looking if we have found an exact match<a name="line.76"></a>
+<span class="sourceLineNo">077</span>            exactMatch = findMatchedExceptionPolicy(routeScoped, exchange, it.next(), candidates);<a name="line.77"></a>
+<span class="sourceLineNo">078</span>        }<a name="line.78"></a>
+<span class="sourceLineNo">079</span><a name="line.79"></a>
+<span class="sourceLineNo">080</span>        // fallback to check context scoped (only do this if there was no exact match)<a name="line.80"></a>
+<span class="sourceLineNo">081</span>        it = createExceptionIterator(exception);<a name="line.81"></a>
+<span class="sourceLineNo">082</span>        while (!exactMatch &amp;&amp; it.hasNext()) {<a name="line.82"></a>
+<span class="sourceLineNo">083</span>            // we should stop looking if we have found an exact match<a name="line.83"></a>
+<span class="sourceLineNo">084</span>            exactMatch = findMatchedExceptionPolicy(contextScoped, exchange, it.next(), candidates);<a name="line.84"></a>
+<span class="sourceLineNo">085</span>        }<a name="line.85"></a>
+<span class="sourceLineNo">086</span><a name="line.86"></a>
+<span class="sourceLineNo">087</span>        // now go through the candidates and find the best<a name="line.87"></a>
+<span class="sourceLineNo">088</span>        LOG.trace("Found {} candidates", candidates.size());<a name="line.88"></a>
+<span class="sourceLineNo">089</span><a name="line.89"></a>
+<span class="sourceLineNo">090</span>        if (candidates.isEmpty()) {<a name="line.90"></a>
+<span class="sourceLineNo">091</span>            // no type found<a name="line.91"></a>
+<span class="sourceLineNo">092</span>            return null;<a name="line.92"></a>
+<span class="sourceLineNo">093</span>        } else {<a name="line.93"></a>
+<span class="sourceLineNo">094</span>            // return the first in the map as its sorted and we checked route scoped first, which we prefer<a name="line.94"></a>
+<span class="sourceLineNo">095</span>            return candidates.values().iterator().next();<a name="line.95"></a>
+<span class="sourceLineNo">096</span>        }<a name="line.96"></a>
+<span class="sourceLineNo">097</span>    }<a name="line.97"></a>
+<span class="sourceLineNo">098</span><a name="line.98"></a>
+<span class="sourceLineNo">099</span>    private void initRouteAndContextScopedExceptionPolicies(Map&lt;ExceptionPolicyKey, OnExceptionDefinition&gt; exceptionPolicies,<a name="line.99"></a>
+<span class="sourceLineNo">100</span>                                                            Map&lt;ExceptionPolicyKey, OnExceptionDefinition&gt; routeScoped,<a name="line.100"></a>
+<span class="sourceLineNo">101</span>                                                            Map&lt;ExceptionPolicyKey, OnExceptionDefinition&gt; contextScoped) {<a name="line.101"></a>
+<span class="sourceLineNo">102</span><a name="line.102"></a>
+<span class="sourceLineNo">103</span>        // loop through all the entries and split into route and context scoped<a name="line.103"></a>
+<span class="sourceLineNo">104</span>        Set&lt;Map.Entry&lt;ExceptionPolicyKey, OnExceptionDefinition&gt;&gt; entries = exceptionPolicies.entrySet();<a name="line.104"></a>
+<span class="sourceLineNo">105</span>        for (Map.Entry&lt;ExceptionPolicyKey, OnExceptionDefinition&gt; entry : entries) {<a name="line.105"></a>
+<span class="sourceLineNo">106</span>            if (entry.getKey().getRouteId() != null) {<a name="line.106"></a>
+<span class="sourceLineNo">107</span>                routeScoped.put(entry.getKey(), entry.getValue());<a name="line.107"></a>
+<span class="sourceLineNo">108</span>            } else {<a name="line.108"></a>
+<span class="sourceLineNo">109</span>                contextScoped.put(entry.getKey(), entry.getValue());<a name="line.109"></a>
+<span class="sourceLineNo">110</span>            }<a name="line.110"></a>
+<span class="sourceLineNo">111</span>        }<a name="line.111"></a>
+<span class="sourceLineNo">112</span>    }<a name="line.112"></a>
+<span class="sourceLineNo">113</span><a name="line.113"></a>
+<span class="sourceLineNo">114</span><a name="line.114"></a>
+<span class="sourceLineNo">115</span>    private boolean findMatchedExceptionPolicy(Map&lt;ExceptionPolicyKey, OnExceptionDefinition&gt; exceptionPolicies,<a name="line.115"></a>
+<span class="sourceLineNo">116</span>                                               Exchange exchange, Throwable exception,<a name="line.116"></a>
+<span class="sourceLineNo">117</span>                                               Map&lt;Integer, OnExceptionDefinition&gt; candidates) {<a name="line.117"></a>
+<span class="sourceLineNo">118</span>        if (LOG.isTraceEnabled()) {<a name="line.118"></a>
+<span class="sourceLineNo">119</span>            LOG.trace("Finding best suited exception policy for thrown exception {}", exception.getClass().getName());<a name="line.119"></a>
+<span class="sourceLineNo">120</span>        }<a name="line.120"></a>
+<span class="sourceLineNo">121</span><a name="line.121"></a>
+<span class="sourceLineNo">122</span>        // the goal is to find the exception with the same/closet inheritance level as the target exception being thrown<a name="line.122"></a>
+<span class="sourceLineNo">123</span>        int targetLevel = getInheritanceLevel(exception.getClass());<a name="line.123"></a>
+<span class="sourceLineNo">124</span>        // candidate is the best candidate found so far to return<a name="line.124"></a>
+<span class="sourceLineNo">125</span>        OnExceptionDefinition candidate = null;<a name="line.125"></a>
+<span class="sourceLineNo">126</span>        // difference in inheritance level between the current candidate and the thrown exception (target level)<a name="line.126"></a>
+<span class="sourceLineNo">127</span>        int candidateDiff = Integer.MAX_VALUE;<a name="line.127"></a>
+<span class="sourceLineNo">128</span><a name="line.128"></a>
+<span class="sourceLineNo">129</span>        // loop through all the entries and find the best candidates to use<a name="line.129"></a>
+<span class="sourceLineNo">130</span>        Set&lt;Map.Entry&lt;ExceptionPolicyKey, OnExceptionDefinition&gt;&gt; entries = exceptionPolicies.entrySet();<a name="line.130"></a>
+<span class="sourceLineNo">131</span>        for (Map.Entry&lt;ExceptionPolicyKey, OnExceptionDefinition&gt; entry : entries) {<a name="line.131"></a>
+<span class="sourceLineNo">132</span>            Class&lt;?&gt; clazz = entry.getKey().getExceptionClass();<a name="line.132"></a>
+<span class="sourceLineNo">133</span>            OnExceptionDefinition type = entry.getValue();<a name="line.133"></a>
+<span class="sourceLineNo">134</span><a name="line.134"></a>
+<span class="sourceLineNo">135</span>            // if OnException is route scoped then the current route (Exchange) must match<a name="line.135"></a>
+<span class="sourceLineNo">136</span>            // so we will not pick an OnException from another route<a name="line.136"></a>
+<span class="sourceLineNo">137</span>            if (exchange != null &amp;&amp; exchange.getUnitOfWork() != null &amp;&amp; type.isRouteScoped()) {<a name="line.137"></a>
+<span class="sourceLineNo">138</span>                RouteDefinition route = exchange.getUnitOfWork().getRouteContext() != null ? exchange.getUnitOfWork().getRouteContext().getRoute() : null;<a name="line.138"></a>
+<span class="sourceLineNo">139</span>                RouteDefinition typeRoute = ProcessorDefinitionHelper.getRoute(type);<a name="line.139"></a>
+<span class="sourceLineNo">140</span>                if (route != null &amp;&amp; typeRoute != null &amp;&amp; route != typeRoute) {<a name="line.140"></a>
+<span class="sourceLineNo">141</span>                    if (LOG.isTraceEnabled()) {<a name="line.141"></a>
+<span class="sourceLineNo">142</span>                        LOG.trace("The type is scoped for route: {} however Exchange is at route: {}", typeRoute.getId(), route.getId());<a name="line.142"></a>
+<span class="sourceLineNo">143</span>                    }<a name="line.143"></a>
+<span class="sourceLineNo">144</span>                    continue;<a name="line.144"></a>
+<span class="sourceLineNo">145</span>                }<a name="line.145"></a>
+<span class="sourceLineNo">146</span>            }<a name="line.146"></a>
+<span class="sourceLineNo">147</span><a name="line.147"></a>
+<span class="sourceLineNo">148</span>            if (filter(type, clazz, exception)) {<a name="line.148"></a>
+<span class="sourceLineNo">149</span><a name="line.149"></a>
+<span class="sourceLineNo">150</span>                // must match<a name="line.150"></a>
+<span class="sourceLineNo">151</span>                if (!matchesWhen(type, exchange)) {<a name="line.151"></a>
+<span class="sourceLineNo">152</span>                    LOG.trace("The type did not match when: {}", type);<a name="line.152"></a>
+<span class="sourceLineNo">153</span>                    continue;<a name="line.153"></a>
+<span class="sourceLineNo">154</span>                }<a name="line.154"></a>
+<span class="sourceLineNo">155</span><a name="line.155"></a>
+<span class="sourceLineNo">156</span>                // exact match then break<a name="line.156"></a>
+<span class="sourceLineNo">157</span>                if (clazz.equals(exception.getClass())) {<a name="line.157"></a>
+<span class="sourceLineNo">158</span>                    candidate = type;<a name="line.158"></a>
+<span class="sourceLineNo">159</span>                    candidateDiff = 0;<a name="line.159"></a>
+<span class="sourceLineNo">160</span>                    break;<a name="line.160"></a>
+<span class="sourceLineNo">161</span>                }<a name="line.161"></a>
+<span class="sourceLineNo">162</span><a name="line.162"></a>
+<span class="sourceLineNo">163</span>                // not an exact match so find the best candidate<a name="line.163"></a>
+<span class="sourceLineNo">164</span>                int level = getInheritanceLevel(clazz);<a name="line.164"></a>
+<span class="sourceLineNo">165</span>                int diff = targetLevel - level;<a name="line.165"></a>
+<span class="sourceLineNo">166</span><a name="line.166"></a>
+<span class="sourceLineNo">167</span>                if (diff &lt; candidateDiff) {<a name="line.167"></a>
+<span class="sourceLineNo">168</span>                    // replace with a much better candidate<a name="line.168"></a>
+<span class="sourceLineNo">169</span>                    candidate = type;<a name="line.169"></a>
+<span class="sourceLineNo">170</span>                    candidateDiff = diff;<a name="line.170"></a>
+<span class="sourceLineNo">171</span>                }<a name="line.171"></a>
+<span class="sourceLineNo">172</span>            }<a name="line.172"></a>
+<span class="sourceLineNo">173</span>        }<a name="line.173"></a>
+<span class="sourceLineNo">174</span><a name="line.174"></a>
+<span class="sourceLineNo">175</span>        if (candidate != null) {<a name="line.175"></a>
+<span class="sourceLineNo">176</span>            if (!candidates.containsKey(candidateDiff)) {<a name="line.176"></a>
+<span class="sourceLineNo">177</span>                // only add as candidate if we do not already have it registered with that level<a name="line.177"></a>
+<span class="sourceLineNo">178</span>                LOG.trace("Adding {} as candidate at level {}", candidate, candidateDiff);<a name="line.178"></a>
+<span class="sourceLineNo">179</span>                candidates.put(candidateDiff, candidate);<a name="line.179"></a>
+<span class="sourceLineNo">180</span>            } else {<a name="line.180"></a>
+<span class="sourceLineNo">181</span>                // we have an existing candidate already which we should prefer to use<a name="line.181"></a>
+<span class="sourceLineNo">182</span>                // for example we check route scope before context scope (preferring route scopes)<a name="line.182"></a>
+<span class="sourceLineNo">183</span>                if (LOG.isTraceEnabled()) {<a name="line.183"></a>
+<span class="sourceLineNo">184</span>                    LOG.trace("Existing candidate {} takes precedence over{} at level {}",<a name="line.184"></a>
+<span class="sourceLineNo">185</span>                            new Object[]{candidates.get(candidateDiff), candidate, candidateDiff});<a name="line.185"></a>
+<span class="sourceLineNo">186</span>                }<a name="line.186"></a>
+<span class="sourceLineNo">187</span>            }<a name="line.187"></a>
+<span class="sourceLineNo">188</span>        }<a name="line.188"></a>
+<span class="sourceLineNo">189</span><a name="line.189"></a>
+<span class="sourceLineNo">190</span>        // if we found a exact match then we should stop continue looking<a name="line.190"></a>
+<span class="sourceLineNo">191</span>        boolean exactMatch = candidateDiff == 0;<a name="line.191"></a>
+<span class="sourceLineNo">192</span>        if (LOG.isTraceEnabled() &amp;&amp; exactMatch) {<a name="line.192"></a>
+<span class="sourceLineNo">193</span>            LOG.trace("Exact match found for candidate: {}", candidate);<a name="line.193"></a>
+<span class="sourceLineNo">194</span>        }<a name="line.194"></a>
+<span class="sourceLineNo">195</span>        return exactMatch;<a name="line.195"></a>
+<span class="sourceLineNo">196</span>    }<a name="line.196"></a>
+<span class="sourceLineNo">197</span><a name="line.197"></a>
+<span class="sourceLineNo">198</span>    /**<a name="line.198"></a>
+<span class="sourceLineNo">199</span>     * Strategy to filter the given type exception class with the thrown exception<a name="line.199"></a>
+<span class="sourceLineNo">200</span>     *<a name="line.200"></a>
+<span class="sourceLineNo">201</span>     * @param type           the exception type<a name="line.201"></a>
+<span class="sourceLineNo">202</span>     * @param exceptionClass the current exception class for testing<a name="line.202"></a>
+<span class="sourceLineNo">203</span>     * @param exception      the thrown exception<a name="line.203"></a>
+<span class="sourceLineNo">204</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if the to current exception class is a candidate, &lt;tt&gt;false&lt;/tt&gt; to skip it.<a name="line.204"></a>
+<span class="sourceLineNo">205</span>     */<a name="line.205"></a>
+<span class="sourceLineNo">206</span>    protected boolean filter(OnExceptionDefinition type, Class&lt;?&gt; exceptionClass, Throwable exception) {<a name="line.206"></a>
+<span class="sourceLineNo">207</span>        // must be instance of check to ensure that the exceptionClass is one type of the thrown exception<a name="line.207"></a>
+<span class="sourceLineNo">208</span>        return exceptionClass.isInstance(exception);<a name="line.208"></a>
+<span class="sourceLineNo">209</span>    }<a name="line.209"></a>
+<span class="sourceLineNo">210</span><a name="line.210"></a>
+<span class="sourceLineNo">211</span>    /**<a name="line.211"></a>
+<span class="sourceLineNo">212</span>     * Strategy method for matching the exception type with the current exchange.<a name="line.212"></a>
+<span class="sourceLineNo">213</span>     * &lt;p/&gt;<a name="line.213"></a>
+<span class="sourceLineNo">214</span>     * This default implementation will match as:<a name="line.214"></a>
+<span class="sourceLineNo">215</span>     * &lt;ul&gt;<a name="line.215"></a>
+<span class="sourceLineNo">216</span>     * &lt;li&gt;Always true if no when predicate on the exception type<a name="line.216"></a>
+<span class="sourceLineNo">217</span>     * &lt;li&gt;Otherwise the when predicate is matches against the current exchange<a name="line.217"></a>
+<span class="sourceLineNo">218</span>     * &lt;/ul&gt;<a name="line.218"></a>
+<span class="sourceLineNo">219</span>     *<a name="line.219"></a>
+<span class="sourceLineNo">220</span>     * @param definition     the exception definition<a name="line.220"></a>
+<span class="sourceLineNo">221</span>     * @param exchange the current {@link Exchange}<a name="line.221"></a>
+<span class="sourceLineNo">222</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if matched, &lt;tt&gt;false&lt;/tt&gt; otherwise.<a name="line.222"></a>
+<span class="sourceLineNo">223</span>     */<a name="line.223"></a>
+<span class="sourceLineNo">224</span>    protected boolean matchesWhen(OnExceptionDefinition definition, Exchange exchange) {<a name="line.224"></a>
+<span class="sourceLineNo">225</span>        if (definition.getOnWhen() == null || definition.getOnWhen().getExpression() == null) {<a name="line.225"></a>
+<span class="sourceLineNo">226</span>            // if no predicate then it's always a match<a name="line.226"></a>
+<span class="sourceLineNo">227</span>            return true;<a name="line.227"></a>
+<span class="sourceLineNo">228</span>        }<a name="line.228"></a>
+<span class="sourceLineNo">229</span>        return definition.getOnWhen().getExpression().matches(exchange);<a name="line.229"></a>
+<span class="sourceLineNo">230</span>    }<a name="line.230"></a>
+<span class="sourceLineNo">231</span><a name="line.231"></a>
+<span class="sourceLineNo">232</span>    /**<a name="line.232"></a>
+<span class="sourceLineNo">233</span>     * Strategy method creating the iterator to walk the exception in the order Camel should use<a name="line.233"></a>
+<span class="sourceLineNo">234</span>     * for find the {@link OnExceptionDefinition} should be used.<a name="line.234"></a>
+<span class="sourceLineNo">235</span>     * &lt;p/&gt;<a name="line.235"></a>
+<span class="sourceLineNo">236</span>     * The default iterator will walk from the bottom upwards<a name="line.236"></a>
+<span class="sourceLineNo">237</span>     * (the last caused by going upwards to the exception)<a name="line.237"></a>
+<span class="sourceLineNo">238</span>     *<a name="line.238"></a>
+<span class="sourceLineNo">239</span>     * @param exception  the exception<a name="line.239"></a>
+<span class="sourceLineNo">240</span>     * @return the iterator<a name="line.240"></a>
+<span class="sourceLineNo">241</span>     */<a name="line.241"></a>
+<span class="sourceLineNo">242</span>    protected Iterator&lt;Throwable&gt; createExceptionIterator(Throwable exception) {<a name="line.242"></a>
+<span class="sourceLineNo">243</span>        return ObjectHelper.createExceptionIterator(exception);<a name="line.243"></a>
+<span class="sourceLineNo">244</span>    }<a name="line.244"></a>
+<span class="sourceLineNo">245</span><a name="line.245"></a>
+<span class="sourceLineNo">246</span>    private static int getInheritanceLevel(Class&lt;?&gt; clazz) {<a name="line.246"></a>
+<span class="sourceLineNo">247</span>        if (clazz == null || "java.lang.Object".equals(clazz.getName())) {<a name="line.247"></a>
+<span class="sourceLineNo">248</span>            return 0;<a name="line.248"></a>
+<span class="sourceLineNo">249</span>        }<a name="line.249"></a>
+<span class="sourceLineNo">250</span>        return 1 + getInheritanceLevel(clazz.getSuperclass());<a name="line.250"></a>
+<span class="sourceLineNo">251</span>    }<a name="line.251"></a>
+<span class="sourceLineNo">252</span>}<a name="line.252"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

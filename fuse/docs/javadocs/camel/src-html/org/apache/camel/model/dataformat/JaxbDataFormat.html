@@ -1,0 +1,398 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * contributor license agreements.  See the NOTICE file distributed with<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * this work for additional information regarding copyright ownership.<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * The ASF licenses this file to You under the Apache License, Version 2.0<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * (the "License"); you may not use this file except in compliance with<a name="line.6"></a>
+<span class="sourceLineNo">007</span> * the License.  You may obtain a copy of the License at<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *<a name="line.8"></a>
+<span class="sourceLineNo">009</span> *      http://www.apache.org/licenses/LICENSE-2.0<a name="line.9"></a>
+<span class="sourceLineNo">010</span> *<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * Unless required by applicable law or agreed to in writing, software<a name="line.11"></a>
+<span class="sourceLineNo">012</span> * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.12"></a>
+<span class="sourceLineNo">013</span> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * See the License for the specific language governing permissions and<a name="line.14"></a>
+<span class="sourceLineNo">015</span> * limitations under the License.<a name="line.15"></a>
+<span class="sourceLineNo">016</span> */<a name="line.16"></a>
+<span class="sourceLineNo">017</span>package org.apache.camel.model.dataformat;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import javax.xml.bind.annotation.XmlAccessType;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import javax.xml.bind.annotation.XmlAccessorType;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import javax.xml.bind.annotation.XmlAttribute;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import javax.xml.bind.annotation.XmlRootElement;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import javax.xml.namespace.QName;<a name="line.23"></a>
+<span class="sourceLineNo">024</span><a name="line.24"></a>
+<span class="sourceLineNo">025</span>import org.apache.camel.CamelContext;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import org.apache.camel.model.DataFormatDefinition;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import org.apache.camel.spi.DataFormat;<a name="line.27"></a>
+<span class="sourceLineNo">028</span>import org.apache.camel.spi.Metadata;<a name="line.28"></a>
+<span class="sourceLineNo">029</span>import org.apache.camel.util.ObjectHelper;<a name="line.29"></a>
+<span class="sourceLineNo">030</span><a name="line.30"></a>
+<span class="sourceLineNo">031</span>/**<a name="line.31"></a>
+<span class="sourceLineNo">032</span> * JAXB data format<a name="line.32"></a>
+<span class="sourceLineNo">033</span> *<a name="line.33"></a>
+<span class="sourceLineNo">034</span> * @version <a name="line.34"></a>
+<span class="sourceLineNo">035</span> */<a name="line.35"></a>
+<span class="sourceLineNo">036</span>@Metadata(label = "dataformat,transformation,xml", title = "JAXB")<a name="line.36"></a>
+<span class="sourceLineNo">037</span>@XmlRootElement(name = "jaxb")<a name="line.37"></a>
+<span class="sourceLineNo">038</span>@XmlAccessorType(XmlAccessType.FIELD)<a name="line.38"></a>
+<span class="sourceLineNo">039</span>public class JaxbDataFormat extends DataFormatDefinition {<a name="line.39"></a>
+<span class="sourceLineNo">040</span>    @XmlAttribute(required = true)<a name="line.40"></a>
+<span class="sourceLineNo">041</span>    private String contextPath;<a name="line.41"></a>
+<span class="sourceLineNo">042</span>    @XmlAttribute<a name="line.42"></a>
+<span class="sourceLineNo">043</span>    private String schema;<a name="line.43"></a>
+<span class="sourceLineNo">044</span>    @XmlAttribute<a name="line.44"></a>
+<span class="sourceLineNo">045</span>    private Boolean prettyPrint;<a name="line.45"></a>
+<span class="sourceLineNo">046</span>    @XmlAttribute<a name="line.46"></a>
+<span class="sourceLineNo">047</span>    private Boolean objectFactory;<a name="line.47"></a>
+<span class="sourceLineNo">048</span>    @XmlAttribute<a name="line.48"></a>
+<span class="sourceLineNo">049</span>    private Boolean ignoreJAXBElement;<a name="line.49"></a>
+<span class="sourceLineNo">050</span>    @XmlAttribute<a name="line.50"></a>
+<span class="sourceLineNo">051</span>    private Boolean mustBeJAXBElement;<a name="line.51"></a>
+<span class="sourceLineNo">052</span>    @XmlAttribute<a name="line.52"></a>
+<span class="sourceLineNo">053</span>    private Boolean filterNonXmlChars;<a name="line.53"></a>
+<span class="sourceLineNo">054</span>    @XmlAttribute<a name="line.54"></a>
+<span class="sourceLineNo">055</span>    private String encoding;<a name="line.55"></a>
+<span class="sourceLineNo">056</span>    @XmlAttribute<a name="line.56"></a>
+<span class="sourceLineNo">057</span>    private Boolean fragment;<a name="line.57"></a>
+<span class="sourceLineNo">058</span>    // Partial encoding<a name="line.58"></a>
+<span class="sourceLineNo">059</span>    @XmlAttribute<a name="line.59"></a>
+<span class="sourceLineNo">060</span>    private String partClass;<a name="line.60"></a>
+<span class="sourceLineNo">061</span>    @XmlAttribute<a name="line.61"></a>
+<span class="sourceLineNo">062</span>    private String partNamespace;<a name="line.62"></a>
+<span class="sourceLineNo">063</span>    @XmlAttribute<a name="line.63"></a>
+<span class="sourceLineNo">064</span>    private String namespacePrefixRef;<a name="line.64"></a>
+<span class="sourceLineNo">065</span>    @XmlAttribute<a name="line.65"></a>
+<span class="sourceLineNo">066</span>    private String xmlStreamWriterWrapper;<a name="line.66"></a>
+<span class="sourceLineNo">067</span>    @XmlAttribute<a name="line.67"></a>
+<span class="sourceLineNo">068</span>    private String schemaLocation;<a name="line.68"></a>
+<span class="sourceLineNo">069</span>    @XmlAttribute<a name="line.69"></a>
+<span class="sourceLineNo">070</span>    private String noNamespaceSchemaLocation;<a name="line.70"></a>
+<span class="sourceLineNo">071</span><a name="line.71"></a>
+<span class="sourceLineNo">072</span>    public JaxbDataFormat() {<a name="line.72"></a>
+<span class="sourceLineNo">073</span>        super("jaxb");<a name="line.73"></a>
+<span class="sourceLineNo">074</span>    }<a name="line.74"></a>
+<span class="sourceLineNo">075</span><a name="line.75"></a>
+<span class="sourceLineNo">076</span>    public JaxbDataFormat(boolean prettyPrint) {<a name="line.76"></a>
+<span class="sourceLineNo">077</span>        this();<a name="line.77"></a>
+<span class="sourceLineNo">078</span>        setPrettyPrint(prettyPrint);<a name="line.78"></a>
+<span class="sourceLineNo">079</span>    }<a name="line.79"></a>
+<span class="sourceLineNo">080</span><a name="line.80"></a>
+<span class="sourceLineNo">081</span>    public String getContextPath() {<a name="line.81"></a>
+<span class="sourceLineNo">082</span>        return contextPath;<a name="line.82"></a>
+<span class="sourceLineNo">083</span>    }<a name="line.83"></a>
+<span class="sourceLineNo">084</span><a name="line.84"></a>
+<span class="sourceLineNo">085</span>    /**<a name="line.85"></a>
+<span class="sourceLineNo">086</span>     * Package name where your JAXB classes are located.<a name="line.86"></a>
+<span class="sourceLineNo">087</span>     */<a name="line.87"></a>
+<span class="sourceLineNo">088</span>    public void setContextPath(String contextPath) {<a name="line.88"></a>
+<span class="sourceLineNo">089</span>        this.contextPath = contextPath;<a name="line.89"></a>
+<span class="sourceLineNo">090</span>    }<a name="line.90"></a>
+<span class="sourceLineNo">091</span><a name="line.91"></a>
+<span class="sourceLineNo">092</span>    public String getSchema() {<a name="line.92"></a>
+<span class="sourceLineNo">093</span>        return schema;<a name="line.93"></a>
+<span class="sourceLineNo">094</span>    }<a name="line.94"></a>
+<span class="sourceLineNo">095</span><a name="line.95"></a>
+<span class="sourceLineNo">096</span>    /**<a name="line.96"></a>
+<span class="sourceLineNo">097</span>     * To validate against an existing schema.<a name="line.97"></a>
+<span class="sourceLineNo">098</span>     * Your can use the prefix classpath:, file:* or *http: to specify how the resource should by resolved.<a name="line.98"></a>
+<span class="sourceLineNo">099</span>     * You can separate multiple schema files by using the ',' character.<a name="line.99"></a>
+<span class="sourceLineNo">100</span>     */<a name="line.100"></a>
+<span class="sourceLineNo">101</span>    public void setSchema(String schema) {<a name="line.101"></a>
+<span class="sourceLineNo">102</span>        this.schema = schema;<a name="line.102"></a>
+<span class="sourceLineNo">103</span>    }<a name="line.103"></a>
+<span class="sourceLineNo">104</span><a name="line.104"></a>
+<span class="sourceLineNo">105</span>    public Boolean getPrettyPrint() {<a name="line.105"></a>
+<span class="sourceLineNo">106</span>        return prettyPrint;<a name="line.106"></a>
+<span class="sourceLineNo">107</span>    }<a name="line.107"></a>
+<span class="sourceLineNo">108</span><a name="line.108"></a>
+<span class="sourceLineNo">109</span>    /**<a name="line.109"></a>
+<span class="sourceLineNo">110</span>     * To enable pretty printing output nicely formatted.<a name="line.110"></a>
+<span class="sourceLineNo">111</span>     * &lt;p/&gt;<a name="line.111"></a>
+<span class="sourceLineNo">112</span>     * Is by default false.<a name="line.112"></a>
+<span class="sourceLineNo">113</span>     */<a name="line.113"></a>
+<span class="sourceLineNo">114</span>    public void setPrettyPrint(Boolean prettyPrint) {<a name="line.114"></a>
+<span class="sourceLineNo">115</span>        this.prettyPrint = prettyPrint;<a name="line.115"></a>
+<span class="sourceLineNo">116</span>    }<a name="line.116"></a>
+<span class="sourceLineNo">117</span><a name="line.117"></a>
+<span class="sourceLineNo">118</span>    public Boolean getObjectFactory() {<a name="line.118"></a>
+<span class="sourceLineNo">119</span>        return objectFactory;<a name="line.119"></a>
+<span class="sourceLineNo">120</span>    }<a name="line.120"></a>
+<span class="sourceLineNo">121</span><a name="line.121"></a>
+<span class="sourceLineNo">122</span>    /**<a name="line.122"></a>
+<span class="sourceLineNo">123</span>     * Whether to allow using ObjectFactory classes to create the POJO classes during marshalling.<a name="line.123"></a>
+<span class="sourceLineNo">124</span>     * This only applies to POJO classes that has not been annotated with JAXB and providing jaxb.index descriptor files.<a name="line.124"></a>
+<span class="sourceLineNo">125</span>     */<a name="line.125"></a>
+<span class="sourceLineNo">126</span>    public void setObjectFactory(Boolean objectFactory) {<a name="line.126"></a>
+<span class="sourceLineNo">127</span>        this.objectFactory = objectFactory;<a name="line.127"></a>
+<span class="sourceLineNo">128</span>    }<a name="line.128"></a>
+<span class="sourceLineNo">129</span><a name="line.129"></a>
+<span class="sourceLineNo">130</span>    public Boolean getIgnoreJAXBElement() {<a name="line.130"></a>
+<span class="sourceLineNo">131</span>        return ignoreJAXBElement;<a name="line.131"></a>
+<span class="sourceLineNo">132</span>    }<a name="line.132"></a>
+<span class="sourceLineNo">133</span><a name="line.133"></a>
+<span class="sourceLineNo">134</span>    /**<a name="line.134"></a>
+<span class="sourceLineNo">135</span>     * Whether to ignore JAXBElement elements - only needed to be set to false in very special use-cases.<a name="line.135"></a>
+<span class="sourceLineNo">136</span>     */<a name="line.136"></a>
+<span class="sourceLineNo">137</span>    public void setIgnoreJAXBElement(Boolean ignoreJAXBElement) {<a name="line.137"></a>
+<span class="sourceLineNo">138</span>        this.ignoreJAXBElement = ignoreJAXBElement;<a name="line.138"></a>
+<span class="sourceLineNo">139</span>    }<a name="line.139"></a>
+<span class="sourceLineNo">140</span><a name="line.140"></a>
+<span class="sourceLineNo">141</span>    public Boolean getMustBeJAXBElement() {<a name="line.141"></a>
+<span class="sourceLineNo">142</span>        return mustBeJAXBElement;<a name="line.142"></a>
+<span class="sourceLineNo">143</span>    }<a name="line.143"></a>
+<span class="sourceLineNo">144</span><a name="line.144"></a>
+<span class="sourceLineNo">145</span>    /**<a name="line.145"></a>
+<span class="sourceLineNo">146</span>     * Whether marhsalling must be java objects with JAXB annotations. And if not then it fails.<a name="line.146"></a>
+<span class="sourceLineNo">147</span>     * This option can be set to false to relax that, such as when the data is already in XML format.<a name="line.147"></a>
+<span class="sourceLineNo">148</span>     */<a name="line.148"></a>
+<span class="sourceLineNo">149</span>    public void setMustBeJAXBElement(Boolean mustBeJAXBElement) {<a name="line.149"></a>
+<span class="sourceLineNo">150</span>        this.mustBeJAXBElement = mustBeJAXBElement;<a name="line.150"></a>
+<span class="sourceLineNo">151</span>    }<a name="line.151"></a>
+<span class="sourceLineNo">152</span><a name="line.152"></a>
+<span class="sourceLineNo">153</span>    /**<a name="line.153"></a>
+<span class="sourceLineNo">154</span>     * To turn on marshalling XML fragment trees.<a name="line.154"></a>
+<span class="sourceLineNo">155</span>     * By default JAXB looks for @XmlRootElement annotation on given class to operate on whole XML tree.<a name="line.155"></a>
+<span class="sourceLineNo">156</span>     * This is useful but not always - sometimes generated code does not have @XmlRootElement annotation,<a name="line.156"></a>
+<span class="sourceLineNo">157</span>     * sometimes you need unmarshall only part of tree.<a name="line.157"></a>
+<span class="sourceLineNo">158</span>     * In that case you can use partial unmarshalling. To enable this behaviours you need set property partClass.<a name="line.158"></a>
+<span class="sourceLineNo">159</span>     * Camel will pass this class to JAXB's unmarshaler.<a name="line.159"></a>
+<span class="sourceLineNo">160</span>     */<a name="line.160"></a>
+<span class="sourceLineNo">161</span>    public void setFragment(Boolean fragment) {<a name="line.161"></a>
+<span class="sourceLineNo">162</span>        this.fragment = fragment;<a name="line.162"></a>
+<span class="sourceLineNo">163</span>    }<a name="line.163"></a>
+<span class="sourceLineNo">164</span>    <a name="line.164"></a>
+<span class="sourceLineNo">165</span>    public Boolean getFragment() {<a name="line.165"></a>
+<span class="sourceLineNo">166</span>        return fragment;<a name="line.166"></a>
+<span class="sourceLineNo">167</span>    }<a name="line.167"></a>
+<span class="sourceLineNo">168</span><a name="line.168"></a>
+<span class="sourceLineNo">169</span>    public Boolean getFilterNonXmlChars() {<a name="line.169"></a>
+<span class="sourceLineNo">170</span>        return filterNonXmlChars;<a name="line.170"></a>
+<span class="sourceLineNo">171</span>    }<a name="line.171"></a>
+<span class="sourceLineNo">172</span><a name="line.172"></a>
+<span class="sourceLineNo">173</span>    /**<a name="line.173"></a>
+<span class="sourceLineNo">174</span>     * To ignore non xml characheters and replace them with an empty space.<a name="line.174"></a>
+<span class="sourceLineNo">175</span>     */<a name="line.175"></a>
+<span class="sourceLineNo">176</span>    public void setFilterNonXmlChars(Boolean filterNonXmlChars) {<a name="line.176"></a>
+<span class="sourceLineNo">177</span>        this.filterNonXmlChars = filterNonXmlChars;<a name="line.177"></a>
+<span class="sourceLineNo">178</span>    }<a name="line.178"></a>
+<span class="sourceLineNo">179</span><a name="line.179"></a>
+<span class="sourceLineNo">180</span>    public String getEncoding() {<a name="line.180"></a>
+<span class="sourceLineNo">181</span>        return encoding;<a name="line.181"></a>
+<span class="sourceLineNo">182</span>    }<a name="line.182"></a>
+<span class="sourceLineNo">183</span><a name="line.183"></a>
+<span class="sourceLineNo">184</span>    /**<a name="line.184"></a>
+<span class="sourceLineNo">185</span>     * To overrule and use a specific encoding<a name="line.185"></a>
+<span class="sourceLineNo">186</span>     */<a name="line.186"></a>
+<span class="sourceLineNo">187</span>    public void setEncoding(String encoding) {<a name="line.187"></a>
+<span class="sourceLineNo">188</span>        this.encoding = encoding;<a name="line.188"></a>
+<span class="sourceLineNo">189</span>    }<a name="line.189"></a>
+<span class="sourceLineNo">190</span><a name="line.190"></a>
+<span class="sourceLineNo">191</span>    public String getPartClass() {<a name="line.191"></a>
+<span class="sourceLineNo">192</span>        return partClass;<a name="line.192"></a>
+<span class="sourceLineNo">193</span>    }<a name="line.193"></a>
+<span class="sourceLineNo">194</span><a name="line.194"></a>
+<span class="sourceLineNo">195</span>    /**<a name="line.195"></a>
+<span class="sourceLineNo">196</span>     * Name of class used for fragment parsing.<a name="line.196"></a>
+<span class="sourceLineNo">197</span>     * &lt;p/&gt;<a name="line.197"></a>
+<span class="sourceLineNo">198</span>     * See more details at the fragment option.<a name="line.198"></a>
+<span class="sourceLineNo">199</span>     */<a name="line.199"></a>
+<span class="sourceLineNo">200</span>    public void setPartClass(String partClass) {<a name="line.200"></a>
+<span class="sourceLineNo">201</span>        this.partClass = partClass;<a name="line.201"></a>
+<span class="sourceLineNo">202</span>    }<a name="line.202"></a>
+<span class="sourceLineNo">203</span><a name="line.203"></a>
+<span class="sourceLineNo">204</span>    public String getPartNamespace() {<a name="line.204"></a>
+<span class="sourceLineNo">205</span>        return partNamespace;<a name="line.205"></a>
+<span class="sourceLineNo">206</span>    }<a name="line.206"></a>
+<span class="sourceLineNo">207</span><a name="line.207"></a>
+<span class="sourceLineNo">208</span>    /**<a name="line.208"></a>
+<span class="sourceLineNo">209</span>     * XML namespace to use for fragment parsing.<a name="line.209"></a>
+<span class="sourceLineNo">210</span>     * &lt;p/&gt;<a name="line.210"></a>
+<span class="sourceLineNo">211</span>     * See more details at the fragment option.<a name="line.211"></a>
+<span class="sourceLineNo">212</span>     */<a name="line.212"></a>
+<span class="sourceLineNo">213</span>    public void setPartNamespace(String partNamespace) {<a name="line.213"></a>
+<span class="sourceLineNo">214</span>        this.partNamespace = partNamespace;<a name="line.214"></a>
+<span class="sourceLineNo">215</span>    }<a name="line.215"></a>
+<span class="sourceLineNo">216</span><a name="line.216"></a>
+<span class="sourceLineNo">217</span>    public String getNamespacePrefixRef() {<a name="line.217"></a>
+<span class="sourceLineNo">218</span>        return namespacePrefixRef;<a name="line.218"></a>
+<span class="sourceLineNo">219</span>    }<a name="line.219"></a>
+<span class="sourceLineNo">220</span><a name="line.220"></a>
+<span class="sourceLineNo">221</span>    /**<a name="line.221"></a>
+<span class="sourceLineNo">222</span>     * When marshalling using JAXB or SOAP then the JAXB implementation will automatic assign namespace prefixes,<a name="line.222"></a>
+<span class="sourceLineNo">223</span>     * such as ns2, ns3, ns4 etc. To control this mapping, Camel allows you to refer to a map which contains the desired mapping.<a name="line.223"></a>
+<span class="sourceLineNo">224</span>     */<a name="line.224"></a>
+<span class="sourceLineNo">225</span>    public void setNamespacePrefixRef(String namespacePrefixRef) {<a name="line.225"></a>
+<span class="sourceLineNo">226</span>        this.namespacePrefixRef = namespacePrefixRef;<a name="line.226"></a>
+<span class="sourceLineNo">227</span>    }<a name="line.227"></a>
+<span class="sourceLineNo">228</span><a name="line.228"></a>
+<span class="sourceLineNo">229</span>    public String getXmlStreamWriterWrapper() {<a name="line.229"></a>
+<span class="sourceLineNo">230</span>        return xmlStreamWriterWrapper;<a name="line.230"></a>
+<span class="sourceLineNo">231</span>    }<a name="line.231"></a>
+<span class="sourceLineNo">232</span><a name="line.232"></a>
+<span class="sourceLineNo">233</span>    /**<a name="line.233"></a>
+<span class="sourceLineNo">234</span>     * To use a custom xml stream writer.<a name="line.234"></a>
+<span class="sourceLineNo">235</span>     */<a name="line.235"></a>
+<span class="sourceLineNo">236</span>    public void setXmlStreamWriterWrapper(String xmlStreamWriterWrapperRef) {<a name="line.236"></a>
+<span class="sourceLineNo">237</span>        this.xmlStreamWriterWrapper = xmlStreamWriterWrapperRef;<a name="line.237"></a>
+<span class="sourceLineNo">238</span>    }<a name="line.238"></a>
+<span class="sourceLineNo">239</span><a name="line.239"></a>
+<span class="sourceLineNo">240</span>    public String getSchemaLocation() {<a name="line.240"></a>
+<span class="sourceLineNo">241</span>        return schemaLocation;<a name="line.241"></a>
+<span class="sourceLineNo">242</span>    }<a name="line.242"></a>
+<span class="sourceLineNo">243</span><a name="line.243"></a>
+<span class="sourceLineNo">244</span>    /**<a name="line.244"></a>
+<span class="sourceLineNo">245</span>     * To define the location of the schema<a name="line.245"></a>
+<span class="sourceLineNo">246</span>     */<a name="line.246"></a>
+<span class="sourceLineNo">247</span>    public void setSchemaLocation(String schemaLocation) {<a name="line.247"></a>
+<span class="sourceLineNo">248</span>        this.schemaLocation = schemaLocation;<a name="line.248"></a>
+<span class="sourceLineNo">249</span>    }<a name="line.249"></a>
+<span class="sourceLineNo">250</span><a name="line.250"></a>
+<span class="sourceLineNo">251</span>    public String getNoNamespaceSchemaLocation() {<a name="line.251"></a>
+<span class="sourceLineNo">252</span>        return noNamespaceSchemaLocation;<a name="line.252"></a>
+<span class="sourceLineNo">253</span>    }<a name="line.253"></a>
+<span class="sourceLineNo">254</span><a name="line.254"></a>
+<span class="sourceLineNo">255</span>    /**<a name="line.255"></a>
+<span class="sourceLineNo">256</span>     * To define the location of the namespaceless schema<a name="line.256"></a>
+<span class="sourceLineNo">257</span>     */<a name="line.257"></a>
+<span class="sourceLineNo">258</span>    public void setNoNamespaceSchemaLocation(String schemaLocation) {<a name="line.258"></a>
+<span class="sourceLineNo">259</span>        this.noNamespaceSchemaLocation = schemaLocation;<a name="line.259"></a>
+<span class="sourceLineNo">260</span>    }<a name="line.260"></a>
+<span class="sourceLineNo">261</span><a name="line.261"></a>
+<span class="sourceLineNo">262</span>    @Override<a name="line.262"></a>
+<span class="sourceLineNo">263</span>    protected void configureDataFormat(DataFormat dataFormat, CamelContext camelContext) {<a name="line.263"></a>
+<span class="sourceLineNo">264</span>        Boolean answer = ObjectHelper.toBoolean(getPrettyPrint());<a name="line.264"></a>
+<span class="sourceLineNo">265</span>        if (answer != null &amp;&amp; !answer) {<a name="line.265"></a>
+<span class="sourceLineNo">266</span>            setProperty(camelContext, dataFormat, "prettyPrint", Boolean.FALSE);<a name="line.266"></a>
+<span class="sourceLineNo">267</span>        } else { // the default value is true<a name="line.267"></a>
+<span class="sourceLineNo">268</span>            setProperty(camelContext, dataFormat, "prettyPrint", Boolean.TRUE);<a name="line.268"></a>
+<span class="sourceLineNo">269</span>        }<a name="line.269"></a>
+<span class="sourceLineNo">270</span>        answer = ObjectHelper.toBoolean(getObjectFactory());<a name="line.270"></a>
+<span class="sourceLineNo">271</span>        if (answer != null &amp;&amp; !answer) {<a name="line.271"></a>
+<span class="sourceLineNo">272</span>            setProperty(camelContext, dataFormat, "objectFactory", Boolean.FALSE);<a name="line.272"></a>
+<span class="sourceLineNo">273</span>        } else { // the default value is true<a name="line.273"></a>
+<span class="sourceLineNo">274</span>            setProperty(camelContext, dataFormat, "objectFactory", Boolean.TRUE);<a name="line.274"></a>
+<span class="sourceLineNo">275</span>        }<a name="line.275"></a>
+<span class="sourceLineNo">276</span>        answer = ObjectHelper.toBoolean(getIgnoreJAXBElement());<a name="line.276"></a>
+<span class="sourceLineNo">277</span>        if (answer != null &amp;&amp; !answer) {<a name="line.277"></a>
+<span class="sourceLineNo">278</span>            setProperty(camelContext, dataFormat, "ignoreJAXBElement", Boolean.FALSE);<a name="line.278"></a>
+<span class="sourceLineNo">279</span>        } else { // the default value is true<a name="line.279"></a>
+<span class="sourceLineNo">280</span>            setProperty(camelContext, dataFormat, "ignoreJAXBElement", Boolean.TRUE);<a name="line.280"></a>
+<span class="sourceLineNo">281</span>        }<a name="line.281"></a>
+<span class="sourceLineNo">282</span>        answer = ObjectHelper.toBoolean(getMustBeJAXBElement());<a name="line.282"></a>
+<span class="sourceLineNo">283</span>        if (answer != null &amp;&amp; answer) {<a name="line.283"></a>
+<span class="sourceLineNo">284</span>            setProperty(camelContext, dataFormat, "mustBeJAXBElement", Boolean.TRUE);<a name="line.284"></a>
+<span class="sourceLineNo">285</span>        } else { // the default value is false<a name="line.285"></a>
+<span class="sourceLineNo">286</span>            setProperty(camelContext, dataFormat, "mustBeJAXBElement", Boolean.FALSE);<a name="line.286"></a>
+<span class="sourceLineNo">287</span>        }<a name="line.287"></a>
+<span class="sourceLineNo">288</span>        answer = ObjectHelper.toBoolean(getFilterNonXmlChars());<a name="line.288"></a>
+<span class="sourceLineNo">289</span>        if (answer != null &amp;&amp; answer) {<a name="line.289"></a>
+<span class="sourceLineNo">290</span>            setProperty(camelContext, dataFormat, "filterNonXmlChars", Boolean.TRUE);<a name="line.290"></a>
+<span class="sourceLineNo">291</span>        } else { // the default value is false<a name="line.291"></a>
+<span class="sourceLineNo">292</span>            setProperty(camelContext, dataFormat, "filterNonXmlChars", Boolean.FALSE);<a name="line.292"></a>
+<span class="sourceLineNo">293</span>        }<a name="line.293"></a>
+<span class="sourceLineNo">294</span>        answer = ObjectHelper.toBoolean(getFragment());<a name="line.294"></a>
+<span class="sourceLineNo">295</span>        if (answer != null &amp;&amp; answer) {<a name="line.295"></a>
+<span class="sourceLineNo">296</span>            setProperty(camelContext, dataFormat, "fragment", Boolean.TRUE);<a name="line.296"></a>
+<span class="sourceLineNo">297</span>        } else { // the default value is false<a name="line.297"></a>
+<span class="sourceLineNo">298</span>            setProperty(camelContext, dataFormat, "fragment", Boolean.FALSE);<a name="line.298"></a>
+<span class="sourceLineNo">299</span>        }<a name="line.299"></a>
+<span class="sourceLineNo">300</span>        if (partClass != null) {<a name="line.300"></a>
+<span class="sourceLineNo">301</span>            setProperty(camelContext, dataFormat, "partClass", partClass);<a name="line.301"></a>
+<span class="sourceLineNo">302</span>        }<a name="line.302"></a>
+<span class="sourceLineNo">303</span>        if (partNamespace != null) {<a name="line.303"></a>
+<span class="sourceLineNo">304</span>            setProperty(camelContext, dataFormat, "partNamespace", QName.valueOf(partNamespace));<a name="line.304"></a>
+<span class="sourceLineNo">305</span>        }<a name="line.305"></a>
+<span class="sourceLineNo">306</span>        if (encoding != null) {<a name="line.306"></a>
+<span class="sourceLineNo">307</span>            setProperty(camelContext, dataFormat, "encoding", encoding);<a name="line.307"></a>
+<span class="sourceLineNo">308</span>        }<a name="line.308"></a>
+<span class="sourceLineNo">309</span>        if (namespacePrefixRef != null) {<a name="line.309"></a>
+<span class="sourceLineNo">310</span>            setProperty(camelContext, dataFormat, "namespacePrefixRef", namespacePrefixRef);<a name="line.310"></a>
+<span class="sourceLineNo">311</span>        }<a name="line.311"></a>
+<span class="sourceLineNo">312</span>        setProperty(camelContext, dataFormat, "contextPath", contextPath);<a name="line.312"></a>
+<span class="sourceLineNo">313</span>        if (schema != null) {<a name="line.313"></a>
+<span class="sourceLineNo">314</span>            setProperty(camelContext, dataFormat, "schema", schema);<a name="line.314"></a>
+<span class="sourceLineNo">315</span>        }<a name="line.315"></a>
+<span class="sourceLineNo">316</span>        if (xmlStreamWriterWrapper != null) {<a name="line.316"></a>
+<span class="sourceLineNo">317</span>            setProperty(camelContext, dataFormat, "xmlStreamWriterWrapper", xmlStreamWriterWrapper);<a name="line.317"></a>
+<span class="sourceLineNo">318</span>        }<a name="line.318"></a>
+<span class="sourceLineNo">319</span>        if (schemaLocation != null) {<a name="line.319"></a>
+<span class="sourceLineNo">320</span>            setProperty(camelContext, dataFormat, "schemaLocation", schemaLocation);<a name="line.320"></a>
+<span class="sourceLineNo">321</span>        }<a name="line.321"></a>
+<span class="sourceLineNo">322</span>        if (noNamespaceSchemaLocation != null) {<a name="line.322"></a>
+<span class="sourceLineNo">323</span>            setProperty(camelContext, dataFormat, "noNamespaceSchemaLocation", noNamespaceSchemaLocation);<a name="line.323"></a>
+<span class="sourceLineNo">324</span>        }<a name="line.324"></a>
+<span class="sourceLineNo">325</span>    }<a name="line.325"></a>
+<span class="sourceLineNo">326</span>}<a name="line.326"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

@@ -1,0 +1,65 @@
+// ------------------------------------------------------------------
+// Transitive dependencies of this project determined from the
+// maven pom organized by organization.
+// ------------------------------------------------------------------
+
+Apache Karaf :: Shell :: Console
+
+
+From: 'an unknown organization'
+  - JLEdit :: Core (https://github.com/jledit/jledit/core) org.jledit:core:bundle:0.2.1
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'FUSE Source' (http://www.fusesource.org/)
+  - jansi (http://jansi.fusesource.org/jansi/jansi) org.fusesource.jansi:jansi:jar:1.11.redhat-1:compile
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'JLine' (http://jline.sourceforge.net)
+  - JLine (http://jline.sourceforge.net) jline:jline:jar:2.12.1.redhat-002:compile
+    License: The BSD License  (http://jline.sourceforge.net/license.html)
+
+From: 'OSGi Alliance' (http://www.osgi.org)
+  - osgi.cmpn (http://www.osgi.org) org.osgi:org.osgi.compendium:jar:5.0.0
+    License: Apache License, Version 2.0  (http://opensource.org/licenses/apache2.0.php)
+  - osgi.core (http://www.osgi.org) org.osgi:org.osgi.core:jar:5.0.0
+    License: Apache License, Version 2.0  (http://opensource.org/licenses/apache2.0.php)
+
+From: 'QOS.ch' (http://www.qos.ch)
+  - SLF4J API Module (http://www.slf4j.org/slf4j-api) org.slf4j:slf4j-api:jar:1.7.7.redhat-2:compile
+    License: MIT style  (http://www.slf4j.org/license.html)
+  - SLF4J Simple Binding (http://www.slf4j.org) org.slf4j:slf4j-simple:jar:1.7.7.redhat-2
+    License: MIT License  (http://www.opensource.org/licenses/mit-license.php)
+
+From: 'The Apache Software Foundation' (http://www.apache.org)
+  - Apache Aries Util (http://aries.apache.org/default-parent/java5-parent/org.apache.aries.util) org.apache.aries:org.apache.aries.util:bundle:1.1.0
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Aries Blueprint API (http://aries.apache.org/org.apache.aries.blueprint.api) org.apache.aries.blueprint:org.apache.aries.blueprint.api:bundle:1.0.1
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Aries Blueprint Core (http://aries.apache.org/org.apache.aries.blueprint.core) org.apache.aries.blueprint:org.apache.aries.blueprint.core:bundle:1.4.5
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Aries Proxy API (http://aries.apache.org/org.apache.aries.proxy.api) org.apache.aries.proxy:org.apache.aries.proxy.api:bundle:1.0.1
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Aries Quiesce API (http://aries.apache.org/default-parent/java5-parent/org.apache.aries.quiesce.api) org.apache.aries.quiesce:org.apache.aries.quiesce.api:bundle:1.0.0
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'The Apache Software Foundation' (http://www.apache.org/)
+  - Apache Felix File Install (http://felix.apache.org/site/apache-felix-file-install.html) org.apache.felix:org.apache.felix.fileinstall:jar:3.5.0
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Felix Gogo Runtime (http://felix.apache.org/gogo-parent/org.apache.felix.gogo.runtime/) org.apache.felix:org.apache.felix.gogo.runtime:bundle:0.12.1
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Felix Utils (http://felix.apache.org/org.apache.felix.utils/) org.apache.felix:org.apache.felix.utils:jar:1.8.0
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Karaf :: Util (http://www.apache.org/karaf/org.apache.karaf.util/) org.apache.karaf:org.apache.karaf.util:jar:2.4.0.redhat-630187
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Karaf :: JAAS :: Boot (http://www.apache.org/karaf/jaas/org.apache.karaf.jaas.boot/) org.apache.karaf.jaas:org.apache.karaf.jaas.boot:bundle:2.4.0.redhat-630187
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Karaf :: JAAS :: Config (http://www.apache.org/karaf/jaas/org.apache.karaf.jaas.config/) org.apache.karaf.jaas:org.apache.karaf.jaas.config:bundle:2.4.0.redhat-630187
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Karaf :: JAAS :: Modules (http://www.apache.org/karaf/jaas/org.apache.karaf.jaas.modules/) org.apache.karaf.jaas:org.apache.karaf.jaas.modules:bundle:2.4.0.redhat-630187
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+  - Apache Mina SSHD :: Core (http://www.apache.org/sshd/sshd-core/) org.apache.sshd:sshd-core:jar:0.14.0
+    License: Apache 2.0 License  (http://www.apache.org/licenses/LICENSE-2.0)
+
+
+
+

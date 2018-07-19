@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/io.fabric8.zookeeper.curator.ManagedCuratorFramework">
+    <OCD id="io.fabric8.zookeeper" name="%io.fabric8.zookeeper.name" description="%io.fabric8.zookeeper.description">
+        <AD id="zookeeper.url" type="String" default="${zookeeper.url}" name="%io.fabric8.zookeeper.zookeeper.url.name" description="%io.fabric8.zookeeper.zookeeper.url.description"/>
+        <AD id="zookeeper.password" type="String" default="${zookeeper.password}" name="%io.fabric8.zookeeper.zookeeper.password.name" description="%io.fabric8.zookeeper.zookeeper.password.description"/>
+        <AD id="retryPolicy.maxRetries" type="String" default="${zookeeper.retry.max}" name="%io.fabric8.zookeeper.retryPolicy.maxRetries.name" description="%io.fabric8.zookeeper.retryPolicy.maxRetries.description"/>
+        <AD id="retryPolicy.retryIntervalMs" type="String" default="${zookeeper.retry.interval}" name="%io.fabric8.zookeeper.retryPolicy.retryIntervalMs.name" description="%io.fabric8.zookeeper.retryPolicy.retryIntervalMs.description"/>
+        <AD id="connectionTimeOutMs" type="String" default="${zookeeper.connection.timeout}" name="%io.fabric8.zookeeper.connectionTimeOutMs.name" description="%io.fabric8.zookeeper.connectionTimeOutMs.description"/>
+        <AD id="sessionTimeOutMs" type="String" default="${zookeeper.session.timeout}" name="%io.fabric8.zookeeper.sessionTimeOutMs.name" description="%io.fabric8.zookeeper.sessionTimeOutMs.description"/>
+    </OCD>
+    <Designate pid="io.fabric8.zookeeper">
+        <Object ocdref="io.fabric8.zookeeper"/>
+    </Designate>
+</metatype:MetaData>

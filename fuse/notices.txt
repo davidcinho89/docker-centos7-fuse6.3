@@ -1,0 +1,3808 @@
+In addition to the Red Hat products, this disk contains certain third party software or components ("Third Party Components"), which are bundled as separate files or modules and separately licensed to you by said third parties. This file contains a listing of all NOTICE/NOTICE.txt files included with the Third Party Component jars in this distribution of Fuse ESB. Please see the dependencies.txt file for the complete listing of Third Party Components and their attributed license agreements. Your use of the Third Party Components is subject to the terms and conditions set forth in the applicable third party license agreement. The Third Party Components are provided by Red Hat, Inc. solely on an "AS IS" basis, without any warranty. Red Hat, Inc. disclaims all warranties and indemnities with respect to the Third Party Components, express or implied, and assumes no liability with respect to the Third Party Components. You acknowledge that the authors of the Third Party Components have no obligation to provide support to you for the Third Party Components. You hereby undertake to comply with all licenses related to the applicable Third Party Components. All third party license agreements are contained in the licenses directory ofJBoss Fuse
+// ------------------------------------------------------------------
+
+JBoss Fuse :: Components :: SAP JCO :: Camel Component
+Copyright 2007-2016 The Apache Software Foundation
+
+This product includes software developed at
+Red Hat, Inc. All Rights Reserved. (http://redhat.com).
+
+This product includes/uses software(s) developed by 'Apache Software Foundation' (http://www.apache.org)
+  - Streaming API for XML (STAX API 1.0) (http://geronimo.apache.org/specs/geronimo-stax-api_1.0_spec)
+
+This product includes/uses software(s) developed by 'Apache Software Foundation' (http://www.apache.org/)
+  - Abdera Client (http://abdera.apache.org/abdera-client)
+  - Abdera Core (http://abdera.apache.org/abdera-core)
+  - Abdera Parser (http://abdera.apache.org/abdera-parser)
+  - I18N Libraries (http://abdera.apache.org)
+
+This product includes/uses software(s) developed by 'The Apache Software Foundation' (http://jakarta.apache.org)
+  - Logging (http://jakarta.apache.org/commons/logging/)
+
+This product includes/uses software(s) developed by 'The Apache Software Foundation' (http://www.apache.org)
+  - Activation 1.1 (http://geronimo.apache.org/maven/specs/geronimo-activation_1.1_spec/1.1)
+  - JavaMail 1.4 (http://geronimo.apache.org/maven/specs/geronimo-javamail_1.4_spec/1.7.1)
+  - XML APIs (http://xml.apache.org/commons/components/external/xml-apis)
+
+This product includes/uses software(s) developed by 'The Apache Software Foundation' (http://www.apache.org/)
+  - Apache JAMES Mime4j (Core) (http://james.apache.org/mime4j/apache-mime4j-core)
+  - Axiom API (http://ws.apache.org/axiom/)
+  - Axiom Impl (http://ws.apache.org/axiom/axiom-impl)
+  - Commons Codec (http://commons.apache.org/codec/)
+  - Xerces2 Java Parser (http://xerces.apache.org/xerces2-j)
+
+This product includes/uses software(s) developed by 'Apache Software Foundation' (http://jakarta.apache.org/)
+  - HttpClient (http://jakarta.apache.org/httpcomponents/httpclient-3.x/)
+
+This product includes/uses software(s) developed by 'Codehaus' (http://www.codehaus.org/)
+  - Stax2 API (http://woodstox.codehaus.org/StAX2)
+  - Woodstox (http://woodstox.codehaus.org)
+
+This product includes/uses software(s) developed by 'The Werken Company' (http://jaxen.codehaus.org)
+  - Jaxen (http://jaxen.codehaus.org/jaxen)
+
+Apache Commons IO
+Copyright 2001-2008 The Apache Software Foundation
+
+This product includes software developed by
+The Apache Software Foundation (http://www.apache.org/).
+
+Beans Scripting Framework (BSF)
+Copyright 2002-2006 The Apache Software Foundation.
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+Apache Commons Logging
+Copyright 2003-2014 The Apache Software Foundation
+
+Apache Commons Digester
+Copyright 2001-2010 The Apache Software Foundation
+
+Apache Commons JXPath
+Copyright 2001-2008 The Apache Software Foundation
+
+Apache HttpComponents HttpClient Cache
+Copyright 2010-2013 The Apache Software Foundation
+
+
+Apache HttpCore
+Copyright 2005-2015 The Apache Software Foundation
+
+This project contains annotations derived from JCIP-ANNOTATIONS
+Copyright (c) 2005 Brian Goetz and Tim Peierls. See http://www.jcip.net
+
+Apache HttpClient
+Copyright 1999-2016 The Apache Software Foundation
+
+Apache Felix Framework
+Copyright 2006-2012 The Apache Software Foundation
+
+This product includes software developed at
+The OSGi Alliance (http://www.osgi.org/).
+Copyright (c) OSGi Alliance (2000, 2009).
+Licensed under the Apache License 2.0.
+
+Maven :: Indexer Core
+Copyright 2002-2013 The Apache Software Foundation
+
+Maven :: Indexer Artifact Utils
+Copyright 2002-2013 The Apache Software Foundation
+
+This product includes software developed by the Indiana University 
+  Extreme! Lab (http://www.extreme.indiana.edu/).
+
+This product includes software developed by 
+The Apache Software Foundation (http://www.apache.org/).
+
+This product includes software developed by 
+ThoughtWorks (http://www.thoughtworks.com).
+
+This product includes software developed by 
+javolution (http://javolution.org/).
+
+This product includes software developed by 
+Rome (https://rome.dev.java.net/).
+
+Apache Lucene
+Copyright 2012 The Apache Software Foundation
+
+The snowball stemmers in
+  contrib/analyzers/common/src/java/net/sf/snowball
+were developed by Martin Porter and Richard Boulton.
+The snowball stopword lists in
+  contrib/analyzers/common/src/resources/org/apache/lucene/analysis/snowball
+were developed by Martin Porter and Richard Boulton.
+The full snowball package is available from
+  http://snowball.tartarus.org/
+
+The KStem stemmer in
+  common/src/org/apache/lucene/analysis/en
+was developed by Bob Krovetz and Sergio Guzman-Lara (CIIR-UMass Amherst)
+under the BSD-license.
+
+The Arabic,Persian,Romanian,Bulgarian, and Hindi analyzers (contrib/analyzers) come with a default
+stopword list that is BSD-licensed created by Jacques Savoy.  These files reside in:
+contrib/analyzers/common/src/resources/org/apache/lucene/analysis/ar/stopwords.txt,
+contrib/analyzers/common/src/resources/org/apache/lucene/analysis/fa/stopwords.txt,
+contrib/analyzers/common/src/resources/org/apache/lucene/analysis/ro/stopwords.txt,
+contrib/analyzers/common/src/resources/org/apache/lucene/analysis/bg/stopwords.txt,
+contrib/analyzers/common/src/resources/org/apache/lucene/analysis/hi/stopwords.txt
+See http://members.unine.ch/jacques.savoy/clef/index.html.
+
+The German,Spanish,Finnish,French,Hungarian,Italian,Portuguese,Russian and Swedish light stemmers
+(common) are based on BSD-licensed reference implementations created by Jacques Savoy and
+Ljiljana Dolamic. These files reside in:
+contrib/analyzers/common/src/java/org/apache/lucene/analysis/de/GermanLightStemmer.java
+contrib/analyzers/common/src/java/org/apache/lucene/analysis/de/GermanMinimalStemmer.java
+contrib/analyzers/common/src/java/org/apache/lucene/analysis/es/SpanishLightStemmer.java
+contrib/analyzers/common/src/java/org/apache/lucene/analysis/fi/FinnishLightStemmer.java
+contrib/analyzers/common/src/java/org/apache/lucene/analysis/fr/FrenchLightStemmer.java
+contrib/analyzers/common/src/java/org/apache/lucene/analysis/fr/FrenchMinimalStemmer.java
+contrib/analyzers/common/src/java/org/apache/lucene/analysis/hu/HungarianLightStemmer.java
+contrib/analyzers/common/src/java/org/apache/lucene/analysis/it/ItalianLightStemmer.java
+contrib/analyzers/common/src/java/org/apache/lucene/analysis/pt/PortugueseLightStemmer.java
+contrib/analyzers/common/src/java/org/apache/lucene/analysis/ru/RussianLightStemmer.java
+contrib/analyzers/common/src/java/org/apache/lucene/analysis/sv/SwedishLightStemmer.java
+
+The Stempel analyzer (contrib/analyzers) includes BSD-licensed software developed 
+by the Egothor project http://egothor.sf.net/, created by Leo Galambos, Martin Kvapil,
+and Edmond Nolan.
+
+The Polish analyzer (contrib/analyzers) comes with a default
+stopword list that is BSD-licensed created by the Carrot2 project. The file resides
+in contrib/analyzers/stempel/src/resources/org/apache/lucene/analysis/pl/stopwords.txt.
+See http://project.carrot2.org/license.html.
+
+Includes software from other Apache Software Foundation projects,
+including, but not limited to:
+ - Apache Ant
+ - Apache Jakarta Regexp
+ - Commons Compress
+ - Xerces
+
+The SmartChineseAnalyzer source code (under contrib/analyzers) was
+provided by Xiaoping Gao and copyright 2009 by www.imdict.net.
+
+ICU4J, (under contrib/icu) is licensed under an MIT styles license
+(contrib/icu/lib/ICU-LICENSE.txt) and Copyright (c) 1995-2008 
+International Business Machines Corporation and others
+
+Some files (contrib/analyzers/common/src/test/.../WordBreakTestUnicode_*.java
+and data files under contrib/icu/src/data/) are derived from Unicode data such
+as the Unicode Character Database. See http://unicode.org/copyright.html for more
+details.
+
+The class org.apache.lucene.SorterTemplate was inspired by CGLIB's class with
+the same name. The implementation part is mainly done using pre-existing
+Lucene sorting code. In-place stable mergesort was borrowed from CGLIB,
+which is Apache-licensed.
+
+The class org.apache.lucene.util.WeakIdentityMap was derived from
+the Apache CXF project and is Apache License 2.0.
+
+The Google Code Prettify is Apache License 2.0.
+See http://code.google.com/p/google-code-prettify/
+
+JUnit (junit-4.10) is licensed under the Common Public License v. 1.0
+See http://junit.sourceforge.net/cpl-v10.html
+
+This product includes code (JaspellTernarySearchTrie) from Java Spelling Checking Package (jaspell): http://jaspell.sourceforge.net/
+License: The BSD License (http://www.opensource.org/licenses/bsd-license.php)
+
+===========================================================================
+Kuromoji Japanese Morphological Analyzer - Apache Lucene Integration
+===========================================================================
+
+This software includes a binary and/or source version of data from
+
+  mecab-ipadic-2.7.0-20070801
+
+which can be obtained from
+
+  http://atilika.com/releases/mecab-ipadic/mecab-ipadic-2.7.0-20070801.tar.gz
+
+or
+
+  http://jaist.dl.sourceforge.net/project/mecab/mecab-ipadic/2.7.0-20070801/mecab-ipadic-2.7.0-20070801.tar.gz
+
+===========================================================================
+mecab-ipadic-2.7.0-20070801 Notice
+===========================================================================
+
+Nara Institute of Science and Technology (NAIST),
+the copyright holders, disclaims all warranties with regard to this
+software, including all implied warranties of merchantability and
+fitness, in no event shall NAIST be liable for
+any special, indirect or consequential damages or any damages
+whatsoever resulting from loss of use, data or profits, whether in an
+action of contract, negligence or other tortuous action, arising out
+of or in connection with the use or performance of this software.
+
+A large portion of the dictionary entries
+originate from ICOT Free Software.  The following conditions for ICOT
+Free Software applies to the current dictionary as well.
+
+Each User may also freely distribute the Program, whether in its
+original form or modified, to any third party or parties, PROVIDED
+that the provisions of Section 3 ("NO WARRANTY") will ALWAYS appear
+on, or be attached to, the Program, which is distributed substantially
+in the same form as set out herein and that such intended
+distribution, if actually made, will neither violate or otherwise
+contravene any of the laws and regulations of the countries having
+jurisdiction over the User or the intended distribution itself.
+
+NO WARRANTY
+
+The program was produced on an experimental basis in the course of the
+research and development conducted during the project and is provided
+to users as so produced on an experimental basis.  Accordingly, the
+program is provided without any warranty whatsoever, whether express,
+implied, statutory or otherwise.  The term "warranty" used herein
+includes, but is not limited to, any warranty of the quality,
+performance, merchantability and fitness for a particular purpose of
+the program and the nonexistence of any infringement or violation of
+any right of any third party.
+
+Each user of the program will agree and understand, and be deemed to
+have agreed and understood, that there is no warranty whatsoever for
+the program and, accordingly, the entire risk arising from or
+otherwise connected with the program is assumed by the user.
+
+Therefore, neither ICOT, the copyright holder, or any other
+organization that participated in or was otherwise related to the
+development of the program and their respective officials, directors,
+officers and other employees shall be held liable for any and all
+damages, including, without limitation, general, special, incidental
+and consequential damages, arising out of or otherwise in connection
+with the use or inability to use the program or any product, material
+or result produced or otherwise obtained by using the program,
+regardless of whether they have been advised of, or otherwise had
+knowledge of, the possibility of such damages at any time during the
+project or thereafter.  Each user will be deemed to have agreed to the
+foregoing by his or her commencement of use of the program.  The term
+"use" as used herein includes, but is not limited to, the use,
+modification, copying and distribution of the program and the
+production of secondary products from the program.
+
+In the case where the program, whether in its original form or
+modified, was distributed or delivered to or received by a user from
+any person, organization or entity other than ICOT, unless it makes or
+grants independently of ICOT any specific warranty to the user in
+writing, such person, organization or entity, will also be exempted
+from and not be held liable to the user for any such damages as noted
+above as far as the program is concerned.
+
+Maven Model
+Copyright 2001-2012 The Apache Software Foundation
+
+Apache Maven Wagon :: Providers :: HTTP Provider
+Copyright 2003-2014 The Apache Software Foundation
+
+Apache Maven Wagon :: Providers :: HTTP Shared Library
+Copyright 2003-2014 The Apache Software Foundation
+
+Sisu Guice - Core Library
+Copyright 2006-2015 Google, Inc.
+
+Apache Maven Wagon :: API
+Copyright 2003-2014 The Apache Software Foundation
+
+Maven Aether Provider
+Copyright 2001-2015 The Apache Software Foundation
+
+Maven Model Builder
+Copyright 2001-2015 The Apache Software Foundation
+
+Maven Repository Metadata Model
+Copyright 2001-2015 The Apache Software Foundation
+
+Apache Maven Wagon :: Providers :: File Provider
+Copyright 2003-2014 The Apache Software Foundation
+
+Maven Settings Builder
+Copyright 2001-2015 The Apache Software Foundation
+
+Maven Builder Support
+Copyright 2001-2015 The Apache Software Foundation
+
+Maven Settings
+Copyright 2001-2015 The Apache Software Foundation
+
+Annotations for SCR
+Copyright 2006-2014 The Apache Software Foundation
+
+   This product includes software developed by
+   The Apache Software Foundation (http://www.apache.org/).
+
+Spring Framework 3.2.16.RELEASE
+Copyright (c) 2002-2015 Pivotal, Inc.
+
+This product is licensed to you under the Apache License, Version 2.0
+(the "License"). You may not use this product except in compliance with
+the License.
+
+This product may include a number of subcomponents with separate
+copyright notices and license terms. Your use of the source code for
+these subcomponents is subject to the terms and conditions of the
+subcomponent's license, as noted in the license.txt file.
+
+=========================================================================
+==  Apache Notice                                                      ==
+=========================================================================
+
+Apache ActiveMQ
+Copyright 2005-2008 The Apache Software Foundation
+
+=========================================================================
+==  Protocol Buffers Notice                                            ==
+=========================================================================
+
+This product includes software developed by the Protocol Buffers
+project (http://code.google.com/apis/protocolbuffers).
+
+Apache Felix Utils
+Copyright 2006-2015 The Apache Software Foundation
+
+Apache Maven Wagon :: Providers :: Lightweight HTTP Provider
+Copyright 2003-2014 The Apache Software Foundation
+
+Apache Jakarta HttpClient
+Copyright 1999-2007 The Apache Software Foundation
+
+Apache Commons FileUpload
+Copyright 2002-2014 The Apache Software Foundation
+
+   Copyright (c) 2007-2010, The JASYPT team (http://www.jasypt.org)
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+---------------------------------
+
+This distribution includes cryptographic software.  The country in 
+which you currently reside may have restrictions on the import, 
+possession, use, and/or re-export to another country, of 
+encryption software.  BEFORE using any encryption software, please 
+check your country's laws, regulations and policies concerning the
+import, possession, or use, and re-export of encryption software, to 
+see if this is permitted.  See http://www.wassenaar.org/ for more
+information.
+
+The U.S. Government Department of Commerce, Bureau of Industry and
+Security (BIS), has classified this software as Export Commodity 
+Control Number (ECCN) 5D002.C.1, which includes information security
+software using or performing cryptographic functions with asymmetric
+algorithms.  The form and manner of this distribution makes it 
+eligible for export under the License Exception ENC Technology 
+Software Unrestricted (TSU) exception (see the BIS Export 
+Administration Regulations, Section 740.13) for both object code and 
+source code.
+
+The following provides more details on the cryptographic software 
+used (note that this software is not included in the distribution):
+
+  * The PBE Encryption facilities require the Java Cryptography 
+    extensions: http://java.sun.com/javase/technologies/security/.
+
+Distributions of this software may include software developed by
+The Apache Software Foundation (http://www.apache.org/).
+
+ICU License - ICU 1.8.1 and later
+
+COPYRIGHT AND PERMISSION NOTICE
+
+Copyright (c) 1995-2006 International Business Machines 
+Corporation and others
+
+All rights reserved.
+
+Permission is hereby granted, free of charge, to any 
+person obtaining a copy of this software and associated 
+documentation files (the "Software"), to deal in the 
+Software without restriction, including without limitation 
+the rights to use, copy, modify, merge, publish, 
+distribute, and/or sell copies of the Software, and to 
+permit persons to whom the Software is furnished to do so, 
+provided that the above copyright notice(s) and this 
+permission notice appear in all copies of the Software and 
+that both the above copyright notice(s) and this 
+permission notice appear in supporting documentation.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY 
+KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE 
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+PURPOSE AND NONINFRINGEMENT OF THIRD PARTY RIGHTS. IN NO 
+EVENT SHALL THE COPYRIGHT HOLDER OR HOLDERS INCLUDED IN 
+THIS NOTICE BE LIABLE FOR ANY CLAIM, OR ANY SPECIAL 
+INDIRECT OR CONSEQUENTIAL DAMAGES, OR ANY DAMAGES 
+WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, 
+WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER 
+TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE 
+USE OR PERFORMANCE OF THIS SOFTWARE.
+
+Except as contained in this notice, the name of a copyright 
+holder shall not be used in advertising or otherwise to 
+promote the sale, use or other dealings in this Software 
+without prior written authorization of the copyright holder. 
+
+proton-j-impl
+Copyright 2013 The Apache Software Foundation
+
+proton-api
+Copyright 2013 The Apache Software Foundation
+
+Apache Karaf
+Copyright 2010-2014 The Apache Software Foundation
+
+I. Included Software
+
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+Licensed under the Apache License 2.0.
+
+This product uses software developed at
+The OSGi Alliance (http://www.osgi.org/).
+Copyright (c) OSGi Alliance (2000, 2010).
+Licensed under the Apache License 2.0.
+
+This product includes software developed at
+OW2 (http://www.ow2.org/).
+Licensed under the BSD License.
+
+This product includes software developed at
+OPS4J (http://www.ops4j.org/).
+Licensed under the Apache License 2.0.
+
+This product includes software developed at
+Eclipse Foundation (http://www.eclipse.org/).
+Licensed under the EPL.
+
+This product includes software written by
+Antony Lesuisse.
+Licensed under Public Domain.
+
+II. Used Software
+
+This product uses software developed at
+FUSE Source (http://www.fusesource.org/).
+Licensed under the Apache License 2.0.
+
+This product uses software developed at
+AOP Alliance (http://aopalliance.sourceforge.net/).
+Licensed under Public Domain.
+
+This product uses software developed at
+Tanuki Software (http://www.tanukisoftware.com/).
+Licensed under the Apache License 2.0.
+
+This product uses software developed at
+Jasypt (http://jasypt.sourceforge.net/).
+Licensed under the Apache License 2.0.
+
+This product uses software developed at
+JLine (http://jline.sourceforge.net).
+Licensed under the BSD License.
+
+This product uses software developed at
+SLF4J (http://www.slf4j.org/).
+Licensed under the MIT License.
+
+This product uses software developed at
+SpringSource (http://www.springsource.org/).
+Licensed under the Apache License 2.0.
+
+This product includes software from http://www.json.org.
+Copyright (c) 2002 JSON.org
+
+III. License Summary
+- Apache License 2.0
+- BSD License
+- EPL License
+- MIT License
+
+Apache ServiceMix
+Copyright 2007-2016 The Apache Software Foundation
+
+Apache log4j
+Copyright 2007 The Apache Software Foundation
+
+jclouds :: Karaf :: Utils
+Copyright 2009-2015 The Apache Software Foundation
+
+Curator Framework
+Copyright 2011-2014 The Apache Software Foundation
+
+Curator Recipes
+Copyright 2011-2014 The Apache Software Foundation
+
+Apache Lucene
+Copyright 2014 The Apache Software Foundation
+
+Includes software from other Apache Software Foundation projects,
+including, but not limited to:
+ - Apache Ant
+ - Apache Jakarta Regexp
+ - Apache Commons
+ - Apache Xerces
+
+ICU4J, (under analysis/icu) is licensed under an MIT styles license
+and Copyright (c) 1995-2008 International Business Machines Corporation and others
+
+Some data files (under analysis/icu/src/data) are derived from Unicode data such
+as the Unicode Character Database. See http://unicode.org/copyright.html for more
+details.
+
+Brics Automaton (under core/src/java/org/apache/lucene/util/automaton) is 
+BSD-licensed, created by Anders Møller. See http://www.brics.dk/automaton/
+
+The levenshtein automata tables (under core/src/java/org/apache/lucene/util/automaton) were
+automatically generated with the moman/finenight FSA library, created by
+Jean-Philippe Barrette-LaPierre. This library is available under an MIT license,
+see http://sites.google.com/site/rrettesite/moman and 
+http://bitbucket.org/jpbarrette/moman/overview/
+
+This product includes code (JaspellTernarySearchTrie) from Java Spelling Checkin
+g Package (jaspell): http://jaspell.sourceforge.net/
+License: The BSD License (http://www.opensource.org/licenses/bsd-license.php)
+
+The snowball stemmers in
+  analysis/common/src/java/net/sf/snowball
+were developed by Martin Porter and Richard Boulton.
+The snowball stopword lists in
+  analysis/common/src/resources/org/apache/lucene/analysis/snowball
+were developed by Martin Porter and Richard Boulton.
+The full snowball package is available from
+  http://snowball.tartarus.org/
+
+The KStem stemmer in
+  analysis/common/src/org/apache/lucene/analysis/en
+was developed by Bob Krovetz and Sergio Guzman-Lara (CIIR-UMass Amherst)
+under the BSD-license.
+
+The Arabic,Persian,Romanian,Bulgarian, and Hindi analyzers (common) come with a default
+stopword list that is BSD-licensed created by Jacques Savoy.  These files reside in:
+analysis/common/src/resources/org/apache/lucene/analysis/ar/stopwords.txt,
+analysis/common/src/resources/org/apache/lucene/analysis/fa/stopwords.txt,
+analysis/common/src/resources/org/apache/lucene/analysis/ro/stopwords.txt,
+analysis/common/src/resources/org/apache/lucene/analysis/bg/stopwords.txt,
+analysis/common/src/resources/org/apache/lucene/analysis/hi/stopwords.txt
+See http://members.unine.ch/jacques.savoy/clef/index.html.
+
+The German,Spanish,Finnish,French,Hungarian,Italian,Portuguese,Russian and Swedish light stemmers
+(common) are based on BSD-licensed reference implementations created by Jacques Savoy and
+Ljiljana Dolamic. These files reside in:
+analysis/common/src/java/org/apache/lucene/analysis/de/GermanLightStemmer.java
+analysis/common/src/java/org/apache/lucene/analysis/de/GermanMinimalStemmer.java
+analysis/common/src/java/org/apache/lucene/analysis/es/SpanishLightStemmer.java
+analysis/common/src/java/org/apache/lucene/analysis/fi/FinnishLightStemmer.java
+analysis/common/src/java/org/apache/lucene/analysis/fr/FrenchLightStemmer.java
+analysis/common/src/java/org/apache/lucene/analysis/fr/FrenchMinimalStemmer.java
+analysis/common/src/java/org/apache/lucene/analysis/hu/HungarianLightStemmer.java
+analysis/common/src/java/org/apache/lucene/analysis/it/ItalianLightStemmer.java
+analysis/common/src/java/org/apache/lucene/analysis/pt/PortugueseLightStemmer.java
+analysis/common/src/java/org/apache/lucene/analysis/ru/RussianLightStemmer.java
+analysis/common/src/java/org/apache/lucene/analysis/sv/SwedishLightStemmer.java
+
+The Stempel analyzer (stempel) includes BSD-licensed software developed 
+by the Egothor project http://egothor.sf.net/, created by Leo Galambos, Martin Kvapil,
+and Edmond Nolan.
+
+The Polish analyzer (stempel) comes with a default
+stopword list that is BSD-licensed created by the Carrot2 project. The file resides
+in stempel/src/resources/org/apache/lucene/analysis/pl/stopwords.txt.
+See http://project.carrot2.org/license.html.
+
+The SmartChineseAnalyzer source code (smartcn) was
+provided by Xiaoping Gao and copyright 2009 by www.imdict.net.
+
+WordBreakTestUnicode_*.java (under modules/analysis/common/src/test/) 
+is derived from Unicode data such as the Unicode Character Database. 
+See http://unicode.org/copyright.html for more details.
+
+The Morfologik analyzer (morfologik) includes BSD-licensed software
+developed by Dawid Weiss and Marcin Miłkowski (http://morfologik.blogspot.com/).
+
+Morfologik uses data from Polish ispell/myspell dictionary
+(http://www.sjp.pl/slownik/en/) licenced on the terms of (inter alia)
+LGPL and Creative Commons ShareAlike.
+
+Morfologic includes data from BSD-licensed dictionary of Polish (SGJP)
+(http://sgjp.pl/morfeusz/)
+
+Servlet-api.jar and javax.servlet-*.jar are under the CDDL license, the original
+source code for this can be found at http://www.eclipse.org/jetty/downloads.php
+
+Apache Felix EventAdmin
+Copyright 2006-2016 The Apache Software Foundation
+
+                            The Netty Project
+                            =================
+
+Please visit the Netty web site for more information:
+
+  * http://netty.io/
+
+Copyright 2011 The Netty Project
+
+The Netty Project licenses this file to you under the Apache License,
+version 2.0 (the "License"); you may not use this file except in compliance
+with the License. You may obtain a copy of the License at:
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations
+under the License.
+
+Also, please refer to each LICENSE.<component>.txt file, which is located in
+the 'license' directory of the distribution file, for the license terms of the
+components that this product depends on.
+
+-------------------------------------------------------------------------------
+This product contains the extensions to Java Collections Framework which has
+been derived from the works by JSR-166 EG, Doug Lea, and Jason T. Greene:
+
+  * LICENSE:
+    * license/LICENSE.jsr166y.txt (Public Domain)
+  * HOMEPAGE:
+    * http://gee.cs.oswego.edu/cgi-bin/viewcvs.cgi/jsr166/
+    * http://viewvc.jboss.org/cgi-bin/viewvc.cgi/jbosscache/experimental/jsr166/
+
+This product contains a modified version of Robert Harder's Public Domain
+Base64 Encoder and Decoder, which can be obtained at:
+
+  * LICENSE:
+    * license/LICENSE.base64.txt (Public Domain)
+  * HOMEPAGE:
+    * http://iharder.sourceforge.net/current/java/base64/
+
+This product contains a modified version of 'JZlib', a re-implementation of
+zlib in pure Java, which can be obtained at:
+
+  * LICENSE:
+    * license/LICENSE.jzlib.txt (BSD Style License)
+  * HOMEPAGE:
+    * http://www.jcraft.com/jzlib/
+
+This product contains a modified version of 'Webbit', a Java event based
+WebSocket and HTTP server:
+
+  * LICENSE:
+    * license/LICENSE.webbit.txt (BSD License)
+  * HOMEPAGE:
+    * https://github.com/joewalnes/webbit
+
+This product optionally depends on 'Protocol Buffers', Google's data
+interchange format, which can be obtained at:
+
+  * LICENSE:
+    * license/LICENSE.protobuf.txt (New BSD License)
+  * HOMEPAGE:
+    * http://code.google.com/p/protobuf/
+
+This product optionally depends on 'Bouncy Castle Crypto APIs' to generate
+a temporary self-signed X.509 certificate when the JVM does not provide the
+equivalent functionality.  It can be obtained at:
+
+  * LICENSE:
+    * license/LICENSE.bouncycastle.txt (MIT License)
+  * HOMEPAGE:
+    * http://www.bouncycastle.org/
+
+This product optionally depends on 'SLF4J', a simple logging facade for Java,
+which can be obtained at:
+
+  * LICENSE:
+    * license/LICENSE.slf4j.txt (MIT License)
+  * HOMEPAGE:
+    * http://www.slf4j.org/
+
+This product optionally depends on 'Apache Commons Logging', a logging
+framework, which can be obtained at:
+
+  * LICENSE:
+    * license/LICENSE.commons-logging.txt (Apache License 2.0)
+  * HOMEPAGE:
+    * http://commons.apache.org/logging/
+
+This product optionally depends on 'Apache Log4J', a logging framework,
+which can be obtained at:
+
+  * LICENSE:
+    * license/LICENSE.log4j.txt (Apache License 2.0)
+  * HOMEPAGE:
+    * http://logging.apache.org/log4j/
+
+This product optionally depends on 'JBoss Logging', a logging framework,
+which can be obtained at:
+
+  * LICENSE:
+    * license/LICENSE.jboss-logging.txt (GNU LGPL 2.1)
+  * HOMEPAGE:
+    * http://anonsvn.jboss.org/repos/common/common-logging-spi/
+
+This product optionally depends on 'Apache Felix', an open source OSGi
+framework implementation, which can be obtained at:
+
+  * LICENSE:
+    * license/LICENSE.felix.txt (Apache License 2.0)
+  * HOMEPAGE:
+    * http://felix.apache.org/
+
+Apache Commons Net
+Copyright 2001-2013 The Apache Software Foundation
+
+Apache Commons Daemon
+Copyright 1999-2013 The Apache Software Foundation
+
+Apache Commons CLI
+Copyright 2001-2015 The Apache Software Foundation
+
+=============================================================================
+= NOTICE file corresponding to section 4d of the Apache License Version 2.0 =
+=============================================================================
+This product includes software developed by
+Joda.org (http://www.joda.org/).
+
+Fuse Source Camel SAP Component
+Copyright 2013 Red Hat, Inc.
+
+Red Hat licenses this product to you under the Apache License, version
+2.0 (the "License"); you may not use this product except in compliance
+with the License.  You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+implied.  See the License for the specific language governing
+permissions and limitations under the License.
+
+Axiom API
+Copyright 2004-2012 The Apache Software Foundation
+
+Axiom DOM
+Copyright 2004-2011 The Apache Software Foundation
+
+Apache Batik
+Copyright 1999-2007 The Apache Software Foundation
+
+This software contains code from the World Wide Web Consortium (W3C) for the 
+Document Object Model API (DOM API) and SVG Document Type Definition (DTD).
+
+This software contains code from the International Organisation for
+Standardization for the definition of character entities used in the software's
+documentation.
+
+This product includes images from the Tango Desktop Project
+(http://tango.freedesktop.org/).
+
+This product includes images from the Pasodoble Icon Theme
+(http://www.jesusda.com/projects/pasodoble).
+
+Apache CXF
+Copyright 2006-2015 The Apache Software Foundation
+
+Copyright 2010-2013 Kevin Seim
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+Apache HttpCore
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache Commons Codec
+Copyright 2002-2011 The Apache Software Foundation
+
+--------------------------------------------------------------------------------
+src/test/org/apache/commons/codec/language/DoubleMetaphoneTest.java contains 
+test data from http://aspell.sourceforge.net/test/batch0.tab.
+
+Copyright (C) 2002 Kevin Atkinson (kevina@gnu.org). Verbatim copying
+and distribution of this entire article is permitted in any medium,
+provided this notice is preserved.
+--------------------------------------------------------------------------------
+
+Pax Web
+Copyright 2007-2009 Open Participation for Java (www.ops4j.org)
+
+This product includes software developed at
+Open Participation for Java (http://www.ops4j.org).
+Licensed under the Apache License 2.0.
+
+This product includes software developed at
+The OSGi Alliance (http://www.osgi.org).
+Copyright (c) OSGi Alliance (2000, 2007).
+Licensed under the Apache License 2.0.
+
+This product uses software developed at
+The OSGi Alliance (http://www.osgi.org).
+Copyright (c) OSGi Alliance (2000, 2007).
+Licensed under the Apache License 2.0.
+
+This product uses software developed at
+Mort Bay Consulting Pty. Ltd. (http://www.mortbay.org/jetty).
+Copyright 2000-2009 Mort Bay Consulting Pty. Ltd.
+Licensed under the Apache License 2.0.
+
+III. License Summary
+- Apache License 2.0
+
+This product includes software developed at
+Mort Bay Consulting Pty. Ltd. (http://www.mortbay.org/jetty).
+Copyright 2000-2009 Mort Bay Consulting Pty. Ltd.
+Licensed under the Apache License 2.0.
+
+Apache Commons Lang
+Copyright 2001-2014 The Apache Software Foundation
+
+This product includes software from the Spring Framework,
+under the Apache License 2.0 (see: StringUtils.containsWhitespace())
+
+Apache Geronimo Bundles: jstl-1.2
+Copyright 2003-2010 The Apache Software Foundation
+
+This product includes software developed for the Java Server Pages Tag
+Library project (https://jstl.dev.java.net/)
+
+Apache Geronimo elects to include this software in this distribution
+under the CDDL license.
+
+Apache Tomcat
+Copyright 1999-2014 The Apache Software Foundation
+
+Apache Groovy
+Copyright 2003-2016 The Apache Software Foundation
+
+This product includes/uses ANTLR (http://www.antlr2.org/)
+developed by Terence Parr 1989-2006
+
+This product bundles icons from the famfamfam.com silk icons set
+http://www.famfamfam.com/lab/icons/silk/
+Licensed under the Creative Commons Attribution Licence v2.5
+http://creativecommons.org/licenses/by/2.5/
+
+This product currently only contains code developed by authors
+of specific components, as identified by the source code files;
+if such notes are missing files have been created by
+Tatu Saloranta.
+
+For additional credits (generally to people who reported problems)
+see CREDITS file.
+
+This product currently only contains code developed by authors
+of specific components, as identified by the source code files.
+
+Since product implements StAX API, it has dependencies to StAX API
+classes.
+
+iBATIS
+   This product includes software developed by
+   The Apache Software Foundation (http://www.apache.org/).
+
+   Copyright 2010 The Apache Software Foundation
+
+OGNL
+
+Refactored SqlBuilder class (SQL, AbstractSQL)
+
+   This product includes software developed by
+   Adam Gent (https://gist.github.com/3650165)
+
+   Copyright 2010 Adam Gent
+
+Apache ServiceMix
+Copyright 2011-2016 Red Hat
+
+Apache JAMES Mime4j
+Copyright 2004-2009 The Apache Software Foundation
+
+   Spring Data Redis 1.3.4.RELEASE
+   Copyright (c) [2011-2014] Pivotal Software, Inc.
+
+   ========================================================================
+   == NOTICE file corresponding to section 4 d of the Apache License,    ==
+   == Version 2.0, in this case for the Spring Integration distribution. ==
+   ========================================================================
+
+   This product includes software developed by
+   the Apache Software Foundation (http://www.apache.org).
+
+   The end-user documentation included with a redistribution, if any,
+   must include the following acknowledgement:
+
+     "This product includes software developed by the Spring Framework
+      Project (http://www.springframework.org)."
+
+   Alternatively, this acknowledgement may appear in the software itself,
+   if and wherever such third-party acknowledgements normally appear.
+
+   The names "Spring", "Spring Framework", and "Spring Data" must
+   not be used to endorse or promote products derived from this software
+   without prior written permission. For written permission, please contact
+   enquiries@springsource.com.
+
+   ==================================================================================
+   == NOTICE file corresponding to section 4 d of the Apache License, Version 2.0, == 
+   == in this case for the Spring Dynamic Modules / Spring OSGi distribution.      ==
+   ==================================================================================
+
+     "This product includes software developed by the Spring Framework
+      Project (http://www.springsource.org)."
+
+   The names "Spring" and "Spring Framework" must not be used to
+   endorse or promote products derived from this software without
+   prior written permission. For written permission, please contact
+   enquiries@springsource.com.
+
+Apache MINA Core
+Copyright 2004-2016 Apache MINA Project
+
+Geronimo TxManager :: Connector
+Copyright 2003-2011 The Apache Software Foundation
+
+Geronimo TxManager :: Transaction
+Copyright 2003-2011 The Apache Software Foundation
+
+Apache Geronimo JSR-303 Bean Validation Spec API
+Copyright 2003-2010 The Apache Software Foundation
+
+Apache Geronimo OSGI factory registry
+Copyright 2003-2011 The Apache Software Foundation
+
+Annotation 1.1
+Copyright 2003-2010 The Apache Software Foundation
+
+Apache Geronimo 
+Copyright 2003-2008 The Apache Software Foundation
+
+Servlet 2.5
+Copyright 2003-2008 The Apache Software Foundation
+This product includes software developed at
+The Apache Software Foundation (http://www.apache.org/).
+
+This product includes software developed by
+The W3C Consortium (http://www.w3.org/).
+
+Copyright © 1994-2002 World Wide Web Consortium, 
+(Massachusetts Institute of Technology, Institut National 
+de Recherche en Informatique et en Automatique, Keio 
+University). All Rights Reserved. 
+http://www.w3.org/Consortium/Legal/
+
+J2EE Connector 1.6
+Copyright 2003-2010 The Apache Software Foundation
+
+Servlet 3.0
+Copyright 2003-2010 The Apache Software Foundation
+
+Apache Geronimo JSR-317 JPA 2.0 Spec API
+Copyright 2003-2010 The Apache Software Foundation
+
+Apache Geronimo JSR-330 Spec API
+Copyright 2003-2010 The Apache Software Foundation
+
+JAXRPC 1.1
+Copyright 2003-2010 The Apache Software Foundation
+
+Interceptor 1.1
+Copyright 2003-2010 The Apache Software Foundation
+
+Java Authentication SPI for Containers
+Copyright 2003-2010 The Apache Software Foundation
+
+Web Services Metadata 2.0
+Copyright 2003-2010 The Apache Software Foundation
+
+Apache Olingo
+Copyright 2013-2016 The Apache Software Foundation
+
+This product uses software developed at
+AOP Alliance (http://aopalliance.sourceforge.net/).
+Licensed under the Public Domain.
+
+Apache Karaf :: OSGi Services :: EventAdmin
+Copyright 2007-2016 The Apache Software Foundation
+
+Apache Felix Metatype Service
+Copyright 2006-2014 The Apache Software Foundation
+
+This product includes software developed at
+The OSGi Alliance (http://www.osgi.org/).
+Copyright (c) OSGi Alliance (2000, 2012).
+Licensed under the Apache License 2.0. 
+
+Apache Felix Gogo Runtime
+Copyright 2011 The Apache Software Foundation
+
+Apache Felix Declarative Services
+Copyright 2006-2014 The Apache Software Foundation
+
+This product includes software developed at
+The OSGi Alliance (http://www.osgi.org/).
+Copyright (c) OSGi Alliance (2000, 2009).
+Licensed under the Apache License 2.0. 
+
+Apache Felix Configuration Admin Service
+Copyright 2006-2015 The Apache Software Foundation
+
+This product includes software developed at
+The OSGi Alliance (http://www.osgi.org/).
+Copyright (c) OSGi Alliance (2000, 2012).
+Licensed under the Apache License 2.0.
+
+Apache Felix File Install
+Copyright 2006-2015 The Apache Software Foundation
+
+Apache Felix OSGi Bundle Repository
+Copyright 2014 The Apache Software Foundation
+
+This product includes software from http://kxml.sourceforge.net.
+Copyright (c) 2002,2003, Stefan Haustein, Oberhausen, Rhld., Germany.
+Licensed under BSD License.
+
+Apache Felix Framework
+Copyright 2006-2014 The Apache Software Foundation
+
+OSGi Bundle Repository Classes
+Copyright 2006-2008 The OSGi Alliance
+
+This product includes software developed at
+The OSGi Alliance (http://www.osgi.org/).
+Copyright 2006-2008 The OSGi Alliance.
+Licensed under the Apache License 2.0.
+
+This product uses software developed at
+The OSGi Alliance (http://www.osgi.org/).
+Copyright 2006-2008 The OSGi Alliance.
+Licensed under the Apache License 2.0.
+
+OSGi Core Classes
+Copyright 2006 OSGi Alliance
+
+This product includes software developed at
+the OSGi Alliance (http://www.osgi.org/).
+
+Apache CXF
+Copyright 2006-2016 The Apache Software Foundation
+
+Apache Velocity
+Copyright 2000-2015 The Apache Software Foundation
+
+This project includes Public Suffix List copied from
+https://publicsuffix.org/list/effective_tld_names.dat
+licensed under the terms of the Mozilla Public License, v. 2.0
+Full license text: <http://mozilla.org/MPL/2.0/>
+
+Apache CXF XJC Runtime
+Copyright 2006-2015 The Apache Software Foundation
+
+The product contains code (StaxBuilder.java) that is
+  Copyright (C) 2000-2004 Jason Hunter & Brett McLaughlin.
+  All rights reserved.
+  See the NOTICE.jdom file for additional information
+
+Java classes (source and binary) under org.apache.cxf.jaxws.javaee
+are generated from schema available here:
+(http://java.sun.com/xml/ns/javaee/javaee_5.xsd)
+
+File json2.min.js has been placed in the public domain.
+
+Portions of the file uuid.min.js derives from code marked:
+/*
+Math.uuid.js (v1.4)
+http://www.broofa.com
+mailto:robert@broofa.com
+
+Copyright (c) 2010 Robert Kieffer
+Dual licensed under the MIT and GPL licenses.
+*/
+
+This product includes software Copyright University of Southampton IT Innovation Centre, 2009 
+(http://www.it-innovation.soton.ac.uk). 
+
+Portions of the file cxf-utils.js derives from code marked:
+This code was written by Tyler Akins and has been placed in the
+public domain.  It would be nice if you left this header intact.
+Base64 code from Tyler Akins -- http://rumkin.com
+
+Apache HttpCore NIO
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache HttpAsyncClient
+Copyright 2010-2016 The Apache Software Foundation
+
+Apache Aries JNDI Core
+Copyright 2009-2014 The Apache Software Foundation
+
+Apache Aries JNDI URL Handler
+Copyright 2009-2014 The Apache Software Foundation
+
+Apache Aries JNDI RMI Handler
+Copyright 2009-2012 The Apache Software Foundation
+
+Apache Aries JNDI Support for Legacy Runtimes
+Copyright 2009-2012 The Apache Software Foundation
+
+Apache Aries JNDI API
+Copyright 2009-2014 The Apache Software Foundation
+
+Apache Aries Application Utils
+Copyright 2009-2012 The Apache Software Foundation
+
+Apache Aries Application Runtime
+Copyright 2009-2012 The Apache Software Foundation
+
+Apache Aries Application Modelling
+Copyright 2009-2012 The Apache Software Foundation
+
+Apache Aries Application OBR Resolver
+Copyright 2009-2012 The Apache Software Foundation
+
+Apache Aries Application Management
+Copyright 2009-2012 The Apache Software Foundation
+
+Apache Aries Application No-op Resolver
+Copyright 2009-2012 The Apache Software Foundation
+
+Apache Aries Application Deployment Management
+Copyright 2009-2012 The Apache Software Foundation
+
+Apache Aries Application Installer
+Copyright 2009-2012 The Apache Software Foundation
+
+Apache Aries Application Default local platform
+Copyright 2009-2012 The Apache Software Foundation
+
+Apache Aries Application API
+Copyright 2009-2012 The Apache Software Foundation
+
+Aries JPA Container Managed Contexts
+Copyright 2009-2014 The Apache Software Foundation
+
+Aries JPA Container API
+Copyright 2009-2014 The Apache Software Foundation
+
+Aries JPA Container blueprint integration for Aries blueprint
+Copyright 2009-2014 The Apache Software Foundation
+
+Aries JPA Container
+Copyright 2009-2016 The Apache Software Foundation
+
+Aries JPA includes the persistence schemas from the JPA specifications.
+Copyright 2005-2009 Sun Microsystems, Inc. All rights reserved.
+Aries JPA elects to include this software in this distribution under the
+CDDL license.  You can obtain a copy of the License at:
+    https://glassfish.dev.java.net/public/CDDL+GPL.html
+The source code is available at:
+    https://glassfish.dev.java.net/source/browse/glassfish/
+
+Apache Aries Transaction Enlisting JDBC Datasource
+Copyright 2009-2016 The Apache Software Foundation
+
+Apache Aries Transaction Manager
+Copyright 2009-2015 The Apache Software Foundation
+
+Apache Aries Transaction Blueprint
+Copyright 2009-2014 The Apache Software Foundation
+
+Apache Aries Blueprint Core
+Copyright 2009-2015 The Apache Software Foundation
+
+Apache Aries Quiesce API
+Copyright 2009-2012 The Apache Software Foundation
+
+Apache Aries Blueprint CM
+Copyright 2009-2015 The Apache Software Foundation
+
+Apache Aries Blueprint Core Compatiblity Fragment Bundle
+Copyright 2009-2012 The Apache Software Foundation
+
+Apache Aries Blueprint Web OSGI
+Copyright 2009-2013 The Apache Software Foundation
+
+Apache Aries Blueprint API
+Copyright 2009-2014 The Apache Software Foundation
+
+Apache Aries SPI Fly Dynamic Weaving Bundle
+Copyright 2009-2015 The Apache Software Foundation
+
+Apache Aries SPI Fly Core (internal module)
+Copyright 2009-2015 The Apache Software Foundation
+
+Apache Aries SPI Fly Weaver (internal module)
+Copyright 2009-2015 The Apache Software Foundation
+
+Apache Aries Proxy API
+Copyright 2009-2014 The Apache Software Foundation
+
+Apache Aries Proxy Service
+Copyright 2009-2016 The Apache Software Foundation
+
+Apache Aries JMX Core
+Copyright 2009-2015 The Apache Software Foundation
+
+Apache Aries JMX Blueprint Core
+Copyright 2009-2013 The Apache Software Foundation
+
+Apache Aries JMX Blueprint API
+Copyright 2009-2013 The Apache Software Foundation
+
+Apache Aries JMX API
+Copyright 2009-2014 The Apache Software Foundation
+
+Apache Aries Util
+Copyright 2009-2013 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-aop
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-webmvc
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-jdbc
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix
+Copyright 2005-2012 The Apache Software Foundation
+
+Apache ServiceMix
+Copyright 2005-2011 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: htmlunit
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: hbase
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache HBase - Annotations
+Copyright 2007-2016 The Apache Software Foundation
+
+Apache Avro
+Copyright 2009-2016 The Apache Software Foundation
+
+Google Guice - Extensions - Servlet
+Copyright 2006-2011 Google, Inc.
+
+ApacheDS Protocol Kerberos Codec
+Copyright 2003-2013 The Apache Software Foundation
+
+ApacheDS I18n
+Copyright 2003-2013 The Apache Software Foundation
+
+Apache Directory API ASN.1 API
+Copyright 2003-2013 The Apache Software Foundation
+
+Apache Directory LDAP API Utilities
+Copyright 2003-2013 The Apache Software Foundation
+
+Apache HBase - Hadoop Two Compatibility
+Copyright 2007-2016 The Apache Software Foundation
+
+Apache HBase - Hadoop Compatibility
+Copyright 2007-2016 The Apache Software Foundation
+
+Apache HBase - Procedure
+Copyright 2007-2016 The Apache Software Foundation
+
+Apache HBase - Common
+Copyright 2007-2016 The Apache Software Foundation
+
+Apache HBase - Protocol
+Copyright 2007-2016 The Apache Software Foundation
+
+--
+This product includes portions of the Guava project v14, specifically
+'hbase-common/src/main/java/org/apache/hadoop/hbase/io/LimitInputStream.java'
+
+Copyright (C) 2007 The Guava Authors
+
+Licensed under the Apache License, Version 2.0
+
+Apache ServiceMix :: Bundles :: spring-core
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: castor
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jaxb-impl
+Copyright 2005-2014 The Apache Software Foundation
+
+Streaming API for XML (STAX API 1.0)
+Copyright 2003-2007 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: antlr
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: SolrJ
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: hadoop-core
+Copyright 2005-2013 The Apache Software Foundation
+
+   =========================================================================
+   ==  NOTICE file corresponding to the section 4 d of                    ==
+   ==  the Apache License, Version 2.0,                                   ==
+   ==  in this case for the Apache Ant distribution.                      ==
+   =========================================================================
+
+   This product includes also software developed by :
+     - the W3C consortium (http://www.w3c.org) ,
+     - the SAX project (http://www.saxproject.org)
+
+   Please read the different LICENSE files present in the root directory of
+   this distribution.
+
+Apache ServiceMix :: Bundles :: spring-tx
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: xstream
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: urlrewritefilter
+Copyright 2005-2013 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: hadoop-client
+Copyright 2005-2016 The Apache Software Foundation
+
+Curator Client
+Copyright 2011-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: facebook4j-core
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: snmp4j
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: compiler
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: opensaml
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-context-support
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: xmlbeans
+Copyright 2005-2013 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: xalan
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: lucene-analyzers-common
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: xmlgraphics-commons
+Copyright 2005-2013 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-aspects
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: lucene-sandbox
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-jms
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: reflections
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-batch-core
+Copyright 2005-2016 The Apache Software Foundation
+
+Spring Batch 3.0.6.RELEASE
+Copyright (c) 2002-2015 Pivotal, Inc.
+
+Apache ServiceMix :: Bundles :: lucene-queries
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: java_nats
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: freemarker
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: splunk
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jt400
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jasypt
+Copyright 2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-ws-support
+Copyright 2005-2016 The Apache Software Foundation
+
+Spring Web Services 2.2.4.RELEASE
+Copyright (c) 2002-2015 Pivotal, Inc
+
+Spring Framework 4.0.9.RELEASE
+Copyright (c) 2002-2014 Pivotal, Inc.
+
+Apache ServiceMix :: Bundles :: dnsjava
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-context
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: saaj-impl
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-batch-infrastructure
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: fop
+Copyright 2005-2013 The Apache Software Foundation
+
+Apache XML Graphics Commons
+Copyright 2006-2012 The Apache Software Foundation
+
+Apache Excalibur
+Copyright 2007 The Apache Software Foundation.
+
+Apache ServiceMix :: Bundles :: spring-test
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: swagger-core_2.10
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-webmvc-portlet
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-orm
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-ws-core
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: noggit
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: avro
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: guice
+Copyright 2005-2013 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-xml
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jolt
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: json4s
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: lucene-core
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: lucene-queryparser
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: chunk-templates
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-ws-security
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: gentlyweb-utils
+Copyright 2005-2012 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: libthrift
+Copyright 2005-2012 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-beans
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: swagger-jaxrs_2.10
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: apns
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: elasticsearch
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: xpp3
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jasper
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: serializer
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jakarta-regexp
+Copyright 2005-2013 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: avro-ipc
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: swagger-annotations
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: quickfixj-all
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix
+Copyright 2005-2009 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: paranamer
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-ldap
+Copyright 2005-2015 The Apache Software Foundation
+
+   ======================================================================
+   == NOTICE file corresponding to section 4 d of the Apache License,  ==
+   == Version 2.0, for the Spring LDAP distribution.                   ==
+   ======================================================================
+
+     "This product includes software developed by the Spring LDAP
+      Project (http://www.springframework.org/ldap)."
+
+   Alternately, this acknowledgement may appear in the software itself,
+   if and wherever such third-party acknowledgements normally appear.
+
+Apache ServiceMix :: Bundles :: spring-oxm
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jsch.agentproxy.sshj
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-instrument
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jaxb-xjc
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-web
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-security-config
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: kxml2
+Copyright 2005-2012 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: aspectj
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: ST4
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: olingo-odata2-core
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: antlr-runtime
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: scribe
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jaxen
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: junit
+Copyright 2005-2012 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: org.eclipse.egit.github.core
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: batik
+Copyright 2005-2012 The Apache Software Foundation
+
+Apache FOP
+Copyright 1999-2006 The Apache Software Foundation
+
+This software consists of voluntary contributions made by many individuals
+on behalf of The Apache Software Foundation and was originally created by
+James Tauber <jtauber@jtauber.com>.
+
+Apache ServiceMix :: Bundles :: twitter4j
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jsch
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: serp
+Copyright 2005-2012 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jasypt-spring31
+Copyright 2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: cglib
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: velocity
+Copyright 2005-2012 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jzlib
+Copyright 2005-2013 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: lightcouch
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: zxing
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: aws-java-sdk
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: cache-api
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-security-core
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: xercesImpl
+Copyright 2005-2013 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: XML-RPC Client
+Copyright 2005-2012 The Apache Software Foundation
+
+Apache XML-RPC Common Library
+Copyright 2001-2010 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: FastInfoset
+Copyright 2005-2013 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spring-expression
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jedis
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: ognl
+Copyright 2005-2016 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: spark-core
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: jets3t
+Copyright 2005-2012 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: wsdl4j
+Copyright 2005-2013 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: juel
+Copyright 2005-2013 The Apache Software Foundation
+
+SAAJ 1.3
+Copyright 2003-2010 The Apache Software Foundation
+
+Apache Geronimo 
+Copyright 2003-2006 The Apache Software Foundation
+
+Apache XBean OSGI Bundle Utilities
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache XBean :: Reflect
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache XBean :: Naming
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache XBean :: Classloader
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache XBean :: Spring
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache XBean :: Classpath Resource Finder
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache XBean :: ASM 5 Util
+Copyright 2005-2015 The Apache Software Foundation
+
+Apache XBean :: OSGI Blueprint Namespace Handler
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache XBean :: ASM 4 shaded (repackaged)
+Copyright 2005-2013 The Apache Software Foundation
+
+QpidJMS Client
+Copyright 2013-2016 The Apache Software Foundation
+
+proton-j
+Copyright 2015 The Apache Software Foundation
+
+Apache Qpid
+Copyright 2006-2014 The Apache Software Foundation
+
+Apache Qpid
+Copyright 2006-2012 Apache Software Foundation
+This product includes software developed at
+Apache Software Foundation (http://www.apache.org/)
+
+jclouds loadbalancer core
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds :: Karaf :: Cache
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds :: Karaf :: Chef :: Cache
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds :: Karaf :: Chef :: Services
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds :: Karaf :: Chef :: Core
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds :: Karaf :: Chef :: Commands
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds :: Karaf :: Services
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds :: Karaf :: Core
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds :: Karaf :: URL Handler
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds :: Karaf :: Recipe
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds :: Karaf :: Commands
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds jsch ssh client
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Components Core
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds GleSYS core
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds ElasticHosts Peer1 London provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Rackspace Cloud Load Balancers US provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Rackspace Cloud Files UK provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Amazon Identity and Access Management (STS) provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Amazon Route 53 provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds CloudFiles UK provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Amazon Elastic Load Balancer provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds ElasticHosts Peer1 San Antonio provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds CloudFiles US provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds dynect api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Go2Cloud Johannesburg1 provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds GoGrid provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds SkaliCloud Malaysia provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds ElasticHosts Peer1 Toronto provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds HP Cloud Object Storage
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds HP Cloud Compute provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds ElasticHosts Peer1 Los Angeles provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Amazon Simple Storage Service (S3) provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Rackspace Next Generation Cloud Block Storage UK provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Amazon Simple Queue Service provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Rackspace Next Generation Cloud Servers US provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Amazon EC2 provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Rackspace Next Generation Cloud Block Storage US provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Rackspace Next Generation Cloud DNS UK provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Open Hosting East1 provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Serverlove Manchester provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Rackspace Cloud Files US provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds ElasticHosts BlueSquare London provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Rackspace Next Generation Cloud Servers provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds SoftLayer core
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Rackspace Next Generation Cloud DNS US provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Azure Storage provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Rackspace Cloud Load Balancers UK provider
+Copyright 2009-2015 The Apache Software Foundation
+
+Apache jclouds :: OpenStack :: Nova API
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds rackspace clouddns api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Chef api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds rackspace cloudidentity api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds s3 api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds openstack-cinder api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds atmos components
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds openstack-swift api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds cloudfiles api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds cloudstack core
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds bring your own node provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds elasticstack core
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds sqs api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds rackspace-cloudfiles api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds sts api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds swift api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds cloudwatch api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds filesystem core
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Rackspace Cloud Load Balancers API
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds openstack-keystone api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds route53 api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds ec2 api
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds OpenStack Components Core
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds script builder
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds blobstore core
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds DigitalOcean Provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds CloudSigma v2 API
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds CloudSigma v2 Honolulu Provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds CloudSigma v2 Las Vegas Provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds CloudSigma v2 Washington DC Provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds CloudSigma v2 San Jose Provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds CloudSigma v2 Zurich Provider
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Log4J Logging Module
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds enterprise Module
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds Apache Http Components Client
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds sshj ssh client
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds netty payload module
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds SLF4J Logging Module
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds bouncycastle EncryptionService Module
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds joda DateService Module
+Copyright 2009-2015 The Apache Software Foundation
+
+jclouds compute core
+Copyright 2009-2015 The Apache Software Foundation
+
+Apache Neethi
+Copyright 2004-2015 The Apache Software Foundation
+
+This product is tested with testcases developed at W3C under the license:
+http://www.w3.org/Consortium/Legal/2002/copyright-documents-20021231
+The source distribution of this product includes those testcases.
+
+Apache Shiro :: Core
+Copyright 2004-2016 The Apache Software Foundation
+
+Apache WSS4J WS-Security Common
+Copyright 2004-2016 The Apache Software Foundation
+
+JavaMail 1.4
+Copyright 2003-2010 The Apache Software Foundation
+
+Apache WSS4J WS-Security Bindings
+Copyright 2004-2016 The Apache Software Foundation
+
+Apache WSS4J DOM WS-Security
+Copyright 2004-2016 The Apache Software Foundation
+
+Apache WSS4J Streaming WS-Security
+Copyright 2004-2016 The Apache Software Foundation
+
+Apache WSS4J WS-SecurityPolicy model
+Copyright 2004-2016 The Apache Software Foundation
+
+Apache WSS4J Streaming WS-SecurityPolicy
+Copyright 2004-2016 The Apache Software Foundation
+
+OpenCMIS OSGi Client Wrapper
+Copyright 2009-2015 The Apache Software Foundation
+
+OpenCMIS contains code from the following Open Source projects:
+
+- Base64 
+  Copyright (c) 2010 Robert Harder
+  Public Domain, <http://iharder.net/base64>
+
+- JSON.simple
+  Copyright (c) 2012 Yidong Fang
+  Apache License 2.0, <http://code.google.com/p/json-simple/>
+
+OpenCMIS contains OASIS CMIS 1.0 and CMIS 1.1 schema and WSDL files.
+Copyright (c) 2010 and 2013 OASIS Open
+<https://www.oasis-open.org/committees/cmis>
+
+OpenCMIS Commons API
+Copyright 2009-2015 The Apache Software Foundation
+
+EXTERNAL DEPENDENCIES
+
+This software depends on libraries with separate copyright notices and
+license terms. Your use of these dependencies is subject to the licenses
+referred to in the separate DEPENDENCIES file.
+
+OpenCMIS Commons Implementation
+Copyright 2009-2015 The Apache Software Foundation
+
+OpenCMIS Client API
+Copyright 2009-2015 The Apache Software Foundation
+
+OpenCMIS Client Implementation
+Copyright 2009-2015 The Apache Software Foundation
+
+OpenCMIS Client Bindings Implementation
+Copyright 2009-2015 The Apache Software Foundation
+
+Apache XML Security for Java
+Copyright 2000-2015 The Apache Software Foundation
+
+Apache Commons CSV
+Copyright 2005-2014 The Apache Software Foundation
+
+src/main/resources/contract.txt
+This file was downloaded from http://www.ferc.gov/docs-filing/eqr/soft-tools/sample-csv/contract.txt and contains neither copyright notice nor license.
+
+src/main/resources/transaction.txt
+This file was downloaded from http://www.ferc.gov/docs-filing/eqr/soft-tools/sample-csv/transaction.txt and contains neither copyright notice nor license.
+
+src/test/resources/CSVFileParser/bom.csv
+src/test/resources/CSVFileParser/test.csv
+src/test/resources/CSVFileParser/test_default.txt
+src/test/resources/CSVFileParser/test_default_comment.txt
+src/test/resources/CSVFileParser/test_rfc4180.txt
+src/test/resources/CSVFileParser/test_rfc4180_trim.txt
+src/test/resources/CSVFileParser/testCSV85.csv
+src/test/resources/CSVFileParser/testCSV85_default.txt
+src/test/resources/CSVFileParser/testCSV85_ignoreEmpty.txt
+These files are used as test data and test result specifications.
+
+Apache Commons Math
+Copyright 2001-2016 The Apache Software Foundation
+
+This product includes software developed for Orekit by
+CS Systèmes d'Information (http://www.c-s.fr/)
+Copyright 2010-2012 CS Systèmes d'Information
+
+Apache Commons Pool
+Copyright 2001-2013 The Apache Software Foundation
+
+The LinkedBlockingDeque implementation is based on an implementation written by
+Doug Lea with assistance from members of JCP JSR-166 Expert Group and released
+to the public domain, as explained at
+http://creativecommons.org/licenses/publicdomain
+
+Apache Commons VFS
+Copyright 2002-2011 The Apache Software Foundation
+
+Maven SCM API
+Copyright 2003-2010 The Apache Software Foundation
+
+Maven SCM Subversion Provider - SVN Executable Impl.
+Copyright 2003-2010 The Apache Software Foundation
+
+Maven SCM Subversion Provider - Common library
+Copyright 2003-2010 The Apache Software Foundation
+
+Apache Commons Math
+Copyright 2001-2011 The Apache Software Foundation
+
+===============================================================================
+
+The BracketFinder (package org.apache.commons.math.optimization.univariate)
+and PowellOptimizer (package org.apache.commons.math.optimization.general)
+classes are based on the Python code in module "optimize.py" (version 0.5)
+developed by Travis E. Oliphant for the SciPy library (http://www.scipy.org/)
+Copyright © 2003-2009 SciPy Developers.
+===============================================================================
+
+The LinearConstraint, LinearObjectiveFunction, LinearOptimizer,
+RelationShip, SimplexSolver and SimplexTableau classes in package
+org.apache.commons.math.optimization.linear include software developed by
+Benjamin McCann (http://www.benmccann.com) and distributed with
+the following copyright: Copyright 2009 Google Inc.
+===============================================================================
+
+This product includes software developed by the
+University of Chicago, as Operator of Argonne National
+Laboratory.
+The LevenbergMarquardtOptimizer class in package
+org.apache.commons.math.optimization.general includes software
+translated from the lmder, lmpar and qrsolv Fortran routines
+from the Minpack package
+Minpack Copyright Notice (1999) University of Chicago.  All rights reserved
+===============================================================================
+
+The GraggBulirschStoerIntegrator class in package
+org.apache.commons.math.ode.nonstiff includes software translated
+from the odex Fortran routine developed by E. Hairer and G. Wanner.
+Original source copyright:
+Copyright (c) 2004, Ernst Hairer
+===============================================================================
+
+The EigenDecompositionImpl class in package
+org.apache.commons.math.linear includes software translated
+from some LAPACK Fortran routines.  Original source copyright:
+Copyright (c) 1992-2008 The University of Tennessee.  All rights reserved.
+===============================================================================
+
+The MersenneTwister class in package org.apache.commons.math.random
+includes software translated from the 2002-01-26 version of
+the Mersenne-Twister generator written in C by Makoto Matsumoto and Takuji
+Nishimura. Original source copyright:
+Copyright (C) 1997 - 2002, Makoto Matsumoto and Takuji Nishimura,
+All rights reserved
+===============================================================================
+
+The complete text of licenses and disclaimers associated with the the original
+sources enumerated above at the time of code translation are in the LICENSE.txt
+file.
+
+Apache Commons Exec
+Copyright 2005-2014 The Apache Software Foundation
+
+Apache Commons JEXL
+Copyright 2001-2011 The Apache Software Foundation
+
+Apache Commons Lang
+Copyright 2001-2015 The Apache Software Foundation
+
+Apache Commons Compress
+Copyright 2002-2015 The Apache Software Foundation
+
+The files in the package org.apache.commons.compress.archivers.sevenz
+were derived from the LZMA SDK, version 9.20 (C/ and CPP/7zip/),
+which has been placed in the public domain:
+
+"LZMA SDK is placed in the public domain." (http://www.7-zip.org/sdk.html)
+
+Apache DeltaSpike Data-Module Impl
+Copyright 2011-2015 The Apache Software Foundation
+
+Apache DeltaSpike Data-Module API
+Copyright 2011-2015 The Apache Software Foundation
+
+Apache DeltaSpike Partial-Bean-Module Impl
+Copyright 2011-2015 The Apache Software Foundation
+
+Apache DeltaSpike Proxy-Module Impl ASM5
+Copyright 2011-2015 The Apache Software Foundation
+
+Apache DeltaSpike Proxy-Module API
+Copyright 2011-2015 The Apache Software Foundation
+
+Apache DeltaSpike Partial-Bean-Module API
+Copyright 2011-2015 The Apache Software Foundation
+
+Apache DeltaSpike JPA-Module API
+Copyright 2011-2015 The Apache Software Foundation
+
+Apache DeltaSpike JPA-Module Impl
+Copyright 2011-2015 The Apache Software Foundation
+
+Apache DeltaSpike Core-API
+Copyright 2011-2015 The Apache Software Foundation
+
+Apache DeltaSpike Core-Implementation
+Copyright 2011-2015 The Apache Software Foundation
+
+Camel :: JUEL
+Copyright 2007-2016 The Apache Software Foundation
+
+   =========================================================================
+   ==  NOTICE file corresponding to the section 4 d of                    ==
+   ==  the Apache License, Version 2.0,                                   ==
+   ==  in this case for the Apache Camel distribution.                    ==
+   =========================================================================
+
+   Please read the different LICENSE files present in the licenses directory of
+   this distribution.
+
+Camel :: StringTemplate
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Netty4 HTTP
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Scala
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Atom
+Copyright 2007-2016 The Apache Software Foundation
+
+Axiom Impl
+Copyright 2004-2012 The Apache Software Foundation
+
+Camel :: Jetty9
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: HazelCast
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: SNMP
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: CSV
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Git
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: UniVocity Parsers
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Simple JMS
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: SQL
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Stream
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Kubernetes
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Jibx
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: HL7
+Copyright 2007-2016 The Apache Software Foundation
+
+   This product includes software developed by
+   The HAPI Project (http://hl7api.sourceforge.net/).
+
+Camel :: Stomp
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Metrics
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: IRC
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: AWS
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Event Admin
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Netty HTTP (deprecated)
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Olingo2 :: Component
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: URLRewrite
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Printer
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Cometd
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: HDFS2
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Platforms :: Apache Karaf :: Commands
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Platforms :: Apache Karaf :: Commands :: Catalog
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Hbase
+Copyright 2007-2016 The Apache Software Foundation
+
+Apache HBase - Client
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Jasypt
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: QuickFIX/J
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: OptaPlanner
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: LZF
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: LinkedIn :: Component
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Platforms :: Catalog
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Core XML
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: XMLBeans
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Braintree
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Jolt
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Zip File
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: MINA-2
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Olingo2 :: API
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: JBPM
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Mustache
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: SSH
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: ElSql
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: JDBC
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: MSV
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: MQTT
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Hipchat
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Chunk
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Freemarker
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Zookeeper
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: iCal
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Netty4
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: BeanIO
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Salesforce
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: CDI
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: FTP
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Atmosphere WebSocket Servlet
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Krati
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Groovy
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: HTTP4
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Solr
+Copyright 2007-2016 The Apache Software Foundation
+
+==============================================================
+ Apache Solr
+ Copyright 2006-2014 The Apache Software Foundation
+==============================================================
+
+Includes software from other Apache Software Foundation projects,
+including, but not limited to:
+  - Apache Lucene Java
+  - Apache Commons
+  - Apache Blur
+  - Apache Hadoop
+
+This product includes code forked from the Java-HLL library.
+Copyright (c) 2013 Aggregate Knowledge, Inc., https://github.com/aggregateknowledge/java-hll/
+
+This product includes the JQuery JavaScript library created by John Resig.
+Copyright (c) 2010 John Resig, http://jquery.com/
+
+This product includes the D3.js JavaScript library created by Michael Bostock.
+Copyright (c) 2012, Michael Bostock, https://github.com/mbostock/d3
+
+This product includes the highlight.js Javascript library created by Ivan Sagalaev
+Copyright (c) 2006, Ivan Sagalaev, https://github.com/isagalaev/highlight.js
+
+This product includes the ZeroClipboard.js Javascript library created by Jon Rohan, James M. Greene
+Copyright (c) 2012 Jon Rohan, James M. Greene, https://github.com/zeroclipboard/ZeroClipboard
+
+This product includes the Chosen Javascript library created by Patrick Filler
+Copyright (c) 2011-2014 by Harvest, https://github.com/harvesthq/chosen
+
+This product includes jquery.ajaxfileupload.js Javascript library created by Jordan Feldstein
+Copyright (c) 2011 Jordan Feldstein, https://github.com/jfeldstein/jQuery.AjaxFileUpload.js
+
+This product includes jquery.blockUI.js Javascript library created by Mike Alsup
+Copyright (c) 2007-2014 M. Alsup https://github.com/malsup/blockui/
+
+This product includes jquery.cookie.js Javascript library created by Klaus Hartl
+Copyright (c) 2013-2014 Klaus Hartl, https://github.com/carhartl/jquery-cookie
+
+This product includes jquery.form Javascript library created by Mike Alsup
+Copyright 2006-2014 (c) M. Alsup, https://github.com/malsup/form/
+
+This product includes the jstree Javascript library created by Ivan Bozhanov
+Copyright (c) 2013-2014 Ivan Bozhanov, https://github.com/vakata/jstree
+
+This product includes the Sammy.js Javascript library created by Aaron Quint
+Copyright (c) 2008 Aaron Quint, Quirkey NYC, LLC, https://github.com/quirkey/sammy
+
+This product includes jquery.timeago.js Javascript library by Ryan McGeary
+Copyright (c) 2008-2014, Ryan McGeary, https://github.com/rmm5t/jquery-timeago
+
+This product includes linker.js Javascript library created by Michalis Tzikas & Vasilis Lolos
+Copyright (C) 2011 by Michalis Tzikas & Vasilis Lolos, https://github.com/lolos/jquery-Linker/
+
+This product includes require.js Javascript library created by James Burke
+Copyright (C) 2010-2014 James Burke, https://github.com/jrburke/requirejs
+
+This product includes fugue icons created by Yusuke Kamiyamane
+Copyright (C) 2013-2014 Yusuke Kamiyamane, https://github.com/yusukekamiyamane/fugue-icons
+
+JavaMail API 1.5.1: https://glassfish.dev.java.net/javaee5/mail/
+License: Common Development and Distribution License (CDDL) v1.1 (https://glassfish.java.net/public/CDDL+GPL_1_1.html)
+
+JavaBeans Activation Framework (JAF): http://java.sun.com/products/javabeans/jaf/index.jsp
+License: Common Development and Distribution License (CDDL) v1.0 (https://glassfish.dev.java.net/public/CDDLv1.0.html)
+
+HSQL Database (HSQLDB): http://hsqldb.org/
+License: http://hsqldb.org/web/hsqlLicense.html
+
+Jersey Core: https://jersey.java.net/
+License: Common Development and Distribution License (CDDL) v1.0 (https://glassfish.dev.java.net/public/CDDLv1.0.html)
+
+The HdfsDirectory and BlockDirectory were derived from
+the Apache Blur incubating project and are Apache License 2.0.
+
+ASM (Java bytecode manipulation and analysis framework): http://asm.ow2.org/
+Copyright (c) 2000-2005 INRIA, France Telecom
+
+=========================================================================
+==  Antlr2 Notice                                                       ==
+=========================================================================
+
+SOFTWARE RIGHTS
+
+ANTLR 1989-2006 Developed by Terence Parr
+Partially supported by University of San Francisco & jGuru.com
+
+We reserve no legal rights to the ANTLR--it is fully in the
+public domain. An individual or company may do whatever
+they wish with source code distributed with ANTLR or the
+code generated by ANTLR, including the incorporation of
+ANTLR, or its output, into commerical software.
+
+We encourage users to develop software with ANTLR. However,
+we do ask that credit is given to us for developing
+ANTLR. By "credit", we mean that if you use ANTLR or
+incorporate any source code into one of your programs
+(commercial product, research project, or otherwise) that
+you acknowledge this fact somewhere in the documentation,
+research report, etc... If you like ANTLR and have
+developed a nice tool with the output, please mention that
+you developed it using ANTLR. In addition, we ask that the
+headers remain intact in our source code. As long as these
+guidelines are kept, we expect to continue enhancing this
+system and expect to make other tools available as they are
+completed.
+
+The primary ANTLR guy:
+
+Terence Parr
+parrt@cs.usfca.edu
+parrt@antlr.org
+
+=========================================================================
+==  Apache Lucene Notice                                               ==
+=========================================================================
+
+In the case where the program, whether in its original form or
+modified, was distributed or delivered to or received by a user from
+any person, organization or entity other than ICOT, unless it makes or
+grants independently of ICOT any specific warranty to the user in
+writing, such person, organization or entity, will also be exempted
+from and not be held liable to the user for any such damages as noted
+above as far as the program is concerned.
+---
+
+This product includes/uses software, Woodstox (http://woodstox.codehaus.org),
+developed by Codehaus  (http://www.codehaus.org/)
+License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+=========================================================================
+==  Woodstox Notice                                                    ==
+=========================================================================
+This product currently only contains code developed by authors
+of specific components, as identified by the source code files.
+
+For additional credits (generally to people who reported problems)
+see CREDITS file.
+---
+
+This product includes software developed by the Eclipse Foundation
+(specifically, Jetty, the bundled servlet container in example),
+available under the Apache 2 License.
+
+Servlet-api.jar is under the CDDL license, the original source
+code for this can be found at http://www.eclipse.org/jetty/downloads.php
+
+=========================================================================
+==  SLF4J Notice -- http://www.slf4j.org/license.html                  ==
+=========================================================================
+
+Copyright (c) 2004-2008 QOS.ch
+All rights reserved.
+
+Permission is hereby granted, free  of charge, to any person obtaining
+a  copy  of this  software  and  associated  documentation files  (the
+"Software"), to  deal in  the Software without  restriction, including
+without limitation  the rights to  use, copy, modify,  merge, publish,
+distribute,  sublicense, and/or sell  copies of  the Software,  and to
+permit persons to whom the Software  is furnished to do so, subject to
+the following conditions:
+
+The  above  copyright  notice  and  this permission  notice  shall  be
+included in all copies or substantial portions of the Software.
+
+THE  SOFTWARE IS  PROVIDED  "AS  IS", WITHOUT  WARRANTY  OF ANY  KIND,
+EXPRESS OR  IMPLIED, INCLUDING  BUT NOT LIMITED  TO THE  WARRANTIES OF
+MERCHANTABILITY,    FITNESS    FOR    A   PARTICULAR    PURPOSE    AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE,  ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+=========================================================================
+==  Apache Tika Notices                                                ==
+=========================================================================
+
+The following notices apply to contrib/extraction:
+
+This product includes software developed by the following copyright owners:
+
+Copyright (c) 2000-2006 The Legion Of The Bouncy Castle
+(http://www.bouncycastle.org)
+
+Copyright (c) 2003-2005, www.pdfbox.org
+
+Copyright (c) 2003-2005, www.fontbox.org
+
+Copyright (c) 1995-2005 International Business Machines Corporation and others
+
+Copyright 2001-2005 (C) MetaStuff, Ltd. All Rights Reserved.
+
+Copyright 2004 Sun Microsystems, Inc. (Rome JAR)
+
+Copyright 2002-2008 by John Cowan (TagSoup -- http://ccil.org/~cowan/XML/tagsoup/)
+
+Copyright (C) 1994-2007 by the Xiph.org Foundation, http://www.xiph.org/ (OggVorbis)
+
+Copyright 2012 Kohei Taketa juniversalchardet (http://code.google.com/p/juniversalchardet/)
+
+Lasse Collin and others, XZ for Java (http://tukaani.org/xz/java.html)
+
+java-libpst is a pure java library for the reading of Outlook PST and OST files.
+https://github.com/rjohnsondev/java-libpst
+
+JMatIO is a JAVA library to read/write/manipulate with Matlab binary MAT-files.
+http://www.sourceforge.net/projects/jmatio
+
+=========================================================================
+==  Language Detection Notices                                         ==
+=========================================================================
+
+The following notices apply to contrib/langid:
+
+This product includes software developed by Cybozu Labs, Inc.
+(c)2010 All rights reserved by Cybozu Labs, Inc.
+http://code.google.com/p/language-detection/
+
+This product includes software developed by the Jsonic project:
+http://sourceforge.jp/projects/jsonic/
+
+=========================================================================
+==     Carrot2 Notice                                                  ==
+=========================================================================
+Copyright (C) 2002-2010, Dawid Weiss, Stanislaw Osinski.
+Portions (C) Contributors listed in "carrot2.CONTRIBUTORS" file.
+All rights reserved.
+
+This product includes software developed by the Carrot2 Project.
+
+See http://project.carrot2.org/
+
+=========================================================================
+==     Guava Notice                                                    ==
+=========================================================================
+
+Copyright (C) 2009 Google Inc.
+
+This product includes software developed by the Google Guava project.
+
+See http://code.google.com/p/guava-libraries/
+
+=========================================================================
+==     Prettify Notice                                                 ==
+=========================================================================
+
+This product includes software developed by the Google Prettify project.
+
+See http://code.google.com/p/google-code-prettify/
+
+=========================================================================
+==     Jackson Notice                                                  ==
+=========================================================================
+Copyright 2010 FasterXML, LLC
+
+This product includes software developed by the Jackson project.
+
+See http://jackson.codehaus.org/
+
+=========================================================================
+==     HSQLDB Notice                                                   ==
+=========================================================================
+
+For content, code, and products originally developed by Thomas Mueller and the Hypersonic SQL Group:
+
+Copyright (c) 1995-2000 by the Hypersonic SQL Group.
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+Redistributions of source code must retain the above copyright notice, this
+list of conditions and the following disclaimer.
+
+Redistributions in binary form must reproduce the above copyright notice,
+this list of conditions and the following disclaimer in the documentation
+and/or other materials provided with the distribution.
+
+Neither the name of the Hypersonic SQL Group nor the names of its
+contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL THE HYPERSONIC SQL GROUP,
+OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+This software consists of voluntary contributions made by many individuals on behalf of the
+Hypersonic SQL Group.
+
+For work added by the HSQL Development Group (a.k.a. hsqldb_lic.txt):
+
+Copyright (c) 2001-2005, The HSQL Development Group
+All rights reserved.
+
+Neither the name of the HSQL Development Group nor the names of its
+contributors may be used to endorse or promote products derived from this
+software without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ARE DISCLAIMED. IN NO EVENT SHALL HSQL DEVELOPMENT GROUP, HSQLDB.ORG,
+OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+This product includes tests written with EasyMock Copyright 2001-2007
+Tammo Freese (http://www.easymock.org/)
+
+==========================================================================
+The following license applies to easymock-2.2.jar
+--------------------------------------------------------------------------
+EasyMock 2 License (MIT License)
+Copyright (c) 2001-2007 OFFIS, Tammo Freese.
+
+Permission is hereby granted, free of charge, to any person obtaining a copy of 
+this software and associated documentation files (the "Software"), to deal in 
+the Software without restriction, including without limitation the rights to 
+use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
+of the Software, and to permit persons to whom the Software is furnished to do 
+so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all 
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
+SOFTWARE. 
+
+=========================================================================
+==     Restlet Notice                                                  ==
+=========================================================================
+
+Copyright (C) 2005-2014 Restlet S.A.S.
+
+Restlet is a registered trademark of Restlet S.A.S.
+
+This product contains software developed by the Restlet project.
+
+See http://www.restlet.org/
+
+=========================================================================
+==     Protocol Buffers Notice                                         ==
+=========================================================================
+
+Protocol Buffers - Google's data interchange format
+Copyright 2008 Google Inc.
+http://code.google.com/apis/protocolbuffers/
+
+Camel :: Spark REST
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Core
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Test :: Spring 4.1+
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Box.com
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: LDAP
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: AHC-WS
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: JAXB
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: BAM
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: JPA
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Saxon
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Avro
+Copyright 2007-2016 The Apache Software Foundation
+
+Apache Avro IPC
+Copyright 2009-2016 The Apache Software Foundation
+
+Camel :: SIP
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Routebox (deprecated)
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: XStream
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: CouchDB
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Nats
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Quartz (deprecated)
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Swagger (deprecated)
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: JMX
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Base64
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: SAP NetWeaver
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: SMPP
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: XML JSON
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: TagSoup
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Shiro
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: XML RPC
+Copyright 2007-2016 The Apache Software Foundation
+
+Apache XML-RPC Client Library
+Copyright 2001-2010 The Apache Software Foundation
+
+Camel :: Restlet
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Exec
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: FOP
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Script
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Cache
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Test
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: RMI
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Lucene
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: AHC
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: JCR
+Copyright 2007-2016 The Apache Software Foundation
+
+Jackrabbit Core
+Copyright 2004-2016 The Apache Software Foundation
+
+Based on source code originally developed by
+Day Software (http://www.day.com/).
+
+Apache Commons DBCP
+Copyright 2001-2010 The Apache Software Foundation
+
+Apache Jackrabbit API
+Copyright 2004-2016 The Apache Software Foundation
+
+Jackrabbit Data
+Copyright 2004-2016 The Apache Software Foundation
+
+Jackrabbit SPI Commons
+Copyright 2004-2016 The Apache Software Foundation
+
+Jackrabbit SPI
+Copyright 2004-2016 The Apache Software Foundation
+
+Apache Tika core
+Copyright 2007-2015 The Apache Software Foundation
+
+=========================================================================
+==  NOTICE file corresponding to section 4(d) of the Apache License,
+==  Version 2.0, in this case for the Apache Derby distribution.
+==
+==  DO NOT EDIT THIS FILE DIRECTLY. IT IS GENERATED
+==  BY THE buildnotice TARGET IN THE TOP LEVEL build.xml FILE.
+==
+=========================================================================
+
+Apache Derby
+Copyright 2004-2014 The Apache Software Foundation
+
+=========================================================================
+
+Portions of Derby were originally developed by
+International Business Machines Corporation and are
+licensed to the Apache Software Foundation under the
+"Software Grant and Corporate Contribution License Agreement",
+informally known as the "Derby CLA".
+The following copyright notice(s) were affixed to portions of the code
+with which this file is now or was at one time distributed
+and are placed here unaltered.
+
+(C) Copyright 1997,2004 International Business Machines Corporation.  All rights reserved.
+
+(C) Copyright IBM Corp. 2003. 
+
+The portion of the functionTests under 'nist' was originally 
+developed by the National Institute of Standards and Technology (NIST), 
+an agency of the United States Department of Commerce, and adapted by
+International Business Machines Corporation in accordance with the NIST
+Software Acknowledgment and Redistribution document at
+http://www.itl.nist.gov/div897/ctg/sql_form.htm
+
+The JDBC apis for small devices and JDBC3 (under java/stubs/jsr169 and
+java/stubs/jdbc3) were produced by trimming sources supplied by the
+Apache Harmony project. In addition, the Harmony SerialBlob and
+SerialClob implementations are used. The following notice covers the Harmony sources:
+
+Portions of Harmony were originally developed by
+Intel Corporation and are licensed to the Apache Software
+Foundation under the "Software Grant and Corporate Contribution
+License Agreement", informally known as the "Intel Harmony CLA".
+
+The Derby build relies on source files supplied by the Apache Felix
+project. The following notice covers the Felix files:
+
+  Apache Felix Main
+  Copyright 2008 The Apache Software Foundation
+
+  I. Included Software
+
+  This product includes software developed at
+  The Apache Software Foundation (http://www.apache.org/).
+  Licensed under the Apache License 2.0.
+
+  This product includes software developed at
+  The OSGi Alliance (http://www.osgi.org/).
+  Copyright (c) OSGi Alliance (2000, 2007).
+  Licensed under the Apache License 2.0.
+
+  This product includes software from http://kxml.sourceforge.net.
+  Copyright (c) 2002,2003, Stefan Haustein, Oberhausen, Rhld., Germany.
+  Licensed under BSD License.
+
+  II. Used Software
+
+  This product uses software developed at
+  The OSGi Alliance (http://www.osgi.org/).
+  Copyright (c) OSGi Alliance (2000, 2007).
+  Licensed under the Apache License 2.0.
+
+  III. License Summary
+  - Apache License 2.0
+  - BSD License
+
+The Derby build relies on jar files supplied by the Apache Lucene
+project. The following notice covers the Lucene files:
+
+Apache Lucene
+Copyright 2013 The Apache Software Foundation
+
+Camel :: Jing
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Spring JavaConfig
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: OGNL
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Barcode
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: RabbitMQ
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Dozer
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Spring
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Jsch
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Splunk
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: XMPP
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: OpenShift
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: JGroups
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: XML Security
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Jetty :: Common
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: JoSQL
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Geocoder
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: SnakeYAML
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Redis
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Core OSGi
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: APNS
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Vertx
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: CoAP
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Schematron
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Servlet
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Netty (deprecated)
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Hessian
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: MyBatis
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Jackson
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Jackson XML
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Twitter
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Beanstalk
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Spring LDAP
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: LinkedIn :: API
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: AMQP
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: ElasticSearch
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: DNS
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: MongoDB
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Pax Logging
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Etcd
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: JXPath
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Nagios
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Syslog
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Facebook
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: SPI Annotations
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Context
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Servlet Listener
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Guice
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Bean validator
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: MLLP
+Copyright 2007-2016 The Apache Software Foundation
+
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+
+   1. Definitions.
+
+      "License" shall mean the terms and conditions for use, reproduction,
+      and distribution as defined by Sections 1 through 9 of this document.
+
+      "Licensor" shall mean the copyright owner or entity authorized by
+      the copyright owner that is granting the License.
+
+      "Legal Entity" shall mean the union of the acting entity and all
+      other entities that control, are controlled by, or are under common
+      control with that entity. For the purposes of this definition,
+      "control" means (i) the power, direct or indirect, to cause the
+      direction or management of such entity, whether by contract or
+      otherwise, or (ii) ownership of fifty percent (50%) or more of the
+      outstanding shares, or (iii) beneficial ownership of such entity.
+
+      "You" (or "Your") shall mean an individual or Legal Entity
+      exercising permissions granted by this License.
+
+      "Source" form shall mean the preferred form for making modifications,
+      including but not limited to software source code, documentation
+      source, and configuration files.
+
+      "Object" form shall mean any form resulting from mechanical
+      transformation or translation of a Source form, including but
+      not limited to compiled object code, generated documentation,
+      and conversions to other media types.
+
+      "Work" shall mean the work of authorship, whether in Source or
+      Object form, made available under the License, as indicated by a
+      copyright notice that is included in or attached to the work
+      (an example is provided in the Appendix below).
+
+      "Derivative Works" shall mean any work, whether in Source or Object
+      form, that is based on (or derived from) the Work and for which the
+      editorial revisions, annotations, elaborations, or other modifications
+      represent, as a whole, an original work of authorship. For the purposes
+      of this License, Derivative Works shall not include works that remain
+      separable from, or merely link (or bind by name) to the interfaces of,
+      the Work and Derivative Works thereof.
+
+      "Contribution" shall mean any work of authorship, including
+      the original version of the Work and any modifications or additions
+      to that Work or Derivative Works thereof, that is intentionally
+      submitted to Licensor for inclusion in the Work by the copyright owner
+      or by an individual or Legal Entity authorized to submit on behalf of
+      the copyright owner. For the purposes of this definition, "submitted"
+      means any form of electronic, verbal, or written communication sent
+      to the Licensor or its representatives, including but not limited to
+      communication on electronic mailing lists, source code control systems,
+      and issue tracking systems that are managed by, or on behalf of, the
+      Licensor for the purpose of discussing and improving the Work, but
+      excluding communication that is conspicuously marked or otherwise
+      designated in writing by the copyright owner as "Not a Contribution."
+
+      "Contributor" shall mean Licensor and any individual or Legal Entity
+      on behalf of whom a Contribution has been received by Licensor and
+      subsequently incorporated within the Work.
+
+   2. Grant of Copyright License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      copyright license to reproduce, prepare Derivative Works of,
+      publicly display, publicly perform, sublicense, and distribute the
+      Work and such Derivative Works in Source or Object form.
+
+   3. Grant of Patent License. Subject to the terms and conditions of
+      this License, each Contributor hereby grants to You a perpetual,
+      worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+      (except as stated in this section) patent license to make, have made,
+      use, offer to sell, sell, import, and otherwise transfer the Work,
+      where such license applies only to those patent claims licensable
+      by such Contributor that are necessarily infringed by their
+      Contribution(s) alone or by combination of their Contribution(s)
+      with the Work to which such Contribution(s) was submitted. If You
+      institute patent litigation against any entity (including a
+      cross-claim or counterclaim in a lawsuit) alleging that the Work
+      or a Contribution incorporated within the Work constitutes direct
+      or contributory patent infringement, then any patent licenses
+      granted to You under this License for that Work shall terminate
+      as of the date such litigation is filed.
+
+   4. Redistribution. You may reproduce and distribute copies of the
+      Work or Derivative Works thereof in any medium, with or without
+      modifications, and in Source or Object form, provided that You
+      meet the following conditions:
+
+      (a) You must give any other recipients of the Work or
+          Derivative Works a copy of this License; and
+
+      (b) You must cause any modified files to carry prominent notices
+          stating that You changed the files; and
+
+      (c) You must retain, in the Source form of any Derivative Works
+          that You distribute, all copyright, patent, trademark, and
+          attribution notices from the Source form of the Work,
+          excluding those notices that do not pertain to any part of
+          the Derivative Works; and
+
+      (d) If the Work includes a "NOTICE" text file as part of its
+          distribution, then any Derivative Works that You distribute must
+          include a readable copy of the attribution notices contained
+          within such NOTICE file, excluding those notices that do not
+          pertain to any part of the Derivative Works, in at least one
+          of the following places: within a NOTICE text file distributed
+          as part of the Derivative Works; within the Source form or
+          documentation, if provided along with the Derivative Works; or,
+          within a display generated by the Derivative Works, if and
+          wherever such third-party notices normally appear. The contents
+          of the NOTICE file are for informational purposes only and
+          do not modify the License. You may add Your own attribution
+          notices within Derivative Works that You distribute, alongside
+          or as an addendum to the NOTICE text from the Work, provided
+          that such additional attribution notices cannot be construed
+          as modifying the License.
+
+      You may add Your own copyright statement to Your modifications and
+      may provide additional or different license terms and conditions
+      for use, reproduction, or distribution of Your modifications, or
+      for any such Derivative Works as a whole, provided Your use,
+      reproduction, and distribution of the Work otherwise complies with
+      the conditions stated in this License.
+
+   5. Submission of Contributions. Unless You explicitly state otherwise,
+      any Contribution intentionally submitted for inclusion in the Work
+      by You to the Licensor shall be under the terms and conditions of
+      this License, without any additional terms or conditions.
+      Notwithstanding the above, nothing herein shall supersede or modify
+      the terms of any separate license agreement you may have executed
+      with Licensor regarding such Contributions.
+
+   6. Trademarks. This License does not grant permission to use the trade
+      names, trademarks, service marks, or product names of the Licensor,
+      except as required for reasonable and customary use in describing the
+      origin of the Work and reproducing the content of the NOTICE file.
+
+   7. Disclaimer of Warranty. Unless required by applicable law or
+      agreed to in writing, Licensor provides the Work (and each
+      Contributor provides its Contributions) on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+      implied, including, without limitation, any warranties or conditions
+      of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+      PARTICULAR PURPOSE. You are solely responsible for determining the
+      appropriateness of using or redistributing the Work and assume any
+      risks associated with Your exercise of permissions under this License.
+
+   8. Limitation of Liability. In no event and under no legal theory,
+      whether in tort (including negligence), contract, or otherwise,
+      unless required by applicable law (such as deliberate and grossly
+      negligent acts) or agreed to in writing, shall any Contributor be
+      liable to You for damages, including any direct, indirect, special,
+      incidental, or consequential damages of any character arising as a
+      result of this License or out of the use or inability to use the
+      Work (including but not limited to damages for loss of goodwill,
+      work stoppage, computer failure or malfunction, or any and all
+      other commercial damages or losses), even if such Contributor
+      has been advised of the possibility of such damages.
+
+   9. Accepting Warranty or Additional Liability. While redistributing
+      the Work or Derivative Works thereof, You may choose to offer,
+      and charge a fee for, acceptance of support, warranty, indemnity,
+      or other liability obligations and/or rights consistent with this
+      License. However, in accepting such obligations, You may act only
+      on Your own behalf and on Your sole responsibility, not on behalf
+      of any other Contributor, and only if You agree to indemnify,
+      defend, and hold each Contributor harmless for any liability
+      incurred by, or claims asserted against, such Contributor by reason
+      of your accepting any such warranty or additional liability.
+
+   END OF TERMS AND CONDITIONS
+
+   APPENDIX: How to apply the Apache License to your work.
+
+      To apply the Apache License to your work, attach the following
+      boilerplate notice, with the fields enclosed by brackets "[]"
+      replaced with your own identifying information. (Don't include
+      the brackets!)  The text should be enclosed in the appropriate
+      comment syntax for the file format. We also recommend that a
+      file or class name and description of purpose be included on the
+      same "printed page" as the copyright notice for easier
+      identification within third-party archives.
+
+   Copyright [yyyy] [name of copyright owner]
+
+Camel :: Infinispan
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Crypto
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Yammer
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: JCache
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: SOAP
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: iBatis (deprecated)
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: LevelDB
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: PgEvent
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Blueprint
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Spring Batch
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Boon
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: GoogleDrive
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Kestrel (deprecated)
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Java Toolbox for AS/400
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: WebSocket
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Castor
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Spring Web Services
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Undertow
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: GoogleMail
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: CXF :: Transport
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: HawtDB
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: RSS
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: ServiceNow
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: FlatPack
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: JMS
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: HTTP :: Common
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Mail
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: SCR
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Disruptor
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Platforms :: Commands :: Core
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Cassandra CQL
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Slack
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Weather
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: CXF
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: JClouds
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Tar File
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Velocity
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Quartz2
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Bindy
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: GoogleCalendar
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: JSon Path
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Dropbox
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: MVEL
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Spring Security
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Paho
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: HTTP
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: GitHub
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: MongoDB GridFS
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Gson
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: MINA (deprecated)
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: RX
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: CMIS
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: PDF
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Swagger Java
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: StAX
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Protobuf
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Kafka
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Guava-EventBus
+Copyright 2007-2016 The Apache Software Foundation
+
+Camel :: Ganglia
+Copyright 2007-2016 The Apache Software Foundation
+
+Jackrabbit JCR Commons
+Copyright 2004-2016 The Apache Software Foundation
+
+Jackrabbit WebDAV Library
+Copyright 2004-2016 The Apache Software Foundation
+
+htrace-core
+Copyright 2015 The Apache Software Foundation
+
+OpenJPA Aggregate Jar
+Copyright 2006-2013 Apache Software Foundation
+
+OpenJPA includes software developed by the SERP project
+Copyright (c) 2002-2006, A. Abram White. All rights reserved.
+
+OpenJPA includes the persistence and orm schemas from the JPA specifications.
+Copyright 2005-2007 Sun Microsystems, Inc. All rights reserved.
+OpenJPA elects to include this software in this distribution under the
+CDDL license.  You can obtain a copy of the License at:
+    https://glassfish.dev.java.net/public/CDDL+GPL.html
+The source code is available at:
+    https://glassfish.dev.java.net/source/browse/glassfish/
+
+OpenJPA includes software written by Miroslav Nachev
+
+OpenJPA uses test code written by Charles Tillman.
+
+Apache JempBox
+Copyright 2008-2016 The Apache Software Foundation
+
+Based on source code contributed to the original JempBox project.
+Copyright (c) 2006-2007, www.jempbox.org
+
+Apache PDFBox
+Copyright 2002-2016 The Apache Software Foundation
+
+Based on source code contributed to the original PDFBox project.
+Copyright (c) 2002-2007, www.pdfbox.org
+
+Apache FontBox
+Copyright 2008-2016 The Apache Software Foundation
+
+Based on source code contributed to the original FontBox project.
+Copyright (c) 2006-2007, www.fontbox.org
+
+Apache Abdera
+Copyright 2006-2012 Apache Software Foundation
+
+Apache HttpClient Mime
+Copyright 1999-2016 The Apache Software Foundation
+
+Apache HttpClient OSGi bundle
+Copyright 1999-2016 The Apache Software Foundation
+
+Apache Commons Codec
+Copyright 2002-2013 The Apache Software Foundation
+
+src/test/org/apache/commons/codec/language/DoubleMetaphoneTest.java
+contains test data from http://aspell.net/test/orig/batch0.tab.
+Copyright (C) 2002 Kevin Atkinson (kevina@gnu.org)
+
+Apache HttpClient Fluent API
+Copyright 2011-2016 The Apache Software Foundation
+
+Apache JAMES Mime4j (Core)
+Copyright 2004-2012 The Apache Software Foundation
+
+Apache MINA SSHD
+Copyright 2008-2015 The Apache Software Foundation
+
+   Apache Ant
+   Copyright 1999-2010 The Apache Software Foundation
+
+   The <sync> task is based on code Copyright (c) 2002, Landmark
+   Graphics Corp that has been kindly donated to the Apache Software
+   Foundation.
+
+ActiveMQ :: All JAR bundle
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: Camel
+Copyright 2005-2016 The Apache Software Foundation
+
+Spring Framework 4.1.9.RELEASE
+Copyright (c) 2002-2015 Pivotal, Inc.
+
+ActiveMQ :: Spring
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: Pool
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: Console
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: STOMP Protocol
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: Broker
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: AMQP
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: MQTT Protocol
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: HTTP Protocol Support
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: KahaDB Store
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: JDBC Store
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: LevelDB Store
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: Client
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: Openwire Legacy Support
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: JAAS
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: Shiro
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveMQ :: Generic JMS Pool
+Copyright 2005-2016 The Apache Software Foundation
+
+ActiveIO :: Core
+Copyright 2005-2012 The Apache Software Foundation
+
+Apache WebServices - XmlSchema
+Copyright 2004-2015 The Apache Software Foundation
+
+Portions Copyright 2006 International Business Machines Corp.
+
+Portions Copyright (C) World Wide Web Consortium 2006, 2007 and licensed under the 
+three-part BSD license.
+
+Java Authentication SPI for Containers
+Copyright 2003-2009 The Apache Software Foundation
+
+Apache Commons BeanUtils
+Copyright 2000-2014 The Apache Software Foundation
+
+Apache Commons Lang
+Copyright 2001-2011 The Apache Software Foundation
+
+Apache Commons Collections
+Copyright 2001-2015 The Apache Software Foundation
+
+Apache Commons Pool
+Copyright 2001-2012 The Apache Software Foundation
+
+Apache Commons Codec
+Copyright 2002-2014 The Apache Software Foundation
+
+The content of package org.apache.commons.codec.language.bm has been translated
+from the original php source code available at http://stevemorse.org/phoneticinfo.htm
+with permission from the original authors.
+Original source copyright:
+Copyright (c) 2008 Alexander Beider & Stephen P. Morse.
+
+Apache Commons Configuration
+Copyright 2001-2012 The Apache Software Foundation
+
+# Compress LZF
+
+This library contains efficient implementation of LZF compression format,
+as well as additional helper classes that build on JDK-provided gzip (deflat)
+codec.
+
+## Licensing
+
+Library is licensed under Apache License 2.0, as per accompanying LICENSE file.
+
+## Credit
+
+Library has been written by Tatu Saloranta (tatu.saloranta@iki.fi).
+It was started at Ning, inc., as an official Open Source process used by
+platform backend, but after initial versions has been developed outside of
+Ning by supporting community.
+
+Other contributors include:
+
+* Jon Hartlaub (first versions of streaming reader/writer; unit tests)
+* Cedrik Lime: parallel LZF implementation
+
+Various community members have contributed bug reports, and suggested minor
+fixes; these can be found from file "VERSION.txt" in SCM.
+
+Java ClassMate library was originally written by Tatu Saloranta (tatu.saloranta@iki.fi)
+
+Other developers who have contributed code are:
+
+* Brian Langel
+
+# Jackson JSON processor
+
+Jackson is a high-performance, Free/Open Source JSON processing library.
+It was originally written by Tatu Saloranta (tatu.saloranta@iki.fi), and has
+been in development since 2007.
+It is currently developed by a community of developers, as well as supported
+commercially by FasterXML.com.
+
+Jackson core and extension components may be licensed under different licenses.
+To find the details that apply to this artifact see the accompanying LICENSE file.
+For more information, including possible other licensing options, contact
+FasterXML.com (http://fasterxml.com).
+
+## Credits
+
+A list of contributors may be found from CREDITS file, which is included
+in some artifacts (usually source distributions); but is always available
+from the source code management (SCM) system project uses.
+
+Jackson core and extension components may licensed under different licenses.
+To find the details that apply to this artifact see the accompanying LICENSE file.
+For more information, including possible other licensing options, contact
+FasterXML.com (http://fasterxml.com).
+
+Google Guice - Core Library
+Copyright 2006-2011 Google, Inc.
+
+Google Guice - Extensions - AssistedInject
+Copyright 2006-2011 Google, Inc.
+
+Google Guice - Extensions - MultiBindings
+Copyright 2006-2011 Google, Inc.
+
+Apache Felix Security Provider
+Copyright 2006-2014 The Apache Software Foundation
+
+   =========================================================================
+   ==  NOTICE file corresponding to section 4(d) of the Apache License,   ==
+   ==  Version 2.0, in this case for the Apache Xerces Java distribution. ==
+   =========================================================================
+
+   Apache Xerces Java
+   Copyright 1999-2010 The Apache Software Foundation
+
+   This product includes software developed at
+   The Apache Software Foundation (http://www.apache.org/).
+
+   Portions of this software were originally based on the following:
+     - software copyright (c) 1999, IBM Corporation., http://www.ibm.com.
+     - software copyright (c) 1999, Sun Microsystems., http://www.sun.com.
+     - voluntary contributions made by Paul Eng on behalf of the 
+       Apache Software Foundation that were originally developed at iClick, Inc.,
+       software copyright (c) 1999.
+
+Xalan Java
+Copyright 2015 The Apache Software Foundation
+
+Xalan Java Serializer
+Copyright 2015 The Apache Software Foundation
+
+Apache Geronimo STAX Spec 1.2
+Copyright 2003-2013 The Apache Software Foundation
+
+Apache ServiceMix :: Bundles :: Saxon-HE
+Copyright 2005-2013 The Apache Software Foundation
+

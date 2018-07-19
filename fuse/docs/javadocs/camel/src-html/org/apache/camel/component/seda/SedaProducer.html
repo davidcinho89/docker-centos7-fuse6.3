@@ -1,0 +1,320 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * contributor license agreements.  See the NOTICE file distributed with<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * this work for additional information regarding copyright ownership.<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * The ASF licenses this file to You under the Apache License, Version 2.0<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * (the "License"); you may not use this file except in compliance with<a name="line.6"></a>
+<span class="sourceLineNo">007</span> * the License.  You may obtain a copy of the License at<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *<a name="line.8"></a>
+<span class="sourceLineNo">009</span> *      http://www.apache.org/licenses/LICENSE-2.0<a name="line.9"></a>
+<span class="sourceLineNo">010</span> *<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * Unless required by applicable law or agreed to in writing, software<a name="line.11"></a>
+<span class="sourceLineNo">012</span> * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.12"></a>
+<span class="sourceLineNo">013</span> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * See the License for the specific language governing permissions and<a name="line.14"></a>
+<span class="sourceLineNo">015</span> * limitations under the License.<a name="line.15"></a>
+<span class="sourceLineNo">016</span> */<a name="line.16"></a>
+<span class="sourceLineNo">017</span>package org.apache.camel.component.seda;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import java.util.concurrent.BlockingQueue;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import java.util.concurrent.CountDownLatch;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import java.util.concurrent.TimeUnit;<a name="line.21"></a>
+<span class="sourceLineNo">022</span><a name="line.22"></a>
+<span class="sourceLineNo">023</span>import org.apache.camel.AsyncCallback;<a name="line.23"></a>
+<span class="sourceLineNo">024</span>import org.apache.camel.Exchange;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import org.apache.camel.ExchangeTimedOutException;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import org.apache.camel.WaitForTaskToComplete;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import org.apache.camel.impl.DefaultAsyncProducer;<a name="line.27"></a>
+<span class="sourceLineNo">028</span>import org.apache.camel.support.SynchronizationAdapter;<a name="line.28"></a>
+<span class="sourceLineNo">029</span>import org.apache.camel.util.ExchangeHelper;<a name="line.29"></a>
+<span class="sourceLineNo">030</span><a name="line.30"></a>
+<span class="sourceLineNo">031</span>/**<a name="line.31"></a>
+<span class="sourceLineNo">032</span> * @version <a name="line.32"></a>
+<span class="sourceLineNo">033</span> */<a name="line.33"></a>
+<span class="sourceLineNo">034</span>public class SedaProducer extends DefaultAsyncProducer {<a name="line.34"></a>
+<span class="sourceLineNo">035</span>    <a name="line.35"></a>
+<span class="sourceLineNo">036</span>    /**<a name="line.36"></a>
+<span class="sourceLineNo">037</span>     * @deprecated Better make use of the {@link SedaEndpoint#getQueue()} API which delivers the accurate reference to the queue currently being used.<a name="line.37"></a>
+<span class="sourceLineNo">038</span>     */<a name="line.38"></a>
+<span class="sourceLineNo">039</span>    @Deprecated<a name="line.39"></a>
+<span class="sourceLineNo">040</span>    protected final BlockingQueue&lt;Exchange&gt; queue;<a name="line.40"></a>
+<span class="sourceLineNo">041</span>    private final SedaEndpoint endpoint;<a name="line.41"></a>
+<span class="sourceLineNo">042</span>    private final WaitForTaskToComplete waitForTaskToComplete;<a name="line.42"></a>
+<span class="sourceLineNo">043</span>    private final long timeout;<a name="line.43"></a>
+<span class="sourceLineNo">044</span>    private final boolean blockWhenFull;<a name="line.44"></a>
+<span class="sourceLineNo">045</span><a name="line.45"></a>
+<span class="sourceLineNo">046</span>    /**<a name="line.46"></a>
+<span class="sourceLineNo">047</span>     * @deprecated Use {@link #SedaProducer(SedaEndpoint, WaitForTaskToComplete, long, boolean) the other constructor}.<a name="line.47"></a>
+<span class="sourceLineNo">048</span>     */<a name="line.48"></a>
+<span class="sourceLineNo">049</span>    @Deprecated<a name="line.49"></a>
+<span class="sourceLineNo">050</span>    public SedaProducer(SedaEndpoint endpoint, BlockingQueue&lt;Exchange&gt; queue, WaitForTaskToComplete waitForTaskToComplete, long timeout) {<a name="line.50"></a>
+<span class="sourceLineNo">051</span>        this(endpoint, waitForTaskToComplete, timeout, false);<a name="line.51"></a>
+<span class="sourceLineNo">052</span>    }<a name="line.52"></a>
+<span class="sourceLineNo">053</span><a name="line.53"></a>
+<span class="sourceLineNo">054</span>    /**<a name="line.54"></a>
+<span class="sourceLineNo">055</span>     * @deprecated Use {@link #SedaProducer(SedaEndpoint, WaitForTaskToComplete, long, boolean) the other constructor}.<a name="line.55"></a>
+<span class="sourceLineNo">056</span>     */<a name="line.56"></a>
+<span class="sourceLineNo">057</span>    @Deprecated<a name="line.57"></a>
+<span class="sourceLineNo">058</span>    public SedaProducer(SedaEndpoint endpoint, BlockingQueue&lt;Exchange&gt; queue, WaitForTaskToComplete waitForTaskToComplete, long timeout, boolean blockWhenFull) {<a name="line.58"></a>
+<span class="sourceLineNo">059</span>        this(endpoint, waitForTaskToComplete, timeout, blockWhenFull);<a name="line.59"></a>
+<span class="sourceLineNo">060</span>    }<a name="line.60"></a>
+<span class="sourceLineNo">061</span><a name="line.61"></a>
+<span class="sourceLineNo">062</span>    public SedaProducer(SedaEndpoint endpoint, WaitForTaskToComplete waitForTaskToComplete, long timeout, boolean blockWhenFull) {<a name="line.62"></a>
+<span class="sourceLineNo">063</span>        super(endpoint);<a name="line.63"></a>
+<span class="sourceLineNo">064</span>        this.queue = endpoint.getQueue();<a name="line.64"></a>
+<span class="sourceLineNo">065</span>        this.endpoint = endpoint;<a name="line.65"></a>
+<span class="sourceLineNo">066</span>        this.waitForTaskToComplete = waitForTaskToComplete;<a name="line.66"></a>
+<span class="sourceLineNo">067</span>        this.timeout = timeout;<a name="line.67"></a>
+<span class="sourceLineNo">068</span>        this.blockWhenFull = blockWhenFull;<a name="line.68"></a>
+<span class="sourceLineNo">069</span>    }<a name="line.69"></a>
+<span class="sourceLineNo">070</span><a name="line.70"></a>
+<span class="sourceLineNo">071</span>    @Override<a name="line.71"></a>
+<span class="sourceLineNo">072</span>    public boolean process(final Exchange exchange, final AsyncCallback callback) {<a name="line.72"></a>
+<span class="sourceLineNo">073</span>        WaitForTaskToComplete wait = waitForTaskToComplete;<a name="line.73"></a>
+<span class="sourceLineNo">074</span>        if (exchange.getProperty(Exchange.ASYNC_WAIT) != null) {<a name="line.74"></a>
+<span class="sourceLineNo">075</span>            wait = exchange.getProperty(Exchange.ASYNC_WAIT, WaitForTaskToComplete.class);<a name="line.75"></a>
+<span class="sourceLineNo">076</span>        }<a name="line.76"></a>
+<span class="sourceLineNo">077</span><a name="line.77"></a>
+<span class="sourceLineNo">078</span>        if (wait == WaitForTaskToComplete.Always<a name="line.78"></a>
+<span class="sourceLineNo">079</span>            || (wait == WaitForTaskToComplete.IfReplyExpected &amp;&amp; ExchangeHelper.isOutCapable(exchange))) {<a name="line.79"></a>
+<span class="sourceLineNo">080</span><a name="line.80"></a>
+<span class="sourceLineNo">081</span>            // do not handover the completion as we wait for the copy to complete, and copy its result back when it done<a name="line.81"></a>
+<span class="sourceLineNo">082</span>            Exchange copy = prepareCopy(exchange, false);<a name="line.82"></a>
+<span class="sourceLineNo">083</span><a name="line.83"></a>
+<span class="sourceLineNo">084</span>            // latch that waits until we are complete<a name="line.84"></a>
+<span class="sourceLineNo">085</span>            final CountDownLatch latch = new CountDownLatch(1);<a name="line.85"></a>
+<span class="sourceLineNo">086</span><a name="line.86"></a>
+<span class="sourceLineNo">087</span>            // we should wait for the reply so install a on completion so we know when its complete<a name="line.87"></a>
+<span class="sourceLineNo">088</span>            copy.addOnCompletion(new SynchronizationAdapter() {<a name="line.88"></a>
+<span class="sourceLineNo">089</span>                @Override<a name="line.89"></a>
+<span class="sourceLineNo">090</span>                public void onDone(Exchange response) {<a name="line.90"></a>
+<span class="sourceLineNo">091</span>                    // check for timeout, which then already would have invoked the latch<a name="line.91"></a>
+<span class="sourceLineNo">092</span>                    if (latch.getCount() == 0) {<a name="line.92"></a>
+<span class="sourceLineNo">093</span>                        if (log.isTraceEnabled()) {<a name="line.93"></a>
+<span class="sourceLineNo">094</span>                            log.trace("{}. Timeout occurred so response will be ignored: {}", this, response.hasOut() ? response.getOut() : response.getIn());<a name="line.94"></a>
+<span class="sourceLineNo">095</span>                        }<a name="line.95"></a>
+<span class="sourceLineNo">096</span>                        return;<a name="line.96"></a>
+<span class="sourceLineNo">097</span>                    } else {<a name="line.97"></a>
+<span class="sourceLineNo">098</span>                        if (log.isTraceEnabled()) {<a name="line.98"></a>
+<span class="sourceLineNo">099</span>                            log.trace("{} with response: {}", this, response.hasOut() ? response.getOut() : response.getIn());<a name="line.99"></a>
+<span class="sourceLineNo">100</span>                        }<a name="line.100"></a>
+<span class="sourceLineNo">101</span>                        try {<a name="line.101"></a>
+<span class="sourceLineNo">102</span>                            ExchangeHelper.copyResults(exchange, response);<a name="line.102"></a>
+<span class="sourceLineNo">103</span>                        } finally {<a name="line.103"></a>
+<span class="sourceLineNo">104</span>                            // always ensure latch is triggered<a name="line.104"></a>
+<span class="sourceLineNo">105</span>                            latch.countDown();<a name="line.105"></a>
+<span class="sourceLineNo">106</span>                        }<a name="line.106"></a>
+<span class="sourceLineNo">107</span>                    }<a name="line.107"></a>
+<span class="sourceLineNo">108</span>                }<a name="line.108"></a>
+<span class="sourceLineNo">109</span><a name="line.109"></a>
+<span class="sourceLineNo">110</span>                @Override<a name="line.110"></a>
+<span class="sourceLineNo">111</span>                public boolean allowHandover() {<a name="line.111"></a>
+<span class="sourceLineNo">112</span>                    // do not allow handover as we want to seda producer to have its completion triggered<a name="line.112"></a>
+<span class="sourceLineNo">113</span>                    // at this point in the routing (at this leg), instead of at the very last (this ensure timeout is honored)<a name="line.113"></a>
+<span class="sourceLineNo">114</span>                    return false;<a name="line.114"></a>
+<span class="sourceLineNo">115</span>                }<a name="line.115"></a>
+<span class="sourceLineNo">116</span><a name="line.116"></a>
+<span class="sourceLineNo">117</span>                @Override<a name="line.117"></a>
+<span class="sourceLineNo">118</span>                public String toString() {<a name="line.118"></a>
+<span class="sourceLineNo">119</span>                    return "onDone at endpoint: " + endpoint;<a name="line.119"></a>
+<span class="sourceLineNo">120</span>                }<a name="line.120"></a>
+<span class="sourceLineNo">121</span>            });<a name="line.121"></a>
+<span class="sourceLineNo">122</span><a name="line.122"></a>
+<span class="sourceLineNo">123</span>            log.trace("Adding Exchange to queue: {}", copy);<a name="line.123"></a>
+<span class="sourceLineNo">124</span>            try {<a name="line.124"></a>
+<span class="sourceLineNo">125</span>                // do not copy as we already did the copy<a name="line.125"></a>
+<span class="sourceLineNo">126</span>                addToQueue(copy, false);<a name="line.126"></a>
+<span class="sourceLineNo">127</span>            } catch (SedaConsumerNotAvailableException e) {<a name="line.127"></a>
+<span class="sourceLineNo">128</span>                exchange.setException(e);<a name="line.128"></a>
+<span class="sourceLineNo">129</span>                callback.done(true);<a name="line.129"></a>
+<span class="sourceLineNo">130</span>                return true;<a name="line.130"></a>
+<span class="sourceLineNo">131</span>            }<a name="line.131"></a>
+<span class="sourceLineNo">132</span><a name="line.132"></a>
+<span class="sourceLineNo">133</span>            if (timeout &gt; 0) {<a name="line.133"></a>
+<span class="sourceLineNo">134</span>                if (log.isTraceEnabled()) {<a name="line.134"></a>
+<span class="sourceLineNo">135</span>                    log.trace("Waiting for task to complete using timeout (ms): {} at [{}]", timeout, endpoint.getEndpointUri());<a name="line.135"></a>
+<span class="sourceLineNo">136</span>                }<a name="line.136"></a>
+<span class="sourceLineNo">137</span>                // lets see if we can get the task done before the timeout<a name="line.137"></a>
+<span class="sourceLineNo">138</span>                boolean done = false;<a name="line.138"></a>
+<span class="sourceLineNo">139</span>                try {<a name="line.139"></a>
+<span class="sourceLineNo">140</span>                    done = latch.await(timeout, TimeUnit.MILLISECONDS);<a name="line.140"></a>
+<span class="sourceLineNo">141</span>                } catch (InterruptedException e) {<a name="line.141"></a>
+<span class="sourceLineNo">142</span>                    // ignore<a name="line.142"></a>
+<span class="sourceLineNo">143</span>                }<a name="line.143"></a>
+<span class="sourceLineNo">144</span>                if (!done) {<a name="line.144"></a>
+<span class="sourceLineNo">145</span>                    exchange.setException(new ExchangeTimedOutException(exchange, timeout));<a name="line.145"></a>
+<span class="sourceLineNo">146</span>                    // remove timed out Exchange from queue<a name="line.146"></a>
+<span class="sourceLineNo">147</span>                    endpoint.getQueue().remove(copy);<a name="line.147"></a>
+<span class="sourceLineNo">148</span>                    // count down to indicate timeout<a name="line.148"></a>
+<span class="sourceLineNo">149</span>                    latch.countDown();<a name="line.149"></a>
+<span class="sourceLineNo">150</span>                }<a name="line.150"></a>
+<span class="sourceLineNo">151</span>            } else {<a name="line.151"></a>
+<span class="sourceLineNo">152</span>                if (log.isTraceEnabled()) {<a name="line.152"></a>
+<span class="sourceLineNo">153</span>                    log.trace("Waiting for task to complete (blocking) at [{}]", endpoint.getEndpointUri());<a name="line.153"></a>
+<span class="sourceLineNo">154</span>                }<a name="line.154"></a>
+<span class="sourceLineNo">155</span>                // no timeout then wait until its done<a name="line.155"></a>
+<span class="sourceLineNo">156</span>                try {<a name="line.156"></a>
+<span class="sourceLineNo">157</span>                    latch.await();<a name="line.157"></a>
+<span class="sourceLineNo">158</span>                } catch (InterruptedException e) {<a name="line.158"></a>
+<span class="sourceLineNo">159</span>                    // ignore<a name="line.159"></a>
+<span class="sourceLineNo">160</span>                }<a name="line.160"></a>
+<span class="sourceLineNo">161</span>            }<a name="line.161"></a>
+<span class="sourceLineNo">162</span>        } else {<a name="line.162"></a>
+<span class="sourceLineNo">163</span>            // no wait, eg its a InOnly then just add to queue and return<a name="line.163"></a>
+<span class="sourceLineNo">164</span>            try {<a name="line.164"></a>
+<span class="sourceLineNo">165</span>                addToQueue(exchange, true);<a name="line.165"></a>
+<span class="sourceLineNo">166</span>            } catch (SedaConsumerNotAvailableException e) {<a name="line.166"></a>
+<span class="sourceLineNo">167</span>                exchange.setException(e);<a name="line.167"></a>
+<span class="sourceLineNo">168</span>                callback.done(true);<a name="line.168"></a>
+<span class="sourceLineNo">169</span>                return true;<a name="line.169"></a>
+<span class="sourceLineNo">170</span>            }<a name="line.170"></a>
+<span class="sourceLineNo">171</span>        }<a name="line.171"></a>
+<span class="sourceLineNo">172</span><a name="line.172"></a>
+<span class="sourceLineNo">173</span>        // we use OnCompletion on the Exchange to callback and wait for the Exchange to be done<a name="line.173"></a>
+<span class="sourceLineNo">174</span>        // so we should just signal the callback we are done synchronously<a name="line.174"></a>
+<span class="sourceLineNo">175</span>        callback.done(true);<a name="line.175"></a>
+<span class="sourceLineNo">176</span>        return true;<a name="line.176"></a>
+<span class="sourceLineNo">177</span>    }<a name="line.177"></a>
+<span class="sourceLineNo">178</span><a name="line.178"></a>
+<span class="sourceLineNo">179</span>    protected Exchange prepareCopy(Exchange exchange, boolean handover) {<a name="line.179"></a>
+<span class="sourceLineNo">180</span>        // use a new copy of the exchange to route async (and use same message id)<a name="line.180"></a>
+<span class="sourceLineNo">181</span>        Exchange copy = ExchangeHelper.createCorrelatedCopy(exchange, handover, true);<a name="line.181"></a>
+<span class="sourceLineNo">182</span>        // set a new from endpoint to be the seda queue<a name="line.182"></a>
+<span class="sourceLineNo">183</span>        copy.setFromEndpoint(endpoint);<a name="line.183"></a>
+<span class="sourceLineNo">184</span>        return copy;<a name="line.184"></a>
+<span class="sourceLineNo">185</span>    }<a name="line.185"></a>
+<span class="sourceLineNo">186</span><a name="line.186"></a>
+<span class="sourceLineNo">187</span>    @Override<a name="line.187"></a>
+<span class="sourceLineNo">188</span>    protected void doStart() throws Exception {<a name="line.188"></a>
+<span class="sourceLineNo">189</span>        super.doStart();<a name="line.189"></a>
+<span class="sourceLineNo">190</span>        endpoint.onStarted(this);<a name="line.190"></a>
+<span class="sourceLineNo">191</span>    }<a name="line.191"></a>
+<span class="sourceLineNo">192</span><a name="line.192"></a>
+<span class="sourceLineNo">193</span>    @Override<a name="line.193"></a>
+<span class="sourceLineNo">194</span>    protected void doStop() throws Exception {<a name="line.194"></a>
+<span class="sourceLineNo">195</span>        endpoint.onStopped(this);<a name="line.195"></a>
+<span class="sourceLineNo">196</span>        super.doStop();<a name="line.196"></a>
+<span class="sourceLineNo">197</span>    }<a name="line.197"></a>
+<span class="sourceLineNo">198</span><a name="line.198"></a>
+<span class="sourceLineNo">199</span>    /**<a name="line.199"></a>
+<span class="sourceLineNo">200</span>     * Strategy method for adding the exchange to the queue.<a name="line.200"></a>
+<span class="sourceLineNo">201</span>     * &lt;p&gt;<a name="line.201"></a>
+<span class="sourceLineNo">202</span>     * Will perform a blocking "put" if blockWhenFull is true, otherwise it will<a name="line.202"></a>
+<span class="sourceLineNo">203</span>     * simply add which will throw exception if the queue is full<a name="line.203"></a>
+<span class="sourceLineNo">204</span>     * <a name="line.204"></a>
+<span class="sourceLineNo">205</span>     * @param exchange the exchange to add to the queue<a name="line.205"></a>
+<span class="sourceLineNo">206</span>     * @param copy     whether to create a copy of the exchange to use for adding to the queue<a name="line.206"></a>
+<span class="sourceLineNo">207</span>     */<a name="line.207"></a>
+<span class="sourceLineNo">208</span>    protected void addToQueue(Exchange exchange, boolean copy) throws SedaConsumerNotAvailableException {<a name="line.208"></a>
+<span class="sourceLineNo">209</span>        BlockingQueue&lt;Exchange&gt; queue = null;<a name="line.209"></a>
+<span class="sourceLineNo">210</span>        QueueReference queueReference = endpoint.getQueueReference();<a name="line.210"></a>
+<span class="sourceLineNo">211</span>        if (queueReference != null) {<a name="line.211"></a>
+<span class="sourceLineNo">212</span>            queue = queueReference.getQueue();<a name="line.212"></a>
+<span class="sourceLineNo">213</span>        }<a name="line.213"></a>
+<span class="sourceLineNo">214</span>        if (queue == null) {<a name="line.214"></a>
+<span class="sourceLineNo">215</span>            throw new SedaConsumerNotAvailableException("No queue available on endpoint: " + endpoint, exchange);<a name="line.215"></a>
+<span class="sourceLineNo">216</span>        }<a name="line.216"></a>
+<span class="sourceLineNo">217</span><a name="line.217"></a>
+<span class="sourceLineNo">218</span>        boolean empty = !queueReference.hasConsumers();<a name="line.218"></a>
+<span class="sourceLineNo">219</span>        if (empty) {<a name="line.219"></a>
+<span class="sourceLineNo">220</span>            if (endpoint.isFailIfNoConsumers()) {<a name="line.220"></a>
+<span class="sourceLineNo">221</span>                throw new SedaConsumerNotAvailableException("No consumers available on endpoint: " + endpoint, exchange);<a name="line.221"></a>
+<span class="sourceLineNo">222</span>            } else if (endpoint.isDiscardIfNoConsumers()) {<a name="line.222"></a>
+<span class="sourceLineNo">223</span>                log.debug("Discard message as no active consumers on endpoint: " + endpoint);<a name="line.223"></a>
+<span class="sourceLineNo">224</span>                return;<a name="line.224"></a>
+<span class="sourceLineNo">225</span>            }<a name="line.225"></a>
+<span class="sourceLineNo">226</span>        }<a name="line.226"></a>
+<span class="sourceLineNo">227</span><a name="line.227"></a>
+<span class="sourceLineNo">228</span>        Exchange target = exchange;<a name="line.228"></a>
+<span class="sourceLineNo">229</span><a name="line.229"></a>
+<span class="sourceLineNo">230</span>        // handover the completion so its the copy which performs that, as we do not wait<a name="line.230"></a>
+<span class="sourceLineNo">231</span>        if (copy) {<a name="line.231"></a>
+<span class="sourceLineNo">232</span>            target = prepareCopy(exchange, true);<a name="line.232"></a>
+<span class="sourceLineNo">233</span>        }<a name="line.233"></a>
+<span class="sourceLineNo">234</span><a name="line.234"></a>
+<span class="sourceLineNo">235</span>        log.trace("Adding Exchange to queue: {}", target);<a name="line.235"></a>
+<span class="sourceLineNo">236</span>        if (blockWhenFull) {<a name="line.236"></a>
+<span class="sourceLineNo">237</span>            try {<a name="line.237"></a>
+<span class="sourceLineNo">238</span>                queue.put(target);<a name="line.238"></a>
+<span class="sourceLineNo">239</span>            } catch (InterruptedException e) {<a name="line.239"></a>
+<span class="sourceLineNo">240</span>                // ignore<a name="line.240"></a>
+<span class="sourceLineNo">241</span>                log.debug("Put interrupted, are we stopping? {}", isStopping() || isStopped());<a name="line.241"></a>
+<span class="sourceLineNo">242</span>            }<a name="line.242"></a>
+<span class="sourceLineNo">243</span>        } else {<a name="line.243"></a>
+<span class="sourceLineNo">244</span>            queue.add(target);<a name="line.244"></a>
+<span class="sourceLineNo">245</span>        }<a name="line.245"></a>
+<span class="sourceLineNo">246</span>    }<a name="line.246"></a>
+<span class="sourceLineNo">247</span><a name="line.247"></a>
+<span class="sourceLineNo">248</span>}<a name="line.248"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

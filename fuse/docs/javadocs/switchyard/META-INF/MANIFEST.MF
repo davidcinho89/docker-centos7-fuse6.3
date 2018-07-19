@@ -1,0 +1,25 @@
+Manifest-Version: 1.0
+Implementation-Title: SwitchYard: Javadoc
+Implementation-Version: 2.1.0.redhat-630187
+Os-Version: 2.6.32-642.3.1.el6.x86_64
+Built-By: mockbuild
+Specification-Vendor: JBoss by Red Hat
+Created-By: Apache Maven 3.1.1
+Os-Name: Linux
+Implementation-URL: http://switchyard.org/switchyard-release/docs/swit
+ chyard-javadocs
+Java-Vendor: Oracle Corporation
+Implementation-Vendor: JBoss by Red Hat
+Scm-Revision: e5aeba7835fc0cd2d3c5651574613c0edecf2927
+Implementation-Vendor-Id: org.switchyard
+Scm-Url: http://github.com/jboss-switchyard/release/docs/switchyard-ja
+ vadocs
+Build-Jdk: 1.7.0_85
+Java-Version: 1.7.0_85
+Scm-Connection: scm:git:https://github.com/jboss-switchyard/release.gi
+ t/docs/switchyard-javadocs
+Os-Arch: i386
+Specification-Title: SwitchYard: Javadoc
+Specification-Version: 2.1.0.redhat-630187
+Archiver-Version: Plexus Archiver
+

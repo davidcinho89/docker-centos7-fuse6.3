@@ -1,0 +1,210 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * contributor license agreements.  See the NOTICE file distributed with<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * this work for additional information regarding copyright ownership.<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * The ASF licenses this file to You under the Apache License, Version 2.0<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * (the "License"); you may not use this file except in compliance with<a name="line.6"></a>
+<span class="sourceLineNo">007</span> * the License.  You may obtain a copy of the License at<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *<a name="line.8"></a>
+<span class="sourceLineNo">009</span> *      http://www.apache.org/licenses/LICENSE-2.0<a name="line.9"></a>
+<span class="sourceLineNo">010</span> *<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * Unless required by applicable law or agreed to in writing, software<a name="line.11"></a>
+<span class="sourceLineNo">012</span> * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.12"></a>
+<span class="sourceLineNo">013</span> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * See the License for the specific language governing permissions and<a name="line.14"></a>
+<span class="sourceLineNo">015</span> * limitations under the License.<a name="line.15"></a>
+<span class="sourceLineNo">016</span> */<a name="line.16"></a>
+<span class="sourceLineNo">017</span>package org.apache.camel.api.management.mbean;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import org.apache.camel.api.management.ManagedAttribute;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import org.apache.camel.api.management.ManagedOperation;<a name="line.20"></a>
+<span class="sourceLineNo">021</span><a name="line.21"></a>
+<span class="sourceLineNo">022</span>public interface ManagedAggregateProcessorMBean extends ManagedProcessorMBean {<a name="line.22"></a>
+<span class="sourceLineNo">023</span><a name="line.23"></a>
+<span class="sourceLineNo">024</span>    @ManagedAttribute(description = "The language for the expression")<a name="line.24"></a>
+<span class="sourceLineNo">025</span>    String getCorrelationExpressionLanguage();<a name="line.25"></a>
+<span class="sourceLineNo">026</span><a name="line.26"></a>
+<span class="sourceLineNo">027</span>    @ManagedAttribute(description = "Correlation Expression")<a name="line.27"></a>
+<span class="sourceLineNo">028</span>    String getCorrelationExpression();<a name="line.28"></a>
+<span class="sourceLineNo">029</span><a name="line.29"></a>
+<span class="sourceLineNo">030</span>    @ManagedAttribute(description = "Completion timeout in millis")<a name="line.30"></a>
+<span class="sourceLineNo">031</span>    long getCompletionTimeout();<a name="line.31"></a>
+<span class="sourceLineNo">032</span><a name="line.32"></a>
+<span class="sourceLineNo">033</span>    @ManagedAttribute(description = "The language for the expression")<a name="line.33"></a>
+<span class="sourceLineNo">034</span>    String getCompletionTimeoutLanguage();<a name="line.34"></a>
+<span class="sourceLineNo">035</span><a name="line.35"></a>
+<span class="sourceLineNo">036</span>    @ManagedAttribute(description = "Completion timeout expression")<a name="line.36"></a>
+<span class="sourceLineNo">037</span>    String getCompletionTimeoutExpression();<a name="line.37"></a>
+<span class="sourceLineNo">038</span><a name="line.38"></a>
+<span class="sourceLineNo">039</span>    @ManagedAttribute(description = "Completion interval in millis")<a name="line.39"></a>
+<span class="sourceLineNo">040</span>    long getCompletionInterval();<a name="line.40"></a>
+<span class="sourceLineNo">041</span><a name="line.41"></a>
+<span class="sourceLineNo">042</span>    @ManagedAttribute(description = "Completion size")<a name="line.42"></a>
+<span class="sourceLineNo">043</span>    int getCompletionSize();<a name="line.43"></a>
+<span class="sourceLineNo">044</span><a name="line.44"></a>
+<span class="sourceLineNo">045</span>    @ManagedAttribute(description = "The language for the expression")<a name="line.45"></a>
+<span class="sourceLineNo">046</span>    String getCompletionSizeExpressionLanguage();<a name="line.46"></a>
+<span class="sourceLineNo">047</span><a name="line.47"></a>
+<span class="sourceLineNo">048</span>    @ManagedAttribute(description = "Completion size expression")<a name="line.48"></a>
+<span class="sourceLineNo">049</span>    String getCompletionSizeExpression();<a name="line.49"></a>
+<span class="sourceLineNo">050</span><a name="line.50"></a>
+<span class="sourceLineNo">051</span>    @ManagedAttribute(description = "Complete from batch consumers")<a name="line.51"></a>
+<span class="sourceLineNo">052</span>    boolean isCompletionFromBatchConsumer();<a name="line.52"></a>
+<span class="sourceLineNo">053</span><a name="line.53"></a>
+<span class="sourceLineNo">054</span>    @ManagedAttribute(description = "Ignore invalid correlation keys")<a name="line.54"></a>
+<span class="sourceLineNo">055</span>    boolean isIgnoreInvalidCorrelationKeys();<a name="line.55"></a>
+<span class="sourceLineNo">056</span><a name="line.56"></a>
+<span class="sourceLineNo">057</span>    @ManagedAttribute(description = "Whether to close the correlation group on completion if this value is &gt; 0.")<a name="line.57"></a>
+<span class="sourceLineNo">058</span>    Integer getCloseCorrelationKeyOnCompletion();<a name="line.58"></a>
+<span class="sourceLineNo">059</span><a name="line.59"></a>
+<span class="sourceLineNo">060</span>    @ManagedAttribute(description = "Parallel mode")<a name="line.60"></a>
+<span class="sourceLineNo">061</span>    boolean isParallelProcessing();<a name="line.61"></a>
+<span class="sourceLineNo">062</span><a name="line.62"></a>
+<span class="sourceLineNo">063</span>    @ManagedAttribute(description = "Optimistic locking")<a name="line.63"></a>
+<span class="sourceLineNo">064</span>    boolean isOptimisticLocking();<a name="line.64"></a>
+<span class="sourceLineNo">065</span><a name="line.65"></a>
+<span class="sourceLineNo">066</span>    @ManagedAttribute(description = "Whether or not to eager check for completion when a new incoming Exchange has been received")<a name="line.66"></a>
+<span class="sourceLineNo">067</span>    boolean isEagerCheckCompletion();<a name="line.67"></a>
+<span class="sourceLineNo">068</span><a name="line.68"></a>
+<span class="sourceLineNo">069</span>    @ManagedAttribute(description = "The language for the predicate")<a name="line.69"></a>
+<span class="sourceLineNo">070</span>    String getCompletionPredicateLanguage();<a name="line.70"></a>
+<span class="sourceLineNo">071</span><a name="line.71"></a>
+<span class="sourceLineNo">072</span>    @ManagedAttribute(description = "A Predicate to indicate when an aggregated exchange is complete")<a name="line.72"></a>
+<span class="sourceLineNo">073</span>    String getCompletionPredicate();<a name="line.73"></a>
+<span class="sourceLineNo">074</span><a name="line.74"></a>
+<span class="sourceLineNo">075</span>    @ManagedAttribute(description = "Whether or not exchanges which complete due to a timeout should be discarded")<a name="line.75"></a>
+<span class="sourceLineNo">076</span>    boolean isDiscardOnCompletionTimeout();<a name="line.76"></a>
+<span class="sourceLineNo">077</span><a name="line.77"></a>
+<span class="sourceLineNo">078</span>    @ManagedAttribute(description = "Indicates to complete all current aggregated exchanges when the context is stopped")<a name="line.78"></a>
+<span class="sourceLineNo">079</span>    boolean isForceCompletionOnStop();<a name="line.79"></a>
+<span class="sourceLineNo">080</span><a name="line.80"></a>
+<span class="sourceLineNo">081</span>    @ManagedAttribute(description = "Indicates to wait to complete all current and partial (pending) aggregated exchanges when the context is stopped")<a name="line.81"></a>
+<span class="sourceLineNo">082</span>    boolean isCompleteAllOnStop();<a name="line.82"></a>
+<span class="sourceLineNo">083</span><a name="line.83"></a>
+<span class="sourceLineNo">084</span>    @ManagedAttribute(description = "Number of completed exchanges which are currently in-flight")<a name="line.84"></a>
+<span class="sourceLineNo">085</span>    int getInProgressCompleteExchanges();<a name="line.85"></a>
+<span class="sourceLineNo">086</span><a name="line.86"></a>
+<span class="sourceLineNo">087</span>    @ManagedOperation(description = "Number of groups currently in the aggregation repository")<a name="line.87"></a>
+<span class="sourceLineNo">088</span>    int aggregationRepositoryGroups();<a name="line.88"></a>
+<span class="sourceLineNo">089</span><a name="line.89"></a>
+<span class="sourceLineNo">090</span>    @ManagedOperation(description = "To force completing a specific group by its key")<a name="line.90"></a>
+<span class="sourceLineNo">091</span>    int forceCompletionOfGroup(String key);<a name="line.91"></a>
+<span class="sourceLineNo">092</span><a name="line.92"></a>
+<span class="sourceLineNo">093</span>    @ManagedOperation(description = "To force complete of all groups")<a name="line.93"></a>
+<span class="sourceLineNo">094</span>    int forceCompletionOfAllGroups();<a name="line.94"></a>
+<span class="sourceLineNo">095</span><a name="line.95"></a>
+<span class="sourceLineNo">096</span>    @ManagedAttribute(description = "Current number of closed correlation keys in the memory cache")<a name="line.96"></a>
+<span class="sourceLineNo">097</span>    int getClosedCorrelationKeysCacheSize();<a name="line.97"></a>
+<span class="sourceLineNo">098</span><a name="line.98"></a>
+<span class="sourceLineNo">099</span>    @ManagedOperation(description = "Clear all the closed correlation keys stored in the cache")<a name="line.99"></a>
+<span class="sourceLineNo">100</span>    void clearClosedCorrelationKeysCache();<a name="line.100"></a>
+<span class="sourceLineNo">101</span><a name="line.101"></a>
+<span class="sourceLineNo">102</span>    @ManagedAttribute(description = "Total number of exchanges arrived into the aggregator")<a name="line.102"></a>
+<span class="sourceLineNo">103</span>    long getTotalIn();<a name="line.103"></a>
+<span class="sourceLineNo">104</span><a name="line.104"></a>
+<span class="sourceLineNo">105</span>    @ManagedAttribute(description = "Total number of exchanges completed and outgoing from the aggregator")<a name="line.105"></a>
+<span class="sourceLineNo">106</span>    long getTotalCompleted();<a name="line.106"></a>
+<span class="sourceLineNo">107</span><a name="line.107"></a>
+<span class="sourceLineNo">108</span>    @ManagedAttribute(description = "Total number of exchanged completed by completion size trigger")<a name="line.108"></a>
+<span class="sourceLineNo">109</span>    long getCompletedBySize();<a name="line.109"></a>
+<span class="sourceLineNo">110</span><a name="line.110"></a>
+<span class="sourceLineNo">111</span>    @ManagedAttribute(description = "Total number of exchanged completed by completion aggregation strategy trigger")<a name="line.111"></a>
+<span class="sourceLineNo">112</span>    long getCompletedByStrategy();<a name="line.112"></a>
+<span class="sourceLineNo">113</span><a name="line.113"></a>
+<span class="sourceLineNo">114</span>    @ManagedAttribute(description = "Total number of exchanged completed by completion interval (timeout) trigger")<a name="line.114"></a>
+<span class="sourceLineNo">115</span>    long getCompletedByInterval();<a name="line.115"></a>
+<span class="sourceLineNo">116</span><a name="line.116"></a>
+<span class="sourceLineNo">117</span>    @ManagedAttribute(description = "Total number of exchanged completed by completion timeout trigger")<a name="line.117"></a>
+<span class="sourceLineNo">118</span>    long getCompletedByTimeout();<a name="line.118"></a>
+<span class="sourceLineNo">119</span><a name="line.119"></a>
+<span class="sourceLineNo">120</span>    @ManagedAttribute(description = "Total number of exchanged completed by completion predicate trigger")<a name="line.120"></a>
+<span class="sourceLineNo">121</span>    long getCompletedByPredicate();<a name="line.121"></a>
+<span class="sourceLineNo">122</span><a name="line.122"></a>
+<span class="sourceLineNo">123</span>    @ManagedAttribute(description = "Total number of exchanged completed by completion batch consumer trigger")<a name="line.123"></a>
+<span class="sourceLineNo">124</span>    long getCompletedByBatchConsumer();<a name="line.124"></a>
+<span class="sourceLineNo">125</span><a name="line.125"></a>
+<span class="sourceLineNo">126</span>    @ManagedAttribute(description = "Total number of exchanged completed by completion force trigger")<a name="line.126"></a>
+<span class="sourceLineNo">127</span>    long getCompletedByForce();<a name="line.127"></a>
+<span class="sourceLineNo">128</span><a name="line.128"></a>
+<span class="sourceLineNo">129</span>    @ManagedOperation(description = " Reset the statistics counters")<a name="line.129"></a>
+<span class="sourceLineNo">130</span>    void resetStatistics();<a name="line.130"></a>
+<span class="sourceLineNo">131</span><a name="line.131"></a>
+<span class="sourceLineNo">132</span>    @ManagedAttribute(description = "Sets whether statistics is enabled")<a name="line.132"></a>
+<span class="sourceLineNo">133</span>    boolean isStatisticsEnabled();<a name="line.133"></a>
+<span class="sourceLineNo">134</span><a name="line.134"></a>
+<span class="sourceLineNo">135</span>    @ManagedAttribute(description = "Sets whether statistics is enabled")<a name="line.135"></a>
+<span class="sourceLineNo">136</span>    void setStatisticsEnabled(boolean statisticsEnabled);<a name="line.136"></a>
+<span class="sourceLineNo">137</span><a name="line.137"></a>
+<span class="sourceLineNo">138</span>}<a name="line.138"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

@@ -1,0 +1,665 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+     Copyright 2005-2016 Red Hat, Inc.
+
+     Red Hat licenses this file to you under the Apache License, version
+     2.0 (the "License"); you may not use this file except in compliance
+     with the License.  You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+     Unless required by applicable law or agreed to in writing, software
+     distributed under the License is distributed on an "AS IS" BASIS,
+     WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+     implied.  See the License for the specific language governing
+     permissions and limitations under the License.
+
+-->
+<features name="fabric-1.2.0.redhat-630187"
+          xmlns="http://karaf.apache.org/xmlns/features/v1.2.0">
+
+    <repository>mvn:org.apache.cxf.karaf/apache-cxf/3.1.5.redhat-630187/xml/features</repository>
+<!--
+    CXF 3 version of JAXRS 2.0 client for fabric-docker-api
+    <repository>mvn:org.apache.cxf.karaf/apache-cxf/${cxf-3-version}/xml/features</repository>
+-->
+    <repository>mvn:org.apache.camel.karaf/apache-camel/2.17.0.redhat-630187/xml/features</repository>
+    <repository>mvn:org.apache.activemq/activemq-karaf/5.11.0.redhat-630187/xml/features-core</repository>
+    <repository>mvn:org.apache.karaf.assemblies.features/jclouds-features/2.4.0.redhat-630187/xml/features</repository>
+    <repository>mvn:io.hawt/hawtio-karaf/1.4.0.redhat-630187/xml/features</repository>
+    <repository>mvn:org.apache.karaf.assemblies.features/standard/2.4.0.redhat-630187/xml/features</repository>
+    <repository>mvn:org.apache.karaf.assemblies.features/spring/2.4.0.redhat-630187/xml/features</repository>
+    <repository>mvn:org.apache.karaf.assemblies.features/enterprise/2.4.0.redhat-630187/xml/features</repository>
+
+    <feature name="fabric-startup" version="1.2.0.redhat-630187" resolver="(obr)">
+        <!-- bundles referenced from $KARAF_HOME/etc/startup.properties -->
+        <bundle dependency="true">mvn:org.ops4j.pax.url/pax-url-aether/2.4.7</bundle>
+        <bundle dependency="true">mvn:org.ops4j.pax.url/pax-url-wrap/2.4.7/jar/uber</bundle>
+        <bundle dependency="true">mvn:org.ops4j.pax.logging/pax-logging-api/1.8.5</bundle>
+        <bundle dependency="true">mvn:org.ops4j.pax.logging/pax-logging-service/1.8.5</bundle>
+        <bundle dependency="true">mvn:org.apache.felix/org.apache.felix.configadmin/1.8.4</bundle>
+        <bundle dependency="true">mvn:org.apache.felix/org.apache.felix.fileinstall/3.5.0</bundle>
+        <bundle dependency="true">mvn:io.fabric8/fabric-ssl/1.2.0.redhat-630187</bundle>
+        <bundle dependency="true">mvn:org.apache.felix/org.apache.felix.metatype/1.0.10</bundle>
+        <bundle dependency="true">mvn:org.apache.karaf.services/org.apache.karaf.services.eventadmin/2.4.0.redhat-630187</bundle>
+        <bundle dependency="true">mvn:org.apache.karaf.admin/org.apache.karaf.admin.management/2.4.0.redhat-630187</bundle>
+        <bundle dependency="true">mvn:io.fabric8.patch/patch-management/1.2.0.redhat-630187</bundle>
+        <bundle dependency="true">mvn:org.apache.karaf.features/org.apache.karaf.features.core/2.4.0.redhat-630187</bundle>
+        <bundle dependency="true">mvn:org.apache.felix/org.apache.felix.bundlerepository/2.0.4</bundle>
+        <bundle dependency="true">mvn:org.apache.karaf.features/org.apache.karaf.features.obr/2.4.0.redhat-630187</bundle>
+        <!-- bundles referenced from $KARAF_HOME/bin/admin and $KARAF_HOME/bin/client -->
+        <bundle dependency="true">mvn:org.apache.karaf.admin/org.apache.karaf.admin.command/2.4.0.redhat-630187</bundle>
+        <bundle dependency="true">mvn:org.apache.karaf.admin/org.apache.karaf.admin.core/2.4.0.redhat-630187</bundle>
+        <bundle dependency="true">mvn:org.apache.karaf.shell/org.apache.karaf.shell.console/2.4.0.redhat-630187</bundle>
+        <bundle dependency="true">mvn:org.apache.felix/org.apache.felix.gogo.runtime/0.12.1</bundle>
+        <bundle dependency="true">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.api/1.0.1</bundle>
+        <bundle dependency="true">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.core/1.4.5</bundle>
+        <bundle dependency="true">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.cm/1.0.6</bundle>
+        <bundle dependency="true">mvn:org.apache.felix/org.apache.felix.framework/4.4.1</bundle>
+        <bundle dependency="true">mvn:org.bouncycastle/bcprov-jdk15on/1.54</bundle>
+        <bundle dependency="true">mvn:org.apache.sshd/sshd-core/0.14.0</bundle>
+        <bundle dependency="true">mvn:org.apache.mina/mina-core/2.0.13</bundle>
+        <!-- referenced from $KARAF_HOME/etc/org.apache.karaf.features.cfg -->
+        <feature>jsr-311</feature>
+    </feature>
+
+    <feature name="karaf" version="2.4.0.redhat-630187" resolver="(obr)">
+        <bundle>mvn:io.fabric8/fabric-ssl/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:org.apache.felix/org.apache.felix.configadmin/1.8.4</bundle>
+
+        <bundle dependency="true">mvn:javax.servlet/javax.servlet-api/3.1.0.redhat-1</bundle>
+        <bundle>mvn:io.fabric8/fabric-maven/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:org.ops4j.pax.url/pax-url-wrap/2.4.7/jar/uber</bundle>
+
+        <bundle start-level="8">mvn:org.ops4j.pax.logging/pax-logging-api/1.8.5</bundle>
+        <bundle start-level="8">mvn:org.ops4j.pax.logging/pax-logging-service/1.8.5</bundle>
+
+        <bundle start-level="45">mvn:org.apache.karaf.shell/org.apache.karaf.shell.console/2.4.0.redhat-630187</bundle>
+        <bundle start-level="50">mvn:org.apache.karaf.shell/org.apache.karaf.shell.osgi/2.4.0.redhat-630187</bundle>
+        <bundle start-level="50">mvn:org.apache.karaf.shell/org.apache.karaf.shell.commands/2.4.0.redhat-630187</bundle>
+        <bundle start-level="50">mvn:org.apache.karaf.shell/org.apache.karaf.shell.dev/2.4.0.redhat-630187</bundle>
+        <bundle start-level="50">mvn:org.apache.karaf.shell/org.apache.karaf.shell.log/2.4.0.redhat-630187</bundle>
+        <bundle start-level="50">mvn:org.apache.karaf.shell/org.apache.karaf.shell.config/2.4.0.redhat-630187</bundle>
+        <bundle start-level="50">mvn:org.apache.karaf.shell/org.apache.karaf.shell.packages/2.4.0.redhat-630187</bundle>
+        <bundle start-level="50">mvn:org.apache.karaf.shell/org.apache.karaf.shell.ssh/2.4.0.redhat-630187</bundle>
+
+        <bundle start-level="40">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.api/1.0.1</bundle>
+        <bundle start-level="40">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.core/1.4.5</bundle>
+        <bundle start-level="40">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.core.compatibility/1.0.0</bundle>
+        <bundle start-level="40">mvn:org.apache.aries.blueprint/org.apache.aries.blueprint.cm/1.0.6</bundle>
+
+        <bundle start-level="40">mvn:org.apache.aries/org.apache.aries.util/1.1.0</bundle>
+        <bundle start-level="40">mvn:org.apache.aries.proxy/org.apache.aries.proxy.api/1.0.1</bundle>
+        <bundle start-level="40">mvn:org.apache.aries.proxy/org.apache.aries.proxy.impl/1.0.5</bundle>
+        <bundle start-level="40">mvn:org.ow2.asm/asm-all/5.0.4</bundle>
+        <bundle start-level="50">mvn:org.apache.aries.jmx/org.apache.aries.jmx.api/1.1.1</bundle>
+        <bundle start-level="50">mvn:org.apache.aries.jmx/org.apache.aries.jmx.core/1.1.3</bundle>
+        <bundle start-level="50">mvn:org.apache.aries.jmx/org.apache.aries.jmx.blueprint.api/1.1.0</bundle>
+        <bundle start-level="50">mvn:org.apache.aries.jmx/org.apache.aries.jmx.blueprint.core/1.1.0</bundle>
+        <bundle start-level="45" dependency="true">mvn:org.apache.karaf.management/org.apache.karaf.management.server/2.4.0.redhat-630187</bundle>
+
+        <bundle start-level="45">mvn:org.bouncycastle/bcprov-jdk15on/1.54</bundle>
+        <bundle start-level="50">mvn:org.apache.sshd/sshd-core/0.14.0</bundle>
+        <bundle start-level="50">mvn:org.apache.mina/mina-core/2.0.13</bundle>
+
+        <bundle start-level="50">mvn:org.apache.karaf.jaas/org.apache.karaf.jaas.command/2.4.0.redhat-630187</bundle>
+        <bundle start-level="50">mvn:org.apache.karaf.jaas/org.apache.karaf.jaas.config/2.4.0.redhat-630187</bundle>
+        <bundle start-level="50">mvn:org.apache.karaf.jaas/org.apache.karaf.jaas.modules/2.4.0.redhat-630187</bundle>
+
+        <bundle start-level="49">mvn:org.apache.karaf.admin/org.apache.karaf.admin.core/2.4.0.redhat-630187</bundle>
+        <bundle start-level="49">mvn:org.apache.karaf.admin/org.apache.karaf.admin.management/2.4.0.redhat-630187</bundle>
+
+        <bundle start-level="10">mvn:org.apache.karaf.service/org.apache.karaf.service.guard/2.4.0.redhat-630187</bundle>
+
+        <bundle>mvn:org.apache.karaf.services/org.apache.karaf.services.eventadmin/2.4.0.redhat-630187</bundle>
+
+
+        <!-- TODO: Either decouple diagonstic common from org.apache.karaf.features or provide a dummy FeatureServiceImpl.
+             Till then we need to comment this out.-->
+        <!--bundle>mvn:org.apache.karaf.diagnostic/org.apache.karaf.diagnostic.management/2.4.0.redhat-630187</bundle>
+        <bundle>mvn:org.apache.karaf.diagnostic/org.apache.karaf.diagnostic.core/2.4.0.redhat-630187</bundle>
+        <bundle>mvn:org.apache.karaf.diagnostic/org.apache.karaf.diagnostic.command/2.4.0.redhat-630187</bundle>
+        <bundle>mvn:org.apache.karaf.diagnostic/org.apache.karaf.diagnostic.common/2.4.0.redhat-630187</bundle-->
+
+        <bundle>mvn:org.apache.felix/org.apache.felix.fileinstall/3.5.0</bundle>
+        <bundle>mvn:org.apache.karaf.deployer/org.apache.karaf.deployer.blueprint/2.4.0.redhat-630187</bundle>
+        <bundle>mvn:org.apache.karaf.deployer/org.apache.karaf.deployer.spring/2.4.0.redhat-630187</bundle>
+        <bundle>mvn:org.apache.karaf.deployer/org.apache.karaf.deployer.wrap/2.4.0.redhat-630187</bundle>
+
+        <conditional>
+            <condition>scr</condition>
+            <bundle>mvn:org.apache.karaf.shell/org.apache.karaf.shell.scr/2.4.0.redhat-630187</bundle>
+            <bundle start-level="30">mvn:org.apache.karaf.management.mbeans/org.apache.karaf.management.mbeans.scr/2.4.0.redhat-630187</bundle>
+        </conditional>
+    </feature>
+
+    <feature name="jsr-311" version="1.2.0.redhat-630187" resolver="(obr)">
+        <bundle dependency='true'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1.1/2.7.0</bundle>
+    </feature>
+
+    <feature name="fabric-zookeeper" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature>fabric-core</feature>
+    </feature>
+
+    <feature name="fabric-configadmin" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-core</feature>
+    </feature>
+
+    <feature name="fabric-agent" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-core</feature>
+    </feature>
+
+    <feature name="fabric-agent-commands" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-agent</feature>
+        <feature version="1.2.0.redhat-630187">fabric-project-deployer</feature>
+        <feature version="1.2.0.redhat-630187">fabric-boot-commands</feature>
+        <bundle dependency="true">mvn:org.ops4j.pax.url/pax-url-aether/2.4.7</bundle>
+        <bundle dependency="true">mvn:org.ops4j.pax.url/pax-url-wrap/2.4.7/jar/uber</bundle>
+        <bundle dependency="true">mvn:org.apache.felix/org.apache.felix.metatype/1.0.10</bundle>
+        <bundle>mvn:org.apache.karaf.features/org.apache.karaf.features.command/2.4.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-agent-commands/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-archetype-commands" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-boot-commands</feature>
+        <bundle dependency="true">mvn:commons-io/commons-io/2.4.0.redhat-1</bundle>
+        <bundle dependency="true">mvn:org.ops4j.base/ops4j-base-util-property/1.5.0</bundle>
+        <bundle>mvn:io.fabric8/archetype-builder/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/archetype-commands/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-project-deployer" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-agent</feature>
+        <bundle dependency="true">mvn:org.ops4j.pax.url/pax-url-aether/2.4.7</bundle>
+        <bundle dependency="true">mvn:org.ops4j.pax.url/pax-url-wrap/2.4.7/jar/uber</bundle>
+        <bundle dependency="true">mvn:org.ops4j.base/ops4j-base-util-property/1.5.0</bundle>
+        <bundle>mvn:io.fabric8/fabric-project-deployer/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-web" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="2.4.0.redhat-630187">http</feature>
+        <feature version="1.2.0.redhat-630187">fabric-core</feature>
+        <bundle>mvn:io.fabric8/fabric-web/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-maven-proxy" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="2.4.0.redhat-630187">http</feature>
+        <feature version="1.2.0.redhat-630187">fabric-core</feature>
+        <feature version="1.2.0.redhat-630187">fabric-project-deployer</feature>
+        <bundle dependency="true">mvn:org.ops4j.base/ops4j-base-lang/1.5.0</bundle>
+        <bundle dependency="true">mvn:commons-io/commons-io/2.4.0.redhat-1</bundle>
+        <bundle>mvn:io.fabric8/fabric-maven/1.2.0.redhat-630187</bundle>
+        <bundle dependency="true">mvn:javax.servlet/javax.servlet-api/3.1.0.redhat-1</bundle>
+        <bundle>mvn:io.fabric8/fabric-maven-proxy/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-core</feature>
+        <feature version="1.2.0.redhat-630187">fabric-jaas</feature>
+        <feature version="1.2.0.redhat-630187">fabric-git-server</feature>
+        <feature version="1.2.0.redhat-630187">fabric-boot-commands</feature>
+        <feature version="1.2.0.redhat-630187">fabric-redirect</feature>
+        <feature version="1.2.0.redhat-630187">fabric-commands</feature>
+        <feature version="1.2.0.redhat-630187">fabric-agent</feature>
+        <feature version="1.2.0.redhat-630187">fabric-maven-proxy</feature>
+        
+        <bundle>mvn:org.apache.karaf.features/org.apache.karaf.features.command/2.4.0.redhat-630187</bundle>
+        <bundle>mvn:org.apache.karaf.features/org.apache.karaf.features.management/2.4.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-core" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature>scr</feature>
+        <feature>karaf</feature>
+
+        <bundle dependency="true">mvn:javax.annotation/javax.annotation-api/1.2</bundle>
+        <bundle dependency="true">mvn:org.mvel/mvel2/2.2.7.Final-redhat-1</bundle>
+        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsch/0.1.53_1</bundle>
+        <bundle dependency="true">mvn:commons-collections/commons-collections/3.2.2.redhat-2</bundle>
+        <bundle dependency="true">mvn:commons-beanutils/commons-beanutils/1.9.2.redhat-1</bundle>
+        <bundle dependency='true'>mvn:commons-lang/commons-lang/2.6.0.redhat-5</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
+        <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jasypt/1.9.3.redhat_3</bundle>
+        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsch/0.1.53_1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jaxb-impl/2.2.11_1</bundle>
+        <bundle dependency='true'>mvn:commons-codec/commons-codec/1.10.0.redhat-5</bundle>
+        <bundle dependency='true'>mvn:com.google.guava/guava/18.0.0.redhat-1</bundle>
+        <bundle dependency='true'>mvn:biz.aQute.bnd/biz.aQute.bndlib/2.4.1</bundle>
+        <bundle dependency='true'>mvn:org.ops4j.base/ops4j-base-lang/1.5.0</bundle>
+        <bundle dependency='true'>mvn:org.ops4j.base/ops4j-base-util-property/1.5.0</bundle>
+        <bundle dependency='true'>mvn:org.ops4j.pax.swissbox/pax-swissbox-property/1.8.2</bundle>
+        <bundle dependency='true'>mvn:org.ops4j.pax.url/pax-url-commons/2.4.7</bundle>
+
+        <bundle>mvn:org.apache.felix/org.apache.felix.metatype/1.0.10</bundle>
+        <bundle>mvn:io.fabric8/common-util/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-api/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-core/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-groups/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-git/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-configadmin/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-maven/1.2.0.redhat-630187</bundle>
+        <bundle dependency="true">mvn:javax.servlet/javax.servlet-api/3.1.0.redhat-1</bundle>
+        <bundle>mvn:io.fabric8/fabric-agent/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-extender-listener/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-jaas/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-zookeeper/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-features-service/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8.insight/insight-log/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8.runtime/fabric-runtime-container-karaf-registration/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-boot-commands" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-core</feature>
+        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsch/0.1.53_1</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
+        <bundle>mvn:io.fabric8/fabric-boot-commands/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-commands" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-boot-commands</feature>
+        <bundle>mvn:org.apache.karaf.features/org.apache.karaf.features.command/2.4.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-features-service/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-commands/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-zookeeper-commands" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-commands</feature>
+        <bundle>mvn:io.fabric8/fabric-zookeeper-commands/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-dosgi" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature>fabric-zookeeper</feature>
+        <bundle dependency="true">mvn:org.fusesource.hawtdispatch/hawtdispatch/1.22</bundle>
+        <bundle dependency="true">mvn:org.fusesource.hawtbuf/hawtbuf/1.11.0.redhat-1</bundle>
+        <bundle>mvn:io.fabric8/fabric-dosgi/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-camel" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="[2.14,3)">camel</feature>
+        <feature>spring-dm</feature>
+        <feature>fabric-groups</feature>
+        <bundle>mvn:io.fabric8/fabric-camel/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-camel-autotest" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="[2.14,3)">camel</feature>
+        <feature>fabric-groups</feature>
+        <bundle>mvn:io.fabric8/fabric-camel-autotest/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-cxf" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="[3.1,3.2)">cxf-jaxws</feature>
+        <feature version="[3.1,3.2)">cxf-jaxrs</feature>
+        <feature version="1.2.0.redhat-630187">swagger</feature>
+        <feature>fabric-groups</feature>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/2.6.3</bundle>
+        <bundle>mvn:io.fabric8/fabric-cxf/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-cxf-registry" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature>fabric-core</feature>
+        <bundle>mvn:io.fabric8/fabric-cxf-registry/1.2.0.redhat-630187</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/2.6.3</bundle>
+        <bundle>mvn:javax.validation/validation-api/1.1.0.Final-redhat-1</bundle>
+    </feature>
+
+    <feature name="mq-fabric" version="1.2.0.redhat-630187" resolver="(obr)" description="A-MQ broker">
+        <feature version="1.2.0.redhat-630187">fabric-groups</feature>
+        <feature>jms-spec-dep</feature>
+        <feature version="5.11.0.redhat-630187">activemq</feature>
+        <bundle>mvn:io.fabric8/common-util/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:org.apache.xbean/xbean-classloader/3.18</bundle>
+        <bundle>mvn:io.fabric8.mq/mq-discovery/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8.mq/mq-fabric/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="mq-fabric-http-discovery" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-groups</feature>
+        <feature version="[2,3)">war</feature>
+        <bundle>mvn:io.fabric8.mq/mq-http-discovery/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <!-- This is just here for backwards compatibility - please use camel-amq if you can -->
+    <feature name="mq-fabric-camel" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">camel-amq</feature>
+    </feature>
+
+    <feature name="camel-amq" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">mq-fabric</feature>
+        <feature version="5.11.0.redhat-630187">activemq-client</feature>
+        <feature version="[2.14,3)">camel-jms</feature>
+        <feature version="[2.14,3)">camel</feature>
+        <bundle>mvn:org.apache.activemq/activemq-camel/5.11.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8.mq/camel-amq/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="activemq-camel" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="5.11.0.redhat-630187">activemq-client</feature>
+        <feature version="[2.14,3)">camel-jms</feature>
+        <feature version="[2.14,3)">camel</feature>
+        <bundle>mvn:org.apache.activemq/activemq-camel/5.11.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-groovy" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-zookeeper</feature>
+        <bundle dependency="true">mvn:org.codehaus.groovy/groovy-all/2.4.6</bundle>
+        <bundle>mvn:io.fabric8/fabric-groovy/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-groups" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-zookeeper</feature>
+        <bundle>mvn:io.fabric8/fabric-groups/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-jaas" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-zookeeper</feature>
+        <bundle dependency='true'>mvn:commons-codec/commons-codec/1.10.0.redhat-5</bundle>
+        <bundle dependency='true'>mvn:commons-lang/commons-lang/2.6.0.redhat-5</bundle>
+        <bundle dependency='true'>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jasypt/1.9.3.redhat_3</bundle>
+        <bundle>mvn:io.fabric8/fabric-jaas/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-ssh" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-commands</feature>
+        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsch/0.1.53_1</bundle>
+        <bundle>mvn:io.fabric8/common-util/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-core-agent-ssh/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-jclouds" version="1.2.0.redhat-630187" resolver="(obr)">
+        <bundle dependency='true'>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.activation-api-1.1/2.7.0</bundle>
+        <feature version="1.2.0.redhat-630187">fabric-commands</feature>
+        <feature version='1.9.1.redhat-001'>jclouds-commands</feature>
+        <feature version='1.9.1.redhat-001'>jclouds-api-ec2</feature>
+        <bundle>mvn:io.fabric8/common-util/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-core-agent-jclouds/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="insight-kibana" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature>war</feature>
+        <bundle>mvn:io.hawt.kibana/hawtio-kibana/3.1.2_2/war</bundle>
+    </feature>
+
+    <feature name="insight-eshead" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature>war</feature>
+        <bundle>mvn:io.hawt.eshead/hawtio-eshead/1.0.2/war</bundle>
+    </feature>
+
+    <feature name="insight-log" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature>karaf</feature>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
+        <bundle>mvn:io.fabric8.insight/insight-log/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="insight-metrics" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature>fabric-core</feature>
+        <bundle dependency="true">mvn:org.mvel/mvel2/2.2.7.Final-redhat-1</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
+        <bundle>mvn:io.fabric8/common-util/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8.insight/insight-storage/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8.insight/insight-metrics-model/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8.insight/insight-metrics-mvel/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="insight-elasticsearch" version="1.2.0.redhat-630187" resolver="(obr)">
+        <config name="io.fabric8.elasticsearch-insight">
+            #
+            # Copyright (C) Red Hat, Inc.
+            # http://redhat.com
+            #
+            # Licensed under the Apache License, Version 2.0 (the "License");
+            # you may not use this file except in compliance with the License.
+            # You may obtain a copy of the License at
+            #
+            # http://www.apache.org/licenses/LICENSE-2.0
+            #
+            # Unless required by applicable law or agreed to in writing, software
+            # distributed under the License is distributed on an "AS IS" BASIS,
+            # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+            # See the License for the specific language governing permissions and
+            # limitations under the License.
+            #
+          cluster.name=insight
+        </config>
+        <feature>eventadmin</feature>
+        <feature>insight-log</feature>
+        <feature version="1.2.0.redhat-630187">insight-metrics</feature>
+        <feature>fabric-zookeeper</feature>
+        <feature>fabric-groups</feature>
+        <!--<feature>insight-kibana</feature>-->
+        <bundle dependency="true">mvn:com.google.guava/guava/18.0.0.redhat-1</bundle>
+        <bundle>mvn:io.fabric8.insight/insight-storage/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.elasticsearch/1.3.2_1</bundle>
+        <bundle>mvn:io.fabric8.insight/insight-elasticsearch-plugin/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8.insight/insight-elasticsearch-discovery/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8.insight/insight-elasticsearch-factory/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="insight-elasticsearch-log-storage" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">insight-elasticsearch</feature>
+        <bundle>mvn:io.fabric8.insight/insight-log-storage/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8.insight/insight-elasticsearch-log-storage/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="insight-elasticsearch-metrics-storage" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">insight-elasticsearch</feature>
+        <feature version="1.2.0.redhat-630187">insight-metrics</feature>
+        <bundle>mvn:io.fabric8.insight/insight-metrics/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8.insight/insight-elasticsearch-metrics-storage/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="insight-camel" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="[2.14,3)">camel</feature>
+        <feature>insight-elasticsearch-log-storage</feature>
+        <bundle dependency="true">mvn:org.mvel/mvel2/2.2.7.Final-redhat-1</bundle>
+        <bundle>mvn:org.codehaus.jackson/jackson-mapper-asl/1.9.13</bundle>
+        <bundle>mvn:org.codehaus.jackson/jackson-core-asl/1.9.13</bundle>
+        <bundle>mvn:io.fabric8.insight/insight-camel/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-ldap-apacheds" version="1.2.0.redhat-630187" resolver="(obr)">
+        <configfile finalname="/data/ldap/default/fabric.ldif">mvn:io.fabric8/fabric-ldap/1.2.0.redhat-630187/ldif/default</configfile>
+        <configfile finalname="/etc/fabric-ldap-apacheds-1.2.0.redhat-630187.xml">mvn:io.fabric8/fabric-ldap/1.2.0.redhat-630187/xml/apacheds</configfile>
+        <bundle>mvn:org.bouncycastle/bcprov-jdk15on/1.54</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.antlr/2.7.7_5</bundle>
+        <bundle dependency="true">mvn:commons-lang/commons-lang/2.6.0.redhat-5</bundle>
+        <bundle dependency="true">mvn:commons-collections/commons-collections/3.2.2.redhat-2</bundle>
+        <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.scripting-api-1.0/2.7.0</bundle>
+        <bundle>mvn:org.apache.commons/commons-jexl/2.1.1</bundle>
+        <bundle>mvn:org.apache.xbean/xbean-blueprint/3.18</bundle>
+        <bundle>mvn:io.fabric8/common-util/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-ldap/1.2.0.redhat-630187</bundle>
+        <bundle>blueprint:file:etc/fabric-ldap-apacheds-1.2.0.redhat-630187.xml</bundle>
+    </feature>
+
+    <feature name="fabric-ldap-jaas" version="1.2.0.redhat-630187" resolver="(obr)">
+        <configfile finalname="/etc/fabric-ldap-jaas-1.2.0.redhat-630187.xml">mvn:io.fabric8/fabric-ldap/1.2.0.redhat-630187/xml/jaas</configfile>
+        <bundle>mvn:io.fabric8/common-util/1.2.0.redhat-630187</bundle>
+        <bundle>blueprint:file:etc/fabric-ldap-jaas-1.2.0.redhat-630187.xml</bundle>
+    </feature>
+
+    <feature name="fabric-git" version="1.2.0.redhat-630187">
+        <bundle>mvn:io.fabric8/fabric-api/1.2.0.redhat-630187</bundle>
+        <feature version="1.2.0.redhat-630187">fabric-groups</feature>
+        <bundle dependency="true">mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.jsch/0.1.53_1</bundle>
+        <bundle>mvn:io.fabric8/fabric-git/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-git-server" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="2.4.0.redhat-630187">http</feature>
+        <feature version="1.2.0.redhat-630187">fabric-git</feature>
+        <bundle>mvn:io.fabric8/fabric-git-server/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-redirect" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature>fabric-core</feature>
+        <feature version="2.4.0.redhat-630187">http</feature>
+        <bundle>mvn:io.fabric8/common-util/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-redirect/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-rest" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="[3.1,3.2)">cxf-jaxrs</feature>
+        <feature version="1.2.0.redhat-630187">fabric-cxf</feature>
+        <feature version="1.2.0.redhat-630187">fabric-cxf-registry</feature>
+        <feature>swagger</feature>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/2.6.3</bundle>
+        <bundle dependency='true'>mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/2.6.3</bundle>
+        <bundle>mvn:javax.validation/validation-api/1.1.0.Final-redhat-1</bundle>
+        <bundle>mvn:io.fabric8/common-util/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-rest/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-hawtio" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-git</feature>
+        <feature version="1.2.0.redhat-630187">fabric-project-deployer</feature>
+        <feature version="1.4.0.redhat-630187">hawtio-karaf-terminal</feature>
+        <feature version="1.4.0.redhat-630187">hawtio-core</feature>
+        <feature version="2.4.0.redhat-630187">http</feature>
+        <bundle>mvn:io.fabric8/fabric-git-hawtio/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-hawtio-swagger" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-hawtio</feature>
+        <feature>swagger</feature>
+        <bundle>mvn:io.hawt.swagger/hawtio-swagger-ui/1.4.0.redhat-630187/war</bundle>
+    </feature>
+
+    <feature name="fabric-dynamic-jaxb" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="[3.1,3.2)">cxf-core</feature>
+        <feature version="[2.14,3)">camel-jaxb</feature>
+        <feature version="1.2.0.redhat-630187">fabric-core</feature>
+        <feature>http</feature>
+        <bundle>mvn:io.fabric8/common-util/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-dynamic-jaxb/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/dynamic-jaxb/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-git-hawtio/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:com.google.guava/guava/18.0.0.redhat-1</bundle>
+    </feature>
+
+    <feature name="fabric-openshift" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-core</feature>
+        <feature version="1.2.0.redhat-630187">fabric-commands</feature>
+        <bundle>mvn:io.fabric8/common-util/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-openshift/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-autoscale" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-core</feature>
+        <bundle>mvn:io.fabric8/common-util/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/fabric-autoscale/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="fabric-vertx" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature>fabric-core</feature>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
+        <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
+        <bundle dependency="true">mvn:commons-pool/commons-pool/1.6.0.redhat-9</bundle>
+        <bundle dependency="true">mvn:io.netty/netty-common/4.0.37.Final-redhat-2</bundle>
+        <bundle dependency="true">mvn:io.netty/netty-buffer/4.0.37.Final-redhat-2</bundle>
+        <bundle dependency="true">mvn:io.netty/netty-transport/4.0.37.Final-redhat-2</bundle>
+        <bundle dependency="true">mvn:io.netty/netty-handler/4.0.37.Final-redhat-2</bundle>
+        <bundle dependency="true">mvn:io.netty/netty-codec/4.0.37.Final-redhat-2</bundle>
+        <bundle dependency="true">mvn:io.netty/netty-codec-http/4.0.37.Final-redhat-2</bundle>
+        <bundle>mvn:io.fabric8/fabric-vertx/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="jolokia" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-core</feature>
+        <feature>http</feature>
+        <bundle>mvn:io.fabric8/fabric-jolokia/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="gateway-core" version="1.2.0.redhat-630187" resolver="(obr)">
+      <feature version="1.2.0.redhat-630187">fabric-vertx</feature>
+      <bundle>mvn:io.fabric8/common-util/1.2.0.redhat-630187</bundle>
+      <bundle>mvn:io.fabric8/gateway-model/1.2.0.redhat-630187</bundle>
+      <bundle>mvn:io.fabric8/gateway-core/1.2.0.redhat-630187</bundle>
+      <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
+      <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
+      <bundle dependency="true">mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
+      <bundle dependency="true">mvn:org.apache.geronimo.specs/geronimo-jta_1.1_spec/1.1.1</bundle>
+    </feature>
+
+    <feature name="gateway-fabric" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature version="1.2.0.redhat-630187">fabric-core</feature>
+        <feature version="1.2.0.redhat-630187">fabric-groups</feature>
+        <feature version="1.2.0.redhat-630187">gateway-core</feature>
+        <bundle>mvn:io.fabric8/gateway-fabric-support/1.2.0.redhat-630187</bundle>
+        <bundle>mvn:io.fabric8/gateway-fabric/1.2.0.redhat-630187</bundle>
+    </feature>
+
+    <feature name="swagger" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature>http</feature>
+        <feature version="[3.1,3.2)">cxf-specs</feature>
+        <bundle dependency='true'>mvn:org.scala-lang/scala-library/2.10.4</bundle>
+        <bundle dependency='true'>mvn:org.scala-lang/scala-reflect/2.10.4</bundle>
+        <bundle dependency='true'>mvn:com.google.guava/guava/15.0</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.javax-inject/1_2</bundle>
+        <bundle>mvn:org.javassist/javassist/3.19.0-GA</bundle>
+        <bundle>mvn:javax.validation/validation-api/1.1.0.Final-redhat-1</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.module/jackson-module-paranamer/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.module/jackson-module-scala_2.10/2.6.3</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.swagger-annotations/1.3.12_1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.swagger-core/1.3.12_1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.swagger-jaxrs/1.3.12_1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.paranamer/2.8_1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.reflections/0.9.10_3</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.json4s/3.2.8_1</bundle>
+    </feature>
+
+    <feature name="swagger-java" version="1.2.0.redhat-630187" resolver="(obr)">
+        <feature>http</feature>
+        <bundle>mvn:org.codehaus.woodstox/stax2-api/3.1.4</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-databind/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-core/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.module/jackson-module-jaxb-annotations/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-xml/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.dataformat/jackson-dataformat-yaml/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-json-provider/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.jaxrs/jackson-jaxrs-base/2.6.3</bundle>
+        <bundle>mvn:com.fasterxml.jackson.core/jackson-annotations/2.6.3</bundle>
+        <bundle>mvn:com.google.guava/guava/18.0.0.redhat-1</bundle>
+        <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.reflections/0.9.10_3</bundle>
+        <bundle>mvn:io.swagger/swagger-core/1.5.8</bundle>
+        <bundle>mvn:io.swagger/swagger-annotations/1.5.8</bundle>
+        <bundle>mvn:io.swagger/swagger-models/1.5.8</bundle>
+        <bundle>mvn:io.swagger/swagger-jaxrs/1.5.8</bundle>
+        <!-- apiman -->
+        <bundle>mvn:com.fasterxml.jackson.datatype/jackson-datatype-joda/2.6.3</bundle>
+        <bundle>mvn:joda-time/joda-time/2.9.2</bundle>
+        <bundle>mvn:com.google.code.findbugs/annotations/2.0.1</bundle>
+        <!-- camel-swagger-java -->
+        <bundle>mvn:org.apache.servicemix.specs/org.apache.servicemix.specs.jsr311-api-1.1.1/2.7.0</bundle>
+        <bundle>mvn:javax.validation/validation-api/1.1.0.Final-redhat-1</bundle>
+        <bundle>mvn:org.apache.commons/commons-lang3/3.4</bundle>
+    </feature>
+
+</features>

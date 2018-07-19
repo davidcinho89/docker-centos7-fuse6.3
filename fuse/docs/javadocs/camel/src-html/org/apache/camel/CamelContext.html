@@ -1,0 +1,1768 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * contributor license agreements.  See the NOTICE file distributed with<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * this work for additional information regarding copyright ownership.<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * The ASF licenses this file to You under the Apache License, Version 2.0<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * (the "License"); you may not use this file except in compliance with<a name="line.6"></a>
+<span class="sourceLineNo">007</span> * the License.  You may obtain a copy of the License at<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *<a name="line.8"></a>
+<span class="sourceLineNo">009</span> *      http://www.apache.org/licenses/LICENSE-2.0<a name="line.9"></a>
+<span class="sourceLineNo">010</span> *<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * Unless required by applicable law or agreed to in writing, software<a name="line.11"></a>
+<span class="sourceLineNo">012</span> * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.12"></a>
+<span class="sourceLineNo">013</span> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * See the License for the specific language governing permissions and<a name="line.14"></a>
+<span class="sourceLineNo">015</span> * limitations under the License.<a name="line.15"></a>
+<span class="sourceLineNo">016</span> */<a name="line.16"></a>
+<span class="sourceLineNo">017</span>package org.apache.camel;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import java.io.IOException;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import java.io.InputStream;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import java.util.Collection;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import java.util.List;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import java.util.Map;<a name="line.23"></a>
+<span class="sourceLineNo">024</span>import java.util.Properties;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import java.util.concurrent.ScheduledExecutorService;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import java.util.concurrent.TimeUnit;<a name="line.26"></a>
+<span class="sourceLineNo">027</span><a name="line.27"></a>
+<span class="sourceLineNo">028</span>import org.apache.camel.api.management.mbean.ManagedCamelContextMBean;<a name="line.28"></a>
+<span class="sourceLineNo">029</span>import org.apache.camel.api.management.mbean.ManagedProcessorMBean;<a name="line.29"></a>
+<span class="sourceLineNo">030</span>import org.apache.camel.api.management.mbean.ManagedRouteMBean;<a name="line.30"></a>
+<span class="sourceLineNo">031</span>import org.apache.camel.builder.ErrorHandlerBuilder;<a name="line.31"></a>
+<span class="sourceLineNo">032</span>import org.apache.camel.model.DataFormatDefinition;<a name="line.32"></a>
+<span class="sourceLineNo">033</span>import org.apache.camel.model.ProcessorDefinition;<a name="line.33"></a>
+<span class="sourceLineNo">034</span>import org.apache.camel.model.RouteDefinition;<a name="line.34"></a>
+<span class="sourceLineNo">035</span>import org.apache.camel.model.RoutesDefinition;<a name="line.35"></a>
+<span class="sourceLineNo">036</span>import org.apache.camel.model.rest.RestDefinition;<a name="line.36"></a>
+<span class="sourceLineNo">037</span>import org.apache.camel.model.rest.RestsDefinition;<a name="line.37"></a>
+<span class="sourceLineNo">038</span>import org.apache.camel.spi.AsyncProcessorAwaitManager;<a name="line.38"></a>
+<span class="sourceLineNo">039</span>import org.apache.camel.spi.CamelContextNameStrategy;<a name="line.39"></a>
+<span class="sourceLineNo">040</span>import org.apache.camel.spi.ClassResolver;<a name="line.40"></a>
+<span class="sourceLineNo">041</span>import org.apache.camel.spi.DataFormat;<a name="line.41"></a>
+<span class="sourceLineNo">042</span>import org.apache.camel.spi.DataFormatResolver;<a name="line.42"></a>
+<span class="sourceLineNo">043</span>import org.apache.camel.spi.Debugger;<a name="line.43"></a>
+<span class="sourceLineNo">044</span>import org.apache.camel.spi.EndpointRegistry;<a name="line.44"></a>
+<span class="sourceLineNo">045</span>import org.apache.camel.spi.EndpointStrategy;<a name="line.45"></a>
+<span class="sourceLineNo">046</span>import org.apache.camel.spi.ExecutorServiceManager;<a name="line.46"></a>
+<span class="sourceLineNo">047</span>import org.apache.camel.spi.FactoryFinder;<a name="line.47"></a>
+<span class="sourceLineNo">048</span>import org.apache.camel.spi.FactoryFinderResolver;<a name="line.48"></a>
+<span class="sourceLineNo">049</span>import org.apache.camel.spi.InflightRepository;<a name="line.49"></a>
+<span class="sourceLineNo">050</span>import org.apache.camel.spi.Injector;<a name="line.50"></a>
+<span class="sourceLineNo">051</span>import org.apache.camel.spi.InterceptStrategy;<a name="line.51"></a>
+<span class="sourceLineNo">052</span>import org.apache.camel.spi.Language;<a name="line.52"></a>
+<span class="sourceLineNo">053</span>import org.apache.camel.spi.LifecycleStrategy;<a name="line.53"></a>
+<span class="sourceLineNo">054</span>import org.apache.camel.spi.ManagementMBeanAssembler;<a name="line.54"></a>
+<span class="sourceLineNo">055</span>import org.apache.camel.spi.ManagementNameStrategy;<a name="line.55"></a>
+<span class="sourceLineNo">056</span>import org.apache.camel.spi.ManagementStrategy;<a name="line.56"></a>
+<span class="sourceLineNo">057</span>import org.apache.camel.spi.MessageHistoryFactory;<a name="line.57"></a>
+<span class="sourceLineNo">058</span>import org.apache.camel.spi.ModelJAXBContextFactory;<a name="line.58"></a>
+<span class="sourceLineNo">059</span>import org.apache.camel.spi.NodeIdFactory;<a name="line.59"></a>
+<span class="sourceLineNo">060</span>import org.apache.camel.spi.PackageScanClassResolver;<a name="line.60"></a>
+<span class="sourceLineNo">061</span>import org.apache.camel.spi.ProcessorFactory;<a name="line.61"></a>
+<span class="sourceLineNo">062</span>import org.apache.camel.spi.Registry;<a name="line.62"></a>
+<span class="sourceLineNo">063</span>import org.apache.camel.spi.RestConfiguration;<a name="line.63"></a>
+<span class="sourceLineNo">064</span>import org.apache.camel.spi.RestRegistry;<a name="line.64"></a>
+<span class="sourceLineNo">065</span>import org.apache.camel.spi.RoutePolicyFactory;<a name="line.65"></a>
+<span class="sourceLineNo">066</span>import org.apache.camel.spi.RouteStartupOrder;<a name="line.66"></a>
+<span class="sourceLineNo">067</span>import org.apache.camel.spi.RuntimeEndpointRegistry;<a name="line.67"></a>
+<span class="sourceLineNo">068</span>import org.apache.camel.spi.ServicePool;<a name="line.68"></a>
+<span class="sourceLineNo">069</span>import org.apache.camel.spi.ShutdownStrategy;<a name="line.69"></a>
+<span class="sourceLineNo">070</span>import org.apache.camel.spi.StreamCachingStrategy;<a name="line.70"></a>
+<span class="sourceLineNo">071</span>import org.apache.camel.spi.TypeConverterRegistry;<a name="line.71"></a>
+<span class="sourceLineNo">072</span>import org.apache.camel.spi.UnitOfWorkFactory;<a name="line.72"></a>
+<span class="sourceLineNo">073</span>import org.apache.camel.spi.UuidGenerator;<a name="line.73"></a>
+<span class="sourceLineNo">074</span>import org.apache.camel.util.LoadPropertiesException;<a name="line.74"></a>
+<span class="sourceLineNo">075</span><a name="line.75"></a>
+<span class="sourceLineNo">076</span>/**<a name="line.76"></a>
+<span class="sourceLineNo">077</span> * Interface used to represent the context used to configure routes and the<a name="line.77"></a>
+<span class="sourceLineNo">078</span> * policies to use during message exchanges between endpoints.<a name="line.78"></a>
+<span class="sourceLineNo">079</span> * &lt;p/&gt;<a name="line.79"></a>
+<span class="sourceLineNo">080</span> * The context offers the following methods to control the lifecycle:<a name="line.80"></a>
+<span class="sourceLineNo">081</span> * &lt;ul&gt;<a name="line.81"></a>
+<span class="sourceLineNo">082</span> *   &lt;li&gt;{@link #start()}  - to start (&lt;b&gt;important:&lt;/b&gt; the start method is not blocked, see more details<a name="line.82"></a>
+<span class="sourceLineNo">083</span> *     &lt;a href="http://camel.apache.org/running-camel-standalone-and-have-it-keep-running.html"&gt;here&lt;/a&gt;)&lt;/li&gt;<a name="line.83"></a>
+<span class="sourceLineNo">084</span> *   &lt;li&gt;{@link #stop()} - to shutdown (will stop all routes/components/endpoints etc and clear internal state/cache)&lt;/li&gt;<a name="line.84"></a>
+<span class="sourceLineNo">085</span> *   &lt;li&gt;{@link #suspend()} - to pause routing messages&lt;/li&gt;<a name="line.85"></a>
+<span class="sourceLineNo">086</span> *   &lt;li&gt;{@link #resume()} - to resume after a suspend&lt;/li&gt;<a name="line.86"></a>
+<span class="sourceLineNo">087</span> * &lt;/ul&gt;<a name="line.87"></a>
+<span class="sourceLineNo">088</span> * &lt;p/&gt;<a name="line.88"></a>
+<span class="sourceLineNo">089</span> * &lt;b&gt;Notice:&lt;/b&gt; {@link #stop()} and {@link #suspend()} will gracefully stop/suspend routes ensuring any messages<a name="line.89"></a>
+<span class="sourceLineNo">090</span> * in progress will be given time to complete. See more details at {@link org.apache.camel.spi.ShutdownStrategy}.<a name="line.90"></a>
+<span class="sourceLineNo">091</span> * &lt;p/&gt;<a name="line.91"></a>
+<span class="sourceLineNo">092</span> * If you are doing a hot restart then it's advised to use the suspend/resume methods which ensure a faster<a name="line.92"></a>
+<span class="sourceLineNo">093</span> * restart but also allows any internal state to be kept as is.<a name="line.93"></a>
+<span class="sourceLineNo">094</span> * The stop/start approach will do a &lt;i&gt;cold&lt;/i&gt; restart of Camel, where all internal state is reset.<a name="line.94"></a>
+<span class="sourceLineNo">095</span> * &lt;p/&gt;<a name="line.95"></a>
+<span class="sourceLineNo">096</span> * End users are advised to use suspend/resume. Using stop is for shutting down Camel and it's not guaranteed that<a name="line.96"></a>
+<span class="sourceLineNo">097</span> * when it's being started again using the start method that Camel will operate consistently.<a name="line.97"></a>
+<span class="sourceLineNo">098</span> *<a name="line.98"></a>
+<span class="sourceLineNo">099</span> * @version <a name="line.99"></a>
+<span class="sourceLineNo">100</span> */<a name="line.100"></a>
+<span class="sourceLineNo">101</span>public interface CamelContext extends SuspendableService, RuntimeConfiguration {<a name="line.101"></a>
+<span class="sourceLineNo">102</span><a name="line.102"></a>
+<span class="sourceLineNo">103</span>    /**<a name="line.103"></a>
+<span class="sourceLineNo">104</span>     * Adapts this {@link org.apache.camel.CamelContext} to the specialized type.<a name="line.104"></a>
+<span class="sourceLineNo">105</span>     * &lt;p/&gt;<a name="line.105"></a>
+<span class="sourceLineNo">106</span>     * For example to adapt to {@link org.apache.camel.model.ModelCamelContext},<a name="line.106"></a>
+<span class="sourceLineNo">107</span>     * or &lt;tt&gt;SpringCamelContext&lt;/tt&gt;, or &lt;tt&gt;CdiCamelContext&lt;/tt&gt;, etc.<a name="line.107"></a>
+<span class="sourceLineNo">108</span>     *<a name="line.108"></a>
+<span class="sourceLineNo">109</span>     * @param type the type to adapt to<a name="line.109"></a>
+<span class="sourceLineNo">110</span>     * @return this {@link org.apache.camel.CamelContext} adapted to the given type<a name="line.110"></a>
+<span class="sourceLineNo">111</span>     */<a name="line.111"></a>
+<span class="sourceLineNo">112</span>    &lt;T extends CamelContext&gt; T adapt(Class&lt;T&gt; type);<a name="line.112"></a>
+<span class="sourceLineNo">113</span><a name="line.113"></a>
+<span class="sourceLineNo">114</span>    /**<a name="line.114"></a>
+<span class="sourceLineNo">115</span>     * Starts the {@link CamelContext} (&lt;b&gt;important:&lt;/b&gt; the start method is not blocked, see more details<a name="line.115"></a>
+<span class="sourceLineNo">116</span>     *     &lt;a href="http://camel.apache.org/running-camel-standalone-and-have-it-keep-running.html"&gt;here&lt;/a&gt;)&lt;/li&gt;.<a name="line.116"></a>
+<span class="sourceLineNo">117</span>     * &lt;p/&gt;<a name="line.117"></a>
+<span class="sourceLineNo">118</span>     * See more details at the class-level javadoc of this class.<a name="line.118"></a>
+<span class="sourceLineNo">119</span>     *<a name="line.119"></a>
+<span class="sourceLineNo">120</span>     * @throws Exception is thrown if starting failed<a name="line.120"></a>
+<span class="sourceLineNo">121</span>     */<a name="line.121"></a>
+<span class="sourceLineNo">122</span>    void start() throws Exception;<a name="line.122"></a>
+<span class="sourceLineNo">123</span><a name="line.123"></a>
+<span class="sourceLineNo">124</span>    /**<a name="line.124"></a>
+<span class="sourceLineNo">125</span>     * Stop and shutdown the {@link CamelContext} (will stop all routes/components/endpoints etc and clear internal state/cache).<a name="line.125"></a>
+<span class="sourceLineNo">126</span>     * &lt;p/&gt;<a name="line.126"></a>
+<span class="sourceLineNo">127</span>     * See more details at the class-level javadoc of this class.<a name="line.127"></a>
+<span class="sourceLineNo">128</span>     *<a name="line.128"></a>
+<span class="sourceLineNo">129</span>     * @throws Exception is thrown if stopping failed<a name="line.129"></a>
+<span class="sourceLineNo">130</span>     */<a name="line.130"></a>
+<span class="sourceLineNo">131</span>    void stop() throws Exception;<a name="line.131"></a>
+<span class="sourceLineNo">132</span><a name="line.132"></a>
+<span class="sourceLineNo">133</span>    /**<a name="line.133"></a>
+<span class="sourceLineNo">134</span>     * Gets the name (id) of the this context.<a name="line.134"></a>
+<span class="sourceLineNo">135</span>     *<a name="line.135"></a>
+<span class="sourceLineNo">136</span>     * @return the name<a name="line.136"></a>
+<span class="sourceLineNo">137</span>     */<a name="line.137"></a>
+<span class="sourceLineNo">138</span>    String getName();<a name="line.138"></a>
+<span class="sourceLineNo">139</span><a name="line.139"></a>
+<span class="sourceLineNo">140</span>    /**<a name="line.140"></a>
+<span class="sourceLineNo">141</span>     * Gets the current name strategy<a name="line.141"></a>
+<span class="sourceLineNo">142</span>     *<a name="line.142"></a>
+<span class="sourceLineNo">143</span>     * @return name strategy<a name="line.143"></a>
+<span class="sourceLineNo">144</span>     */<a name="line.144"></a>
+<span class="sourceLineNo">145</span>    CamelContextNameStrategy getNameStrategy();<a name="line.145"></a>
+<span class="sourceLineNo">146</span><a name="line.146"></a>
+<span class="sourceLineNo">147</span>    /**<a name="line.147"></a>
+<span class="sourceLineNo">148</span>     * Sets a custom name strategy<a name="line.148"></a>
+<span class="sourceLineNo">149</span>     *<a name="line.149"></a>
+<span class="sourceLineNo">150</span>     * @param nameStrategy name strategy<a name="line.150"></a>
+<span class="sourceLineNo">151</span>     */<a name="line.151"></a>
+<span class="sourceLineNo">152</span>    void setNameStrategy(CamelContextNameStrategy nameStrategy);<a name="line.152"></a>
+<span class="sourceLineNo">153</span><a name="line.153"></a>
+<span class="sourceLineNo">154</span>    /**<a name="line.154"></a>
+<span class="sourceLineNo">155</span>     * Gets the current management name strategy<a name="line.155"></a>
+<span class="sourceLineNo">156</span>     *<a name="line.156"></a>
+<span class="sourceLineNo">157</span>     * @return management name strategy<a name="line.157"></a>
+<span class="sourceLineNo">158</span>     */<a name="line.158"></a>
+<span class="sourceLineNo">159</span>    ManagementNameStrategy getManagementNameStrategy();<a name="line.159"></a>
+<span class="sourceLineNo">160</span><a name="line.160"></a>
+<span class="sourceLineNo">161</span>    /**<a name="line.161"></a>
+<span class="sourceLineNo">162</span>     * Sets a custom management name strategy<a name="line.162"></a>
+<span class="sourceLineNo">163</span>     *<a name="line.163"></a>
+<span class="sourceLineNo">164</span>     * @param nameStrategy name strategy<a name="line.164"></a>
+<span class="sourceLineNo">165</span>     */<a name="line.165"></a>
+<span class="sourceLineNo">166</span>    void setManagementNameStrategy(ManagementNameStrategy nameStrategy);<a name="line.166"></a>
+<span class="sourceLineNo">167</span><a name="line.167"></a>
+<span class="sourceLineNo">168</span>    /**<a name="line.168"></a>
+<span class="sourceLineNo">169</span>     * Gets the name this {@link CamelContext} was registered in JMX.<a name="line.169"></a>
+<span class="sourceLineNo">170</span>     * &lt;p/&gt;<a name="line.170"></a>
+<span class="sourceLineNo">171</span>     * The reason that a {@link CamelContext} can have a different name in JMX is the fact to remedy for name clash<a name="line.171"></a>
+<span class="sourceLineNo">172</span>     * in JMX when having multiple {@link CamelContext}s in the same JVM. Camel will automatic reassign and use<a name="line.172"></a>
+<span class="sourceLineNo">173</span>     * a free name to avoid failing to start.<a name="line.173"></a>
+<span class="sourceLineNo">174</span>     *<a name="line.174"></a>
+<span class="sourceLineNo">175</span>     * @return the management name<a name="line.175"></a>
+<span class="sourceLineNo">176</span>     */<a name="line.176"></a>
+<span class="sourceLineNo">177</span>    String getManagementName();<a name="line.177"></a>
+<span class="sourceLineNo">178</span><a name="line.178"></a>
+<span class="sourceLineNo">179</span>    /**<a name="line.179"></a>
+<span class="sourceLineNo">180</span>     * Gets the version of the this context.<a name="line.180"></a>
+<span class="sourceLineNo">181</span>     *<a name="line.181"></a>
+<span class="sourceLineNo">182</span>     * @return the version<a name="line.182"></a>
+<span class="sourceLineNo">183</span>     */<a name="line.183"></a>
+<span class="sourceLineNo">184</span>    String getVersion();<a name="line.184"></a>
+<span class="sourceLineNo">185</span><a name="line.185"></a>
+<span class="sourceLineNo">186</span>    /**<a name="line.186"></a>
+<span class="sourceLineNo">187</span>     * Get the status of this context<a name="line.187"></a>
+<span class="sourceLineNo">188</span>     *<a name="line.188"></a>
+<span class="sourceLineNo">189</span>     * @return the status<a name="line.189"></a>
+<span class="sourceLineNo">190</span>     */<a name="line.190"></a>
+<span class="sourceLineNo">191</span>    ServiceStatus getStatus();<a name="line.191"></a>
+<span class="sourceLineNo">192</span><a name="line.192"></a>
+<span class="sourceLineNo">193</span>    /**<a name="line.193"></a>
+<span class="sourceLineNo">194</span>     * Gets the uptime in a human readable format<a name="line.194"></a>
+<span class="sourceLineNo">195</span>     *<a name="line.195"></a>
+<span class="sourceLineNo">196</span>     * @return the uptime in days/hours/minutes<a name="line.196"></a>
+<span class="sourceLineNo">197</span>     */<a name="line.197"></a>
+<span class="sourceLineNo">198</span>    String getUptime();<a name="line.198"></a>
+<span class="sourceLineNo">199</span><a name="line.199"></a>
+<span class="sourceLineNo">200</span>    /**<a name="line.200"></a>
+<span class="sourceLineNo">201</span>     * Gets the uptime in milli seconds<a name="line.201"></a>
+<span class="sourceLineNo">202</span>     *<a name="line.202"></a>
+<span class="sourceLineNo">203</span>     * @return the uptime in millis seconds<a name="line.203"></a>
+<span class="sourceLineNo">204</span>     */<a name="line.204"></a>
+<span class="sourceLineNo">205</span>    long getUptimeMillis();<a name="line.205"></a>
+<span class="sourceLineNo">206</span><a name="line.206"></a>
+<span class="sourceLineNo">207</span>    // Service Methods<a name="line.207"></a>
+<span class="sourceLineNo">208</span>    //-----------------------------------------------------------------------<a name="line.208"></a>
+<span class="sourceLineNo">209</span><a name="line.209"></a>
+<span class="sourceLineNo">210</span>    /**<a name="line.210"></a>
+<span class="sourceLineNo">211</span>     * Adds a service to this context, which allows this context to control the lifecycle, ensuring<a name="line.211"></a>
+<span class="sourceLineNo">212</span>     * the service is stopped when the context stops.<a name="line.212"></a>
+<span class="sourceLineNo">213</span>     * &lt;p/&gt;<a name="line.213"></a>
+<span class="sourceLineNo">214</span>     * The service will also have {@link CamelContext} injected if its {@link CamelContextAware}.<a name="line.214"></a>
+<span class="sourceLineNo">215</span>     * The service will also be enlisted in JMX for management (if JMX is enabled).<a name="line.215"></a>
+<span class="sourceLineNo">216</span>     * The service will be started, if its not already started.<a name="line.216"></a>
+<span class="sourceLineNo">217</span>     *<a name="line.217"></a>
+<span class="sourceLineNo">218</span>     * @param object the service<a name="line.218"></a>
+<span class="sourceLineNo">219</span>     * @throws Exception can be thrown when starting the service<a name="line.219"></a>
+<span class="sourceLineNo">220</span>     */<a name="line.220"></a>
+<span class="sourceLineNo">221</span>    void addService(Object object) throws Exception;<a name="line.221"></a>
+<span class="sourceLineNo">222</span><a name="line.222"></a>
+<span class="sourceLineNo">223</span>    /**<a name="line.223"></a>
+<span class="sourceLineNo">224</span>     * Adds a service to this context.<a name="line.224"></a>
+<span class="sourceLineNo">225</span>     * &lt;p/&gt;<a name="line.225"></a>
+<span class="sourceLineNo">226</span>     * The service will also have {@link CamelContext} injected if its {@link CamelContextAware}.<a name="line.226"></a>
+<span class="sourceLineNo">227</span>     * The service will also be enlisted in JMX for management (if JMX is enabled).<a name="line.227"></a>
+<span class="sourceLineNo">228</span>     * The service will be started, if its not already started.<a name="line.228"></a>
+<span class="sourceLineNo">229</span>     * &lt;p/&gt;<a name="line.229"></a>
+<span class="sourceLineNo">230</span>     * If the option &lt;tt&gt;closeOnShutdown&lt;/tt&gt; is &lt;tt&gt;true&lt;/tt&gt; then this context will control the lifecycle, ensuring<a name="line.230"></a>
+<span class="sourceLineNo">231</span>     * the service is stopped when the context stops.<a name="line.231"></a>
+<span class="sourceLineNo">232</span>     * If the option &lt;tt&gt;closeOnShutdown&lt;/tt&gt; is &lt;tt&gt;false&lt;/tt&gt; then this context will not stop the service when the context stops.<a name="line.232"></a>
+<span class="sourceLineNo">233</span>     *<a name="line.233"></a>
+<span class="sourceLineNo">234</span>     * @param object the service<a name="line.234"></a>
+<span class="sourceLineNo">235</span>     * @param stopOnShutdown whether to stop the service when this CamelContext shutdown.<a name="line.235"></a>
+<span class="sourceLineNo">236</span>     * @throws Exception can be thrown when starting the service<a name="line.236"></a>
+<span class="sourceLineNo">237</span>     */<a name="line.237"></a>
+<span class="sourceLineNo">238</span>    void addService(Object object, boolean stopOnShutdown) throws Exception;<a name="line.238"></a>
+<span class="sourceLineNo">239</span><a name="line.239"></a>
+<span class="sourceLineNo">240</span>    /**<a name="line.240"></a>
+<span class="sourceLineNo">241</span>     * Removes a service from this context.<a name="line.241"></a>
+<span class="sourceLineNo">242</span>     * &lt;p/&gt;<a name="line.242"></a>
+<span class="sourceLineNo">243</span>     * The service is assumed to have been previously added using {@link #addService(Object)} method.<a name="line.243"></a>
+<span class="sourceLineNo">244</span>     * This method will &lt;b&gt;not&lt;/b&gt; change the service lifecycle.<a name="line.244"></a>
+<span class="sourceLineNo">245</span>     *<a name="line.245"></a>
+<span class="sourceLineNo">246</span>     * @param object the service<a name="line.246"></a>
+<span class="sourceLineNo">247</span>     * @throws Exception can be thrown if error removing the service<a name="line.247"></a>
+<span class="sourceLineNo">248</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if the service was removed, &lt;tt&gt;false&lt;/tt&gt; if no service existed<a name="line.248"></a>
+<span class="sourceLineNo">249</span>     */<a name="line.249"></a>
+<span class="sourceLineNo">250</span>    boolean removeService(Object object) throws Exception;<a name="line.250"></a>
+<span class="sourceLineNo">251</span><a name="line.251"></a>
+<span class="sourceLineNo">252</span>    /**<a name="line.252"></a>
+<span class="sourceLineNo">253</span>     * Has the given service already been added to this context?<a name="line.253"></a>
+<span class="sourceLineNo">254</span>     *<a name="line.254"></a>
+<span class="sourceLineNo">255</span>     * @param object the service<a name="line.255"></a>
+<span class="sourceLineNo">256</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if already added, &lt;tt&gt;false&lt;/tt&gt; if not.<a name="line.256"></a>
+<span class="sourceLineNo">257</span>     */<a name="line.257"></a>
+<span class="sourceLineNo">258</span>    boolean hasService(Object object);<a name="line.258"></a>
+<span class="sourceLineNo">259</span><a name="line.259"></a>
+<span class="sourceLineNo">260</span>    /**<a name="line.260"></a>
+<span class="sourceLineNo">261</span>     * Has the given service type already been added to this context?<a name="line.261"></a>
+<span class="sourceLineNo">262</span>     *<a name="line.262"></a>
+<span class="sourceLineNo">263</span>     * @param type the class type<a name="line.263"></a>
+<span class="sourceLineNo">264</span>     * @return the service instance or &lt;tt&gt;null&lt;/tt&gt; if not already added.<a name="line.264"></a>
+<span class="sourceLineNo">265</span>     */<a name="line.265"></a>
+<span class="sourceLineNo">266</span>    &lt;T&gt; T hasService(Class&lt;T&gt; type);<a name="line.266"></a>
+<span class="sourceLineNo">267</span><a name="line.267"></a>
+<span class="sourceLineNo">268</span>    /**<a name="line.268"></a>
+<span class="sourceLineNo">269</span>     * Defers starting the service until {@link CamelContext} is started and has initialized all its prior services and routes.<a name="line.269"></a>
+<span class="sourceLineNo">270</span>     * &lt;p/&gt;<a name="line.270"></a>
+<span class="sourceLineNo">271</span>     * If {@link CamelContext} is already started then the service is started immediately.<a name="line.271"></a>
+<span class="sourceLineNo">272</span>     *<a name="line.272"></a>
+<span class="sourceLineNo">273</span>     * @param object the service<a name="line.273"></a>
+<span class="sourceLineNo">274</span>     * @param stopOnShutdown whether to stop the service when this CamelContext shutdown. Setting this to &lt;tt&gt;true&lt;/tt&gt; will keep a reference to the service in<a name="line.274"></a>
+<span class="sourceLineNo">275</span>     *                       this {@link CamelContext} until the context is stopped. So do not use it for short lived services.<a name="line.275"></a>
+<span class="sourceLineNo">276</span>     * @throws Exception can be thrown when starting the service, which is only attempted if {@link CamelContext} has already been started when calling this method.<a name="line.276"></a>
+<span class="sourceLineNo">277</span>     */<a name="line.277"></a>
+<span class="sourceLineNo">278</span>    void deferStartService(Object object, boolean stopOnShutdown) throws Exception;<a name="line.278"></a>
+<span class="sourceLineNo">279</span><a name="line.279"></a>
+<span class="sourceLineNo">280</span>    /**<a name="line.280"></a>
+<span class="sourceLineNo">281</span>     * Adds the given listener to be invoked when {@link CamelContext} have just been started.<a name="line.281"></a>
+<span class="sourceLineNo">282</span>     * &lt;p/&gt;<a name="line.282"></a>
+<span class="sourceLineNo">283</span>     * This allows listeners to do any custom work after the routes and other services have been started and are running.<a name="line.283"></a>
+<span class="sourceLineNo">284</span>     * &lt;p/&gt;&lt;b&gt;Important:&lt;/b&gt; The listener will always be invoked, also if the {@link CamelContext} has already been<a name="line.284"></a>
+<span class="sourceLineNo">285</span>     * started, see the {@link org.apache.camel.StartupListener#onCamelContextStarted(CamelContext, boolean)} method.<a name="line.285"></a>
+<span class="sourceLineNo">286</span>     *<a name="line.286"></a>
+<span class="sourceLineNo">287</span>     * @param listener the listener<a name="line.287"></a>
+<span class="sourceLineNo">288</span>     * @throws Exception can be thrown if {@link CamelContext} is already started and the listener is invoked<a name="line.288"></a>
+<span class="sourceLineNo">289</span>     *                   and cause an exception to be thrown<a name="line.289"></a>
+<span class="sourceLineNo">290</span>     */<a name="line.290"></a>
+<span class="sourceLineNo">291</span>    void addStartupListener(StartupListener listener) throws Exception;<a name="line.291"></a>
+<span class="sourceLineNo">292</span><a name="line.292"></a>
+<span class="sourceLineNo">293</span>    // Component Management Methods<a name="line.293"></a>
+<span class="sourceLineNo">294</span>    //-----------------------------------------------------------------------<a name="line.294"></a>
+<span class="sourceLineNo">295</span><a name="line.295"></a>
+<span class="sourceLineNo">296</span>    /**<a name="line.296"></a>
+<span class="sourceLineNo">297</span>     * Adds a component to the context.<a name="line.297"></a>
+<span class="sourceLineNo">298</span>     *<a name="line.298"></a>
+<span class="sourceLineNo">299</span>     * @param componentName the name the component is registered as<a name="line.299"></a>
+<span class="sourceLineNo">300</span>     * @param component     the component<a name="line.300"></a>
+<span class="sourceLineNo">301</span>     */<a name="line.301"></a>
+<span class="sourceLineNo">302</span>    void addComponent(String componentName, Component component);<a name="line.302"></a>
+<span class="sourceLineNo">303</span><a name="line.303"></a>
+<span class="sourceLineNo">304</span>    /**<a name="line.304"></a>
+<span class="sourceLineNo">305</span>     * Is the given component already registered?<a name="line.305"></a>
+<span class="sourceLineNo">306</span>     *<a name="line.306"></a>
+<span class="sourceLineNo">307</span>     * @param componentName the name of the component<a name="line.307"></a>
+<span class="sourceLineNo">308</span>     * @return the registered Component or &lt;tt&gt;null&lt;/tt&gt; if not registered<a name="line.308"></a>
+<span class="sourceLineNo">309</span>     */<a name="line.309"></a>
+<span class="sourceLineNo">310</span>    Component hasComponent(String componentName);<a name="line.310"></a>
+<span class="sourceLineNo">311</span><a name="line.311"></a>
+<span class="sourceLineNo">312</span>    /**<a name="line.312"></a>
+<span class="sourceLineNo">313</span>     * Gets a component from the context by name.<a name="line.313"></a>
+<span class="sourceLineNo">314</span>     *<a name="line.314"></a>
+<span class="sourceLineNo">315</span>     * @param componentName the name of the component<a name="line.315"></a>
+<span class="sourceLineNo">316</span>     * @return the component<a name="line.316"></a>
+<span class="sourceLineNo">317</span>     */<a name="line.317"></a>
+<span class="sourceLineNo">318</span>    Component getComponent(String componentName);<a name="line.318"></a>
+<span class="sourceLineNo">319</span><a name="line.319"></a>
+<span class="sourceLineNo">320</span>    /**<a name="line.320"></a>
+<span class="sourceLineNo">321</span>     * Gets a component from the context by name.<a name="line.321"></a>
+<span class="sourceLineNo">322</span>     *<a name="line.322"></a>
+<span class="sourceLineNo">323</span>     * @param name                 the name of the component<a name="line.323"></a>
+<span class="sourceLineNo">324</span>     * @param autoCreateComponents whether or not the component should<a name="line.324"></a>
+<span class="sourceLineNo">325</span>     *                             be lazily created if it does not already exist<a name="line.325"></a>
+<span class="sourceLineNo">326</span>     * @return the component<a name="line.326"></a>
+<span class="sourceLineNo">327</span>     */<a name="line.327"></a>
+<span class="sourceLineNo">328</span>    Component getComponent(String name, boolean autoCreateComponents);<a name="line.328"></a>
+<span class="sourceLineNo">329</span><a name="line.329"></a>
+<span class="sourceLineNo">330</span>    /**<a name="line.330"></a>
+<span class="sourceLineNo">331</span>     * Gets a component from the context by name and specifying the expected type of component.<a name="line.331"></a>
+<span class="sourceLineNo">332</span>     *<a name="line.332"></a>
+<span class="sourceLineNo">333</span>     * @param name          the name to lookup<a name="line.333"></a>
+<span class="sourceLineNo">334</span>     * @param componentType the expected type<a name="line.334"></a>
+<span class="sourceLineNo">335</span>     * @return the component<a name="line.335"></a>
+<span class="sourceLineNo">336</span>     */<a name="line.336"></a>
+<span class="sourceLineNo">337</span>    &lt;T extends Component&gt; T getComponent(String name, Class&lt;T&gt; componentType);<a name="line.337"></a>
+<span class="sourceLineNo">338</span><a name="line.338"></a>
+<span class="sourceLineNo">339</span>    /**<a name="line.339"></a>
+<span class="sourceLineNo">340</span>     * Gets a readonly list of names of the components currently registered<a name="line.340"></a>
+<span class="sourceLineNo">341</span>     *<a name="line.341"></a>
+<span class="sourceLineNo">342</span>     * @return a readonly list with the names of the the components<a name="line.342"></a>
+<span class="sourceLineNo">343</span>     */<a name="line.343"></a>
+<span class="sourceLineNo">344</span>    List&lt;String&gt; getComponentNames();<a name="line.344"></a>
+<span class="sourceLineNo">345</span><a name="line.345"></a>
+<span class="sourceLineNo">346</span>    /**<a name="line.346"></a>
+<span class="sourceLineNo">347</span>     * Removes a previously added component.<a name="line.347"></a>
+<span class="sourceLineNo">348</span>     * &lt;p/&gt;<a name="line.348"></a>
+<span class="sourceLineNo">349</span>     * The component being removed will be stopped first.<a name="line.349"></a>
+<span class="sourceLineNo">350</span>     *<a name="line.350"></a>
+<span class="sourceLineNo">351</span>     * @param componentName the component name to remove<a name="line.351"></a>
+<span class="sourceLineNo">352</span>     * @return the previously added component or null if it had not been previously added.<a name="line.352"></a>
+<span class="sourceLineNo">353</span>     */<a name="line.353"></a>
+<span class="sourceLineNo">354</span>    Component removeComponent(String componentName);<a name="line.354"></a>
+<span class="sourceLineNo">355</span><a name="line.355"></a>
+<span class="sourceLineNo">356</span>    // Endpoint Management Methods<a name="line.356"></a>
+<span class="sourceLineNo">357</span>    //-----------------------------------------------------------------------<a name="line.357"></a>
+<span class="sourceLineNo">358</span><a name="line.358"></a>
+<span class="sourceLineNo">359</span>    /**<a name="line.359"></a>
+<span class="sourceLineNo">360</span>     * Gets the {@link org.apache.camel.spi.EndpointRegistry}<a name="line.360"></a>
+<span class="sourceLineNo">361</span>     */<a name="line.361"></a>
+<span class="sourceLineNo">362</span>    EndpointRegistry&lt;String&gt; getEndpointRegistry();<a name="line.362"></a>
+<span class="sourceLineNo">363</span><a name="line.363"></a>
+<span class="sourceLineNo">364</span>    /**<a name="line.364"></a>
+<span class="sourceLineNo">365</span>     * Resolves the given name to an {@link Endpoint} of the specified type.<a name="line.365"></a>
+<span class="sourceLineNo">366</span>     * If the name has a singleton endpoint registered, then the singleton is returned.<a name="line.366"></a>
+<span class="sourceLineNo">367</span>     * Otherwise, a new {@link Endpoint} is created and registered in the {@link org.apache.camel.spi.EndpointRegistry}.<a name="line.367"></a>
+<span class="sourceLineNo">368</span>     *<a name="line.368"></a>
+<span class="sourceLineNo">369</span>     * @param uri the URI of the endpoint<a name="line.369"></a>
+<span class="sourceLineNo">370</span>     * @return the endpoint<a name="line.370"></a>
+<span class="sourceLineNo">371</span>     */<a name="line.371"></a>
+<span class="sourceLineNo">372</span>    Endpoint getEndpoint(String uri);<a name="line.372"></a>
+<span class="sourceLineNo">373</span><a name="line.373"></a>
+<span class="sourceLineNo">374</span>    /**<a name="line.374"></a>
+<span class="sourceLineNo">375</span>     * Resolves the given name to an {@link Endpoint} of the specified type.<a name="line.375"></a>
+<span class="sourceLineNo">376</span>     * If the name has a singleton endpoint registered, then the singleton is returned.<a name="line.376"></a>
+<span class="sourceLineNo">377</span>     * Otherwise, a new {@link Endpoint} is created and registered in the {@link org.apache.camel.spi.EndpointRegistry}.<a name="line.377"></a>
+<span class="sourceLineNo">378</span>     *<a name="line.378"></a>
+<span class="sourceLineNo">379</span>     * @param name         the name of the endpoint<a name="line.379"></a>
+<span class="sourceLineNo">380</span>     * @param endpointType the expected type<a name="line.380"></a>
+<span class="sourceLineNo">381</span>     * @return the endpoint<a name="line.381"></a>
+<span class="sourceLineNo">382</span>     */<a name="line.382"></a>
+<span class="sourceLineNo">383</span>    &lt;T extends Endpoint&gt; T getEndpoint(String name, Class&lt;T&gt; endpointType);<a name="line.383"></a>
+<span class="sourceLineNo">384</span><a name="line.384"></a>
+<span class="sourceLineNo">385</span>    /**<a name="line.385"></a>
+<span class="sourceLineNo">386</span>     * Returns a new {@link Collection} of all of the endpoints from the {@link org.apache.camel.spi.EndpointRegistry}<a name="line.386"></a>
+<span class="sourceLineNo">387</span>     *<a name="line.387"></a>
+<span class="sourceLineNo">388</span>     * @return all endpoints<a name="line.388"></a>
+<span class="sourceLineNo">389</span>     */<a name="line.389"></a>
+<span class="sourceLineNo">390</span>    Collection&lt;Endpoint&gt; getEndpoints();<a name="line.390"></a>
+<span class="sourceLineNo">391</span><a name="line.391"></a>
+<span class="sourceLineNo">392</span>    /**<a name="line.392"></a>
+<span class="sourceLineNo">393</span>     * Returns a new {@link Map} containing all of the endpoints from the {@link org.apache.camel.spi.EndpointRegistry}<a name="line.393"></a>
+<span class="sourceLineNo">394</span>     *<a name="line.394"></a>
+<span class="sourceLineNo">395</span>     * @return map of endpoints<a name="line.395"></a>
+<span class="sourceLineNo">396</span>     */<a name="line.396"></a>
+<span class="sourceLineNo">397</span>    Map&lt;String, Endpoint&gt; getEndpointMap();<a name="line.397"></a>
+<span class="sourceLineNo">398</span><a name="line.398"></a>
+<span class="sourceLineNo">399</span>    /**<a name="line.399"></a>
+<span class="sourceLineNo">400</span>     * Is the given endpoint already registered in the {@link org.apache.camel.spi.EndpointRegistry}<a name="line.400"></a>
+<span class="sourceLineNo">401</span>     *<a name="line.401"></a>
+<span class="sourceLineNo">402</span>     * @param uri the URI of the endpoint<a name="line.402"></a>
+<span class="sourceLineNo">403</span>     * @return the registered endpoint or &lt;tt&gt;null&lt;/tt&gt; if not registered<a name="line.403"></a>
+<span class="sourceLineNo">404</span>     */<a name="line.404"></a>
+<span class="sourceLineNo">405</span>    Endpoint hasEndpoint(String uri);<a name="line.405"></a>
+<span class="sourceLineNo">406</span><a name="line.406"></a>
+<span class="sourceLineNo">407</span>    /**<a name="line.407"></a>
+<span class="sourceLineNo">408</span>     * Adds the endpoint to the {@link org.apache.camel.spi.EndpointRegistry} using the given URI.<a name="line.408"></a>
+<span class="sourceLineNo">409</span>     *<a name="line.409"></a>
+<span class="sourceLineNo">410</span>     * @param uri      the URI to be used to resolve this endpoint<a name="line.410"></a>
+<span class="sourceLineNo">411</span>     * @param endpoint the endpoint to be added to the registry<a name="line.411"></a>
+<span class="sourceLineNo">412</span>     * @return the old endpoint that was previously registered or &lt;tt&gt;null&lt;/tt&gt; if none was registered<a name="line.412"></a>
+<span class="sourceLineNo">413</span>     * @throws Exception if the new endpoint could not be started or the old endpoint could not be stopped<a name="line.413"></a>
+<span class="sourceLineNo">414</span>     */<a name="line.414"></a>
+<span class="sourceLineNo">415</span>    Endpoint addEndpoint(String uri, Endpoint endpoint) throws Exception;<a name="line.415"></a>
+<span class="sourceLineNo">416</span><a name="line.416"></a>
+<span class="sourceLineNo">417</span>    /**<a name="line.417"></a>
+<span class="sourceLineNo">418</span>     * Removes the endpoint from the {@link org.apache.camel.spi.EndpointRegistry}.<a name="line.418"></a>
+<span class="sourceLineNo">419</span>     * &lt;p/&gt;<a name="line.419"></a>
+<span class="sourceLineNo">420</span>     * The endpoint being removed will be stopped first.<a name="line.420"></a>
+<span class="sourceLineNo">421</span>     *<a name="line.421"></a>
+<span class="sourceLineNo">422</span>     * @param endpoint  the endpoint<a name="line.422"></a>
+<span class="sourceLineNo">423</span>     * @throws Exception if the endpoint could not be stopped<a name="line.423"></a>
+<span class="sourceLineNo">424</span>     */<a name="line.424"></a>
+<span class="sourceLineNo">425</span>    void removeEndpoint(Endpoint endpoint) throws Exception;<a name="line.425"></a>
+<span class="sourceLineNo">426</span><a name="line.426"></a>
+<span class="sourceLineNo">427</span>    /**<a name="line.427"></a>
+<span class="sourceLineNo">428</span>     * Removes all endpoints with the given URI from the {@link org.apache.camel.spi.EndpointRegistry}.<a name="line.428"></a>
+<span class="sourceLineNo">429</span>     * &lt;p/&gt;<a name="line.429"></a>
+<span class="sourceLineNo">430</span>     * The endpoints being removed will be stopped first.<a name="line.430"></a>
+<span class="sourceLineNo">431</span>     *<a name="line.431"></a>
+<span class="sourceLineNo">432</span>     * @param pattern an uri or pattern to match<a name="line.432"></a>
+<span class="sourceLineNo">433</span>     * @return a collection of endpoints removed which could be empty if there are no endpoints found for the given &lt;tt&gt;pattern&lt;/tt&gt;<a name="line.433"></a>
+<span class="sourceLineNo">434</span>     * @throws Exception if at least one endpoint could not be stopped<a name="line.434"></a>
+<span class="sourceLineNo">435</span>     * @see org.apache.camel.util.EndpointHelper#matchEndpoint(CamelContext, String, String) for pattern<a name="line.435"></a>
+<span class="sourceLineNo">436</span>     */<a name="line.436"></a>
+<span class="sourceLineNo">437</span>    Collection&lt;Endpoint&gt; removeEndpoints(String pattern) throws Exception;<a name="line.437"></a>
+<span class="sourceLineNo">438</span><a name="line.438"></a>
+<span class="sourceLineNo">439</span>    /**<a name="line.439"></a>
+<span class="sourceLineNo">440</span>     * Registers a {@link org.apache.camel.spi.EndpointStrategy callback} to allow you to do custom<a name="line.440"></a>
+<span class="sourceLineNo">441</span>     * logic when an {@link Endpoint} is about to be registered to the {@link org.apache.camel.spi.EndpointRegistry}.<a name="line.441"></a>
+<span class="sourceLineNo">442</span>     * &lt;p/&gt;<a name="line.442"></a>
+<span class="sourceLineNo">443</span>     * When a callback is added it will be executed on the already registered endpoints allowing you to catch-up<a name="line.443"></a>
+<span class="sourceLineNo">444</span>     *<a name="line.444"></a>
+<span class="sourceLineNo">445</span>     * @param strategy callback to be invoked<a name="line.445"></a>
+<span class="sourceLineNo">446</span>     */<a name="line.446"></a>
+<span class="sourceLineNo">447</span>    void addRegisterEndpointCallback(EndpointStrategy strategy);<a name="line.447"></a>
+<span class="sourceLineNo">448</span><a name="line.448"></a>
+<span class="sourceLineNo">449</span>    // Route Management Methods<a name="line.449"></a>
+<span class="sourceLineNo">450</span>    //-----------------------------------------------------------------------<a name="line.450"></a>
+<span class="sourceLineNo">451</span><a name="line.451"></a>
+<span class="sourceLineNo">452</span>    /**<a name="line.452"></a>
+<span class="sourceLineNo">453</span>     * Method to signal to {@link CamelContext} that the process to initialize setup routes is in progress.<a name="line.453"></a>
+<span class="sourceLineNo">454</span>     *<a name="line.454"></a>
+<span class="sourceLineNo">455</span>     * @param done &lt;tt&gt;false&lt;/tt&gt; to start the process, call again with &lt;tt&gt;true&lt;/tt&gt; to signal its done.<a name="line.455"></a>
+<span class="sourceLineNo">456</span>     * @see #isSetupRoutes()<a name="line.456"></a>
+<span class="sourceLineNo">457</span>     */<a name="line.457"></a>
+<span class="sourceLineNo">458</span>    void setupRoutes(boolean done);<a name="line.458"></a>
+<span class="sourceLineNo">459</span><a name="line.459"></a>
+<span class="sourceLineNo">460</span>    /**<a name="line.460"></a>
+<span class="sourceLineNo">461</span>     * Returns a list of the current route definitions<a name="line.461"></a>
+<span class="sourceLineNo">462</span>     *<a name="line.462"></a>
+<span class="sourceLineNo">463</span>     * @return list of the current route definitions<a name="line.463"></a>
+<span class="sourceLineNo">464</span>     */<a name="line.464"></a>
+<span class="sourceLineNo">465</span>    List&lt;RouteDefinition&gt; getRouteDefinitions();<a name="line.465"></a>
+<span class="sourceLineNo">466</span><a name="line.466"></a>
+<span class="sourceLineNo">467</span>    /**<a name="line.467"></a>
+<span class="sourceLineNo">468</span>     * Gets the route definition with the given id<a name="line.468"></a>
+<span class="sourceLineNo">469</span>     *<a name="line.469"></a>
+<span class="sourceLineNo">470</span>     * @param id id of the route<a name="line.470"></a>
+<span class="sourceLineNo">471</span>     * @return the route definition or &lt;tt&gt;null&lt;/tt&gt; if not found<a name="line.471"></a>
+<span class="sourceLineNo">472</span>     */<a name="line.472"></a>
+<span class="sourceLineNo">473</span>    RouteDefinition getRouteDefinition(String id);<a name="line.473"></a>
+<span class="sourceLineNo">474</span><a name="line.474"></a>
+<span class="sourceLineNo">475</span>    /**<a name="line.475"></a>
+<span class="sourceLineNo">476</span>     * Returns a list of the current REST definitions<a name="line.476"></a>
+<span class="sourceLineNo">477</span>     *<a name="line.477"></a>
+<span class="sourceLineNo">478</span>     * @return list of the current REST definitions<a name="line.478"></a>
+<span class="sourceLineNo">479</span>     */<a name="line.479"></a>
+<span class="sourceLineNo">480</span>    List&lt;RestDefinition&gt; getRestDefinitions();<a name="line.480"></a>
+<span class="sourceLineNo">481</span><a name="line.481"></a>
+<span class="sourceLineNo">482</span>    /**<a name="line.482"></a>
+<span class="sourceLineNo">483</span>     * Adds a collection of rest definitions to the context<a name="line.483"></a>
+<span class="sourceLineNo">484</span>     *<a name="line.484"></a>
+<span class="sourceLineNo">485</span>     * @param restDefinitions the rest(s) definition to add<a name="line.485"></a>
+<span class="sourceLineNo">486</span>     */<a name="line.486"></a>
+<span class="sourceLineNo">487</span>    void addRestDefinitions(Collection&lt;RestDefinition&gt; restDefinitions) throws Exception;<a name="line.487"></a>
+<span class="sourceLineNo">488</span><a name="line.488"></a>
+<span class="sourceLineNo">489</span>    /**<a name="line.489"></a>
+<span class="sourceLineNo">490</span>     * Sets a custom {@link org.apache.camel.spi.RestConfiguration}<a name="line.490"></a>
+<span class="sourceLineNo">491</span>     *<a name="line.491"></a>
+<span class="sourceLineNo">492</span>     * @param restConfiguration the REST configuration<a name="line.492"></a>
+<span class="sourceLineNo">493</span>     */<a name="line.493"></a>
+<span class="sourceLineNo">494</span>    void setRestConfiguration(RestConfiguration restConfiguration);<a name="line.494"></a>
+<span class="sourceLineNo">495</span><a name="line.495"></a>
+<span class="sourceLineNo">496</span>    /**<a name="line.496"></a>
+<span class="sourceLineNo">497</span>     * Gets the default REST configuration<a name="line.497"></a>
+<span class="sourceLineNo">498</span>     *<a name="line.498"></a>
+<span class="sourceLineNo">499</span>     * @return the configuration, or &lt;tt&gt;null&lt;/tt&gt; if none has been configured.<a name="line.499"></a>
+<span class="sourceLineNo">500</span>     */<a name="line.500"></a>
+<span class="sourceLineNo">501</span>    RestConfiguration getRestConfiguration();<a name="line.501"></a>
+<span class="sourceLineNo">502</span>    <a name="line.502"></a>
+<span class="sourceLineNo">503</span>    /**<a name="line.503"></a>
+<span class="sourceLineNo">504</span>     * Sets a custom {@link org.apache.camel.spi.RestConfiguration}<a name="line.504"></a>
+<span class="sourceLineNo">505</span>     *<a name="line.505"></a>
+<span class="sourceLineNo">506</span>     * @param restConfiguration the REST configuration<a name="line.506"></a>
+<span class="sourceLineNo">507</span>     */<a name="line.507"></a>
+<span class="sourceLineNo">508</span>    void addRestConfiguration(RestConfiguration restConfiguration);<a name="line.508"></a>
+<span class="sourceLineNo">509</span><a name="line.509"></a>
+<span class="sourceLineNo">510</span>    /**<a name="line.510"></a>
+<span class="sourceLineNo">511</span>     * Gets the REST configuration for the given component<a name="line.511"></a>
+<span class="sourceLineNo">512</span>     *<a name="line.512"></a>
+<span class="sourceLineNo">513</span>     * @param component the component name to get the configuration<a name="line.513"></a>
+<span class="sourceLineNo">514</span>     * @param defaultIfNotFound determine if the default configuration is returned if there isn't a <a name="line.514"></a>
+<span class="sourceLineNo">515</span>     *        specific configuration for the given component  <a name="line.515"></a>
+<span class="sourceLineNo">516</span>     * @return the configuration, or &lt;tt&gt;null&lt;/tt&gt; if none has been configured.<a name="line.516"></a>
+<span class="sourceLineNo">517</span>     */<a name="line.517"></a>
+<span class="sourceLineNo">518</span>    RestConfiguration getRestConfiguration(String component, boolean defaultIfNotFound);<a name="line.518"></a>
+<span class="sourceLineNo">519</span>    <a name="line.519"></a>
+<span class="sourceLineNo">520</span>    /**<a name="line.520"></a>
+<span class="sourceLineNo">521</span>     * Gets all the RestConfiguration's<a name="line.521"></a>
+<span class="sourceLineNo">522</span>     */<a name="line.522"></a>
+<span class="sourceLineNo">523</span>    Collection&lt;RestConfiguration&gt; getRestConfigurations();<a name="line.523"></a>
+<span class="sourceLineNo">524</span><a name="line.524"></a>
+<span class="sourceLineNo">525</span>    /**<a name="line.525"></a>
+<span class="sourceLineNo">526</span>     * Returns the order in which the route inputs was started.<a name="line.526"></a>
+<span class="sourceLineNo">527</span>     * &lt;p/&gt;<a name="line.527"></a>
+<span class="sourceLineNo">528</span>     * The order may not be according to the startupOrder defined on the route.<a name="line.528"></a>
+<span class="sourceLineNo">529</span>     * For example a route could be started manually later, or new routes added at runtime.<a name="line.529"></a>
+<span class="sourceLineNo">530</span>     *<a name="line.530"></a>
+<span class="sourceLineNo">531</span>     * @return a list in the order how routes was started<a name="line.531"></a>
+<span class="sourceLineNo">532</span>     */<a name="line.532"></a>
+<span class="sourceLineNo">533</span>    List&lt;RouteStartupOrder&gt; getRouteStartupOrder();<a name="line.533"></a>
+<span class="sourceLineNo">534</span><a name="line.534"></a>
+<span class="sourceLineNo">535</span>    /**<a name="line.535"></a>
+<span class="sourceLineNo">536</span>     * Returns the current routes in this context<a name="line.536"></a>
+<span class="sourceLineNo">537</span>     *<a name="line.537"></a>
+<span class="sourceLineNo">538</span>     * @return the current routes<a name="line.538"></a>
+<span class="sourceLineNo">539</span>     */<a name="line.539"></a>
+<span class="sourceLineNo">540</span>    List&lt;Route&gt; getRoutes();<a name="line.540"></a>
+<span class="sourceLineNo">541</span><a name="line.541"></a>
+<span class="sourceLineNo">542</span>    /**<a name="line.542"></a>
+<span class="sourceLineNo">543</span>     * Gets the route with the given id<a name="line.543"></a>
+<span class="sourceLineNo">544</span>     *<a name="line.544"></a>
+<span class="sourceLineNo">545</span>     * @param id id of the route<a name="line.545"></a>
+<span class="sourceLineNo">546</span>     * @return the route or &lt;tt&gt;null&lt;/tt&gt; if not found<a name="line.546"></a>
+<span class="sourceLineNo">547</span>     */<a name="line.547"></a>
+<span class="sourceLineNo">548</span>    Route getRoute(String id);<a name="line.548"></a>
+<span class="sourceLineNo">549</span><a name="line.549"></a>
+<span class="sourceLineNo">550</span>    /**<a name="line.550"></a>
+<span class="sourceLineNo">551</span>     * Gets the processor from any of the routes which with the given id<a name="line.551"></a>
+<span class="sourceLineNo">552</span>     *<a name="line.552"></a>
+<span class="sourceLineNo">553</span>     * @param id id of the processor<a name="line.553"></a>
+<span class="sourceLineNo">554</span>     * @return the processor or &lt;tt&gt;null&lt;/tt&gt; if not found<a name="line.554"></a>
+<span class="sourceLineNo">555</span>     */<a name="line.555"></a>
+<span class="sourceLineNo">556</span>    Processor getProcessor(String id);<a name="line.556"></a>
+<span class="sourceLineNo">557</span><a name="line.557"></a>
+<span class="sourceLineNo">558</span>    /**<a name="line.558"></a>
+<span class="sourceLineNo">559</span>     * Gets the processor from any of the routes which with the given id<a name="line.559"></a>
+<span class="sourceLineNo">560</span>     *<a name="line.560"></a>
+<span class="sourceLineNo">561</span>     * @param id id of the processor<a name="line.561"></a>
+<span class="sourceLineNo">562</span>     * @param type the processor type<a name="line.562"></a>
+<span class="sourceLineNo">563</span>     * @return the processor or &lt;tt&gt;null&lt;/tt&gt; if not found<a name="line.563"></a>
+<span class="sourceLineNo">564</span>     * @throws java.lang.ClassCastException is thrown if the type is not correct type<a name="line.564"></a>
+<span class="sourceLineNo">565</span>     */<a name="line.565"></a>
+<span class="sourceLineNo">566</span>    &lt;T extends Processor&gt; T getProcessor(String id, Class&lt;T&gt; type);<a name="line.566"></a>
+<span class="sourceLineNo">567</span><a name="line.567"></a>
+<span class="sourceLineNo">568</span>    /**<a name="line.568"></a>
+<span class="sourceLineNo">569</span>     * Gets the managed processor client api from any of the routes which with the given id<a name="line.569"></a>
+<span class="sourceLineNo">570</span>     *<a name="line.570"></a>
+<span class="sourceLineNo">571</span>     * @param id id of the processor<a name="line.571"></a>
+<span class="sourceLineNo">572</span>     * @param type the managed processor type from the {@link org.apache.camel.api.management.mbean} package.<a name="line.572"></a>
+<span class="sourceLineNo">573</span>     * @return the processor or &lt;tt&gt;null&lt;/tt&gt; if not found<a name="line.573"></a>
+<span class="sourceLineNo">574</span>     * @throws IllegalArgumentException if the type is not compliant<a name="line.574"></a>
+<span class="sourceLineNo">575</span>     */<a name="line.575"></a>
+<span class="sourceLineNo">576</span>    &lt;T extends ManagedProcessorMBean&gt; T getManagedProcessor(String id, Class&lt;T&gt; type);<a name="line.576"></a>
+<span class="sourceLineNo">577</span><a name="line.577"></a>
+<span class="sourceLineNo">578</span>    /**<a name="line.578"></a>
+<span class="sourceLineNo">579</span>     * Gets the managed route client api with the given route id<a name="line.579"></a>
+<span class="sourceLineNo">580</span>     *<a name="line.580"></a>
+<span class="sourceLineNo">581</span>     * @param routeId id of the route<a name="line.581"></a>
+<span class="sourceLineNo">582</span>     * @param type the managed route type from the {@link org.apache.camel.api.management.mbean} package.<a name="line.582"></a>
+<span class="sourceLineNo">583</span>     * @return the route or &lt;tt&gt;null&lt;/tt&gt; if not found<a name="line.583"></a>
+<span class="sourceLineNo">584</span>     * @throws IllegalArgumentException if the type is not compliant<a name="line.584"></a>
+<span class="sourceLineNo">585</span>     */<a name="line.585"></a>
+<span class="sourceLineNo">586</span>    &lt;T extends ManagedRouteMBean&gt; T getManagedRoute(String routeId, Class&lt;T&gt; type);<a name="line.586"></a>
+<span class="sourceLineNo">587</span><a name="line.587"></a>
+<span class="sourceLineNo">588</span>    /**<a name="line.588"></a>
+<span class="sourceLineNo">589</span>     * Gets the managed Camel context client api<a name="line.589"></a>
+<span class="sourceLineNo">590</span>     */<a name="line.590"></a>
+<span class="sourceLineNo">591</span>    ManagedCamelContextMBean getManagedCamelContext();<a name="line.591"></a>
+<span class="sourceLineNo">592</span><a name="line.592"></a>
+<span class="sourceLineNo">593</span>    /**<a name="line.593"></a>
+<span class="sourceLineNo">594</span>     * Gets the processor definition from any of the routes which with the given id<a name="line.594"></a>
+<span class="sourceLineNo">595</span>     *<a name="line.595"></a>
+<span class="sourceLineNo">596</span>     * @param id id of the processor definition<a name="line.596"></a>
+<span class="sourceLineNo">597</span>     * @return the processor definition or &lt;tt&gt;null&lt;/tt&gt; if not found<a name="line.597"></a>
+<span class="sourceLineNo">598</span>     */<a name="line.598"></a>
+<span class="sourceLineNo">599</span>    ProcessorDefinition getProcessorDefinition(String id);<a name="line.599"></a>
+<span class="sourceLineNo">600</span><a name="line.600"></a>
+<span class="sourceLineNo">601</span>    /**<a name="line.601"></a>
+<span class="sourceLineNo">602</span>     * Gets the processor definition from any of the routes which with the given id<a name="line.602"></a>
+<span class="sourceLineNo">603</span>     *<a name="line.603"></a>
+<span class="sourceLineNo">604</span>     * @param id id of the processor definition<a name="line.604"></a>
+<span class="sourceLineNo">605</span>     * @param type the processor definition type<a name="line.605"></a>
+<span class="sourceLineNo">606</span>     * @return the processor definition or &lt;tt&gt;null&lt;/tt&gt; if not found<a name="line.606"></a>
+<span class="sourceLineNo">607</span>     * @throws java.lang.ClassCastException is thrown if the type is not correct type<a name="line.607"></a>
+<span class="sourceLineNo">608</span>     */<a name="line.608"></a>
+<span class="sourceLineNo">609</span>    &lt;T extends ProcessorDefinition&gt; T getProcessorDefinition(String id, Class&lt;T&gt; type);<a name="line.609"></a>
+<span class="sourceLineNo">610</span><a name="line.610"></a>
+<span class="sourceLineNo">611</span>    /**<a name="line.611"></a>
+<span class="sourceLineNo">612</span>     * Adds a collection of routes to this context using the given builder<a name="line.612"></a>
+<span class="sourceLineNo">613</span>     * to build them.<a name="line.613"></a>
+<span class="sourceLineNo">614</span>     * &lt;p/&gt;<a name="line.614"></a>
+<span class="sourceLineNo">615</span>     * &lt;b&gt;Important:&lt;/b&gt; The added routes will &lt;b&gt;only&lt;/b&gt; be started, if {@link CamelContext}<a name="line.615"></a>
+<span class="sourceLineNo">616</span>     * is already started. You may want to check the state of {@link CamelContext} before<a name="line.616"></a>
+<span class="sourceLineNo">617</span>     * adding the routes, using the {@link org.apache.camel.CamelContext#getStatus()} method.<a name="line.617"></a>
+<span class="sourceLineNo">618</span>     * &lt;p/&gt;<a name="line.618"></a>
+<span class="sourceLineNo">619</span>     * &lt;b&gt;Important: &lt;/b&gt; Each route in the same {@link org.apache.camel.CamelContext} must have an &lt;b&gt;unique&lt;/b&gt; route id.<a name="line.619"></a>
+<span class="sourceLineNo">620</span>     * If you use the API from {@link org.apache.camel.CamelContext} or {@link org.apache.camel.model.ModelCamelContext} to add routes, then any<a name="line.620"></a>
+<span class="sourceLineNo">621</span>     * new routes which has a route id that matches an old route, then the old route is replaced by the new route.<a name="line.621"></a>
+<span class="sourceLineNo">622</span>     *<a name="line.622"></a>
+<span class="sourceLineNo">623</span>     * @param builder the builder which will create the routes and add them to this context<a name="line.623"></a>
+<span class="sourceLineNo">624</span>     * @throws Exception if the routes could not be created for whatever reason<a name="line.624"></a>
+<span class="sourceLineNo">625</span>     */<a name="line.625"></a>
+<span class="sourceLineNo">626</span>    void addRoutes(RoutesBuilder builder) throws Exception;<a name="line.626"></a>
+<span class="sourceLineNo">627</span><a name="line.627"></a>
+<span class="sourceLineNo">628</span>    /**<a name="line.628"></a>
+<span class="sourceLineNo">629</span>     * Loads a collection of route definitions from the given {@link java.io.InputStream}.<a name="line.629"></a>
+<span class="sourceLineNo">630</span>     *<a name="line.630"></a>
+<span class="sourceLineNo">631</span>     * @param is input stream with the route(s) definition to add<a name="line.631"></a>
+<span class="sourceLineNo">632</span>     * @throws Exception if the route definitions could not be loaded for whatever reason<a name="line.632"></a>
+<span class="sourceLineNo">633</span>     * @return the route definitions<a name="line.633"></a>
+<span class="sourceLineNo">634</span>     */<a name="line.634"></a>
+<span class="sourceLineNo">635</span>    RoutesDefinition loadRoutesDefinition(InputStream is) throws Exception;<a name="line.635"></a>
+<span class="sourceLineNo">636</span><a name="line.636"></a>
+<span class="sourceLineNo">637</span>    /**<a name="line.637"></a>
+<span class="sourceLineNo">638</span>     * Loads a collection of rest definitions from the given {@link java.io.InputStream}.<a name="line.638"></a>
+<span class="sourceLineNo">639</span>     *<a name="line.639"></a>
+<span class="sourceLineNo">640</span>     * @param is input stream with the rest(s) definition to add<a name="line.640"></a>
+<span class="sourceLineNo">641</span>     * @throws Exception if the rest definitions could not be loaded for whatever reason<a name="line.641"></a>
+<span class="sourceLineNo">642</span>     * @return the rest definitions<a name="line.642"></a>
+<span class="sourceLineNo">643</span>     */<a name="line.643"></a>
+<span class="sourceLineNo">644</span>    RestsDefinition loadRestsDefinition(InputStream is) throws Exception;<a name="line.644"></a>
+<span class="sourceLineNo">645</span>    <a name="line.645"></a>
+<span class="sourceLineNo">646</span>    /**<a name="line.646"></a>
+<span class="sourceLineNo">647</span>     * Adds a collection of route definitions to the context<a name="line.647"></a>
+<span class="sourceLineNo">648</span>     *<a name="line.648"></a>
+<span class="sourceLineNo">649</span>     * @param routeDefinitions the route(s) definition to add<a name="line.649"></a>
+<span class="sourceLineNo">650</span>     * @throws Exception if the route definitions could not be created for whatever reason<a name="line.650"></a>
+<span class="sourceLineNo">651</span>     */<a name="line.651"></a>
+<span class="sourceLineNo">652</span>    void addRouteDefinitions(Collection&lt;RouteDefinition&gt; routeDefinitions) throws Exception;<a name="line.652"></a>
+<span class="sourceLineNo">653</span><a name="line.653"></a>
+<span class="sourceLineNo">654</span>    /**<a name="line.654"></a>
+<span class="sourceLineNo">655</span>     * Add a route definition to the context<a name="line.655"></a>
+<span class="sourceLineNo">656</span>     *<a name="line.656"></a>
+<span class="sourceLineNo">657</span>     * @param routeDefinition the route definition to add<a name="line.657"></a>
+<span class="sourceLineNo">658</span>     * @throws Exception if the route definition could not be created for whatever reason<a name="line.658"></a>
+<span class="sourceLineNo">659</span>     */<a name="line.659"></a>
+<span class="sourceLineNo">660</span>    void addRouteDefinition(RouteDefinition routeDefinition) throws Exception;<a name="line.660"></a>
+<span class="sourceLineNo">661</span><a name="line.661"></a>
+<span class="sourceLineNo">662</span>    /**<a name="line.662"></a>
+<span class="sourceLineNo">663</span>     * Removes a collection of route definitions from the context - stopping any previously running<a name="line.663"></a>
+<span class="sourceLineNo">664</span>     * routes if any of them are actively running<a name="line.664"></a>
+<span class="sourceLineNo">665</span>     *<a name="line.665"></a>
+<span class="sourceLineNo">666</span>     * @param routeDefinitions route(s) definitions to remove<a name="line.666"></a>
+<span class="sourceLineNo">667</span>     * @throws Exception if the route definitions could not be removed for whatever reason<a name="line.667"></a>
+<span class="sourceLineNo">668</span>     */<a name="line.668"></a>
+<span class="sourceLineNo">669</span>    void removeRouteDefinitions(Collection&lt;RouteDefinition&gt; routeDefinitions) throws Exception;<a name="line.669"></a>
+<span class="sourceLineNo">670</span><a name="line.670"></a>
+<span class="sourceLineNo">671</span>    /**<a name="line.671"></a>
+<span class="sourceLineNo">672</span>     * Removes a route definition from the context - stopping any previously running<a name="line.672"></a>
+<span class="sourceLineNo">673</span>     * routes if any of them are actively running<a name="line.673"></a>
+<span class="sourceLineNo">674</span>     *<a name="line.674"></a>
+<span class="sourceLineNo">675</span>     * @param routeDefinition route definition to remove<a name="line.675"></a>
+<span class="sourceLineNo">676</span>     * @throws Exception if the route definition could not be removed for whatever reason<a name="line.676"></a>
+<span class="sourceLineNo">677</span>     */<a name="line.677"></a>
+<span class="sourceLineNo">678</span>    void removeRouteDefinition(RouteDefinition routeDefinition) throws Exception;<a name="line.678"></a>
+<span class="sourceLineNo">679</span><a name="line.679"></a>
+<span class="sourceLineNo">680</span>    /**<a name="line.680"></a>
+<span class="sourceLineNo">681</span>     * Starts the given route if it has been previously stopped<a name="line.681"></a>
+<span class="sourceLineNo">682</span>     *<a name="line.682"></a>
+<span class="sourceLineNo">683</span>     * @param route the route to start<a name="line.683"></a>
+<span class="sourceLineNo">684</span>     * @throws Exception is thrown if the route could not be started for whatever reason<a name="line.684"></a>
+<span class="sourceLineNo">685</span>     * @deprecated favor using {@link CamelContext#startRoute(String)}<a name="line.685"></a>
+<span class="sourceLineNo">686</span>     */<a name="line.686"></a>
+<span class="sourceLineNo">687</span>    @Deprecated<a name="line.687"></a>
+<span class="sourceLineNo">688</span>    void startRoute(RouteDefinition route) throws Exception;<a name="line.688"></a>
+<span class="sourceLineNo">689</span><a name="line.689"></a>
+<span class="sourceLineNo">690</span>    /**<a name="line.690"></a>
+<span class="sourceLineNo">691</span>     * Starts all the routes which currently is not started.<a name="line.691"></a>
+<span class="sourceLineNo">692</span>     *<a name="line.692"></a>
+<span class="sourceLineNo">693</span>     * @throws Exception is thrown if a route could not be started for whatever reason<a name="line.693"></a>
+<span class="sourceLineNo">694</span>     */<a name="line.694"></a>
+<span class="sourceLineNo">695</span>    void startAllRoutes() throws Exception;<a name="line.695"></a>
+<span class="sourceLineNo">696</span><a name="line.696"></a>
+<span class="sourceLineNo">697</span>    /**<a name="line.697"></a>
+<span class="sourceLineNo">698</span>     * Starts the given route if it has been previously stopped<a name="line.698"></a>
+<span class="sourceLineNo">699</span>     *<a name="line.699"></a>
+<span class="sourceLineNo">700</span>     * @param routeId the route id<a name="line.700"></a>
+<span class="sourceLineNo">701</span>     * @throws Exception is thrown if the route could not be started for whatever reason<a name="line.701"></a>
+<span class="sourceLineNo">702</span>     */<a name="line.702"></a>
+<span class="sourceLineNo">703</span>    void startRoute(String routeId) throws Exception;<a name="line.703"></a>
+<span class="sourceLineNo">704</span><a name="line.704"></a>
+<span class="sourceLineNo">705</span>    /**<a name="line.705"></a>
+<span class="sourceLineNo">706</span>     * Stops the given route.<a name="line.706"></a>
+<span class="sourceLineNo">707</span>     *<a name="line.707"></a>
+<span class="sourceLineNo">708</span>     * @param route the route to stop<a name="line.708"></a>
+<span class="sourceLineNo">709</span>     * @throws Exception is thrown if the route could not be stopped for whatever reason<a name="line.709"></a>
+<span class="sourceLineNo">710</span>     * @deprecated favor using {@link CamelContext#stopRoute(String)}<a name="line.710"></a>
+<span class="sourceLineNo">711</span>     */<a name="line.711"></a>
+<span class="sourceLineNo">712</span>    @Deprecated<a name="line.712"></a>
+<span class="sourceLineNo">713</span>    void stopRoute(RouteDefinition route) throws Exception;<a name="line.713"></a>
+<span class="sourceLineNo">714</span><a name="line.714"></a>
+<span class="sourceLineNo">715</span>    /**<a name="line.715"></a>
+<span class="sourceLineNo">716</span>     * Stops the given route using {@link org.apache.camel.spi.ShutdownStrategy}.<a name="line.716"></a>
+<span class="sourceLineNo">717</span>     *<a name="line.717"></a>
+<span class="sourceLineNo">718</span>     * @param routeId the route id<a name="line.718"></a>
+<span class="sourceLineNo">719</span>     * @throws Exception is thrown if the route could not be stopped for whatever reason<a name="line.719"></a>
+<span class="sourceLineNo">720</span>     * @see #suspendRoute(String)<a name="line.720"></a>
+<span class="sourceLineNo">721</span>     */<a name="line.721"></a>
+<span class="sourceLineNo">722</span>    void stopRoute(String routeId) throws Exception;<a name="line.722"></a>
+<span class="sourceLineNo">723</span><a name="line.723"></a>
+<span class="sourceLineNo">724</span>    /**<a name="line.724"></a>
+<span class="sourceLineNo">725</span>     * Stops the given route using {@link org.apache.camel.spi.ShutdownStrategy} with a specified timeout.<a name="line.725"></a>
+<span class="sourceLineNo">726</span>     *<a name="line.726"></a>
+<span class="sourceLineNo">727</span>     * @param routeId the route id<a name="line.727"></a>
+<span class="sourceLineNo">728</span>     * @param timeout  timeout<a name="line.728"></a>
+<span class="sourceLineNo">729</span>     * @param timeUnit the unit to use<a name="line.729"></a>
+<span class="sourceLineNo">730</span>     * @throws Exception is thrown if the route could not be stopped for whatever reason<a name="line.730"></a>
+<span class="sourceLineNo">731</span>     * @see #suspendRoute(String, long, java.util.concurrent.TimeUnit)<a name="line.731"></a>
+<span class="sourceLineNo">732</span>     */<a name="line.732"></a>
+<span class="sourceLineNo">733</span>    void stopRoute(String routeId, long timeout, TimeUnit timeUnit) throws Exception;<a name="line.733"></a>
+<span class="sourceLineNo">734</span><a name="line.734"></a>
+<span class="sourceLineNo">735</span>    /**<a name="line.735"></a>
+<span class="sourceLineNo">736</span>     * Stops the given route using {@link org.apache.camel.spi.ShutdownStrategy} with a specified timeout <a name="line.736"></a>
+<span class="sourceLineNo">737</span>     * and optional abortAfterTimeout mode.<a name="line.737"></a>
+<span class="sourceLineNo">738</span>     *<a name="line.738"></a>
+<span class="sourceLineNo">739</span>     * @param routeId the route id<a name="line.739"></a>
+<span class="sourceLineNo">740</span>     * @param timeout  timeout<a name="line.740"></a>
+<span class="sourceLineNo">741</span>     * @param timeUnit the unit to use<a name="line.741"></a>
+<span class="sourceLineNo">742</span>     * @param abortAfterTimeout should abort shutdown after timeout<a name="line.742"></a>
+<span class="sourceLineNo">743</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if the route is stopped before the timeout<a name="line.743"></a>
+<span class="sourceLineNo">744</span>     * @throws Exception is thrown if the route could not be stopped for whatever reason<a name="line.744"></a>
+<span class="sourceLineNo">745</span>     * @see #suspendRoute(String, long, java.util.concurrent.TimeUnit)<a name="line.745"></a>
+<span class="sourceLineNo">746</span>     */<a name="line.746"></a>
+<span class="sourceLineNo">747</span>    boolean stopRoute(String routeId, long timeout, TimeUnit timeUnit, boolean abortAfterTimeout) throws Exception;<a name="line.747"></a>
+<span class="sourceLineNo">748</span>    <a name="line.748"></a>
+<span class="sourceLineNo">749</span>    /**<a name="line.749"></a>
+<span class="sourceLineNo">750</span>     * Shutdown and &lt;b&gt;removes&lt;/b&gt; the given route using {@link org.apache.camel.spi.ShutdownStrategy}.<a name="line.750"></a>
+<span class="sourceLineNo">751</span>     *<a name="line.751"></a>
+<span class="sourceLineNo">752</span>     * @param routeId the route id<a name="line.752"></a>
+<span class="sourceLineNo">753</span>     * @throws Exception is thrown if the route could not be shutdown for whatever reason<a name="line.753"></a>
+<span class="sourceLineNo">754</span>     * @deprecated use {@link #stopRoute(String)} and {@link #removeRoute(String)}<a name="line.754"></a>
+<span class="sourceLineNo">755</span>     */<a name="line.755"></a>
+<span class="sourceLineNo">756</span>    @Deprecated<a name="line.756"></a>
+<span class="sourceLineNo">757</span>    void shutdownRoute(String routeId) throws Exception;<a name="line.757"></a>
+<span class="sourceLineNo">758</span><a name="line.758"></a>
+<span class="sourceLineNo">759</span>    /**<a name="line.759"></a>
+<span class="sourceLineNo">760</span>     * Shutdown and &lt;b&gt;removes&lt;/b&gt; the given route using {@link org.apache.camel.spi.ShutdownStrategy} with a specified timeout.<a name="line.760"></a>
+<span class="sourceLineNo">761</span>     *<a name="line.761"></a>
+<span class="sourceLineNo">762</span>     * @param routeId  the route id<a name="line.762"></a>
+<span class="sourceLineNo">763</span>     * @param timeout  timeout<a name="line.763"></a>
+<span class="sourceLineNo">764</span>     * @param timeUnit the unit to use<a name="line.764"></a>
+<span class="sourceLineNo">765</span>     * @throws Exception is thrown if the route could not be shutdown for whatever reason<a name="line.765"></a>
+<span class="sourceLineNo">766</span>     * @deprecated use {@link #stopRoute(String, long, java.util.concurrent.TimeUnit)} and {@link #removeRoute(String)}<a name="line.766"></a>
+<span class="sourceLineNo">767</span>     */<a name="line.767"></a>
+<span class="sourceLineNo">768</span>    @Deprecated<a name="line.768"></a>
+<span class="sourceLineNo">769</span>    void shutdownRoute(String routeId, long timeout, TimeUnit timeUnit) throws Exception;<a name="line.769"></a>
+<span class="sourceLineNo">770</span><a name="line.770"></a>
+<span class="sourceLineNo">771</span>    /**<a name="line.771"></a>
+<span class="sourceLineNo">772</span>     * Removes the given route (the route &lt;b&gt;must&lt;/b&gt; be stopped before it can be removed).<a name="line.772"></a>
+<span class="sourceLineNo">773</span>     * &lt;p/&gt;<a name="line.773"></a>
+<span class="sourceLineNo">774</span>     * A route which is removed will be unregistered from JMX, have its services stopped/shutdown and the route<a name="line.774"></a>
+<span class="sourceLineNo">775</span>     * definition etc. will also be removed. All the resources related to the route will be stopped and cleared.<a name="line.775"></a>
+<span class="sourceLineNo">776</span>     * &lt;p/&gt;<a name="line.776"></a>
+<span class="sourceLineNo">777</span>     * &lt;b&gt;Important:&lt;/b&gt; When removing a route, the {@link Endpoint}s which are in the static cache of<a name="line.777"></a>
+<span class="sourceLineNo">778</span>     * {@link org.apache.camel.spi.EndpointRegistry} and are &lt;b&gt;only&lt;/b&gt; used by the route (not used by other routes)<a name="line.778"></a>
+<span class="sourceLineNo">779</span>     * will also be removed. But {@link Endpoint}s which may have been created as part of routing messages by the route,<a name="line.779"></a>
+<span class="sourceLineNo">780</span>     * and those endpoints are enlisted in the dynamic cache of {@link org.apache.camel.spi.EndpointRegistry} are<a name="line.780"></a>
+<span class="sourceLineNo">781</span>     * &lt;b&gt;not&lt;/b&gt; removed. To remove those dynamic kind of endpoints, use the {@link #removeEndpoints(String)} method.<a name="line.781"></a>
+<span class="sourceLineNo">782</span>     * If not removing those endpoints, they will be kept in the dynamic cache of {@link org.apache.camel.spi.EndpointRegistry},<a name="line.782"></a>
+<span class="sourceLineNo">783</span>     * but my eventually be removed (evicted) when they have not been in use for a longer period of time; and the<a name="line.783"></a>
+<span class="sourceLineNo">784</span>     * dynamic cache upper limit is hit, and it evicts the least used endpoints.<a name="line.784"></a>
+<span class="sourceLineNo">785</span>     * &lt;p/&gt;<a name="line.785"></a>
+<span class="sourceLineNo">786</span>     * End users can use this method to remove unwanted routes or temporary routes which no longer is in demand.<a name="line.786"></a>
+<span class="sourceLineNo">787</span>     *<a name="line.787"></a>
+<span class="sourceLineNo">788</span>     * @param routeId the route id<a name="line.788"></a>
+<span class="sourceLineNo">789</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if the route was removed, &lt;tt&gt;false&lt;/tt&gt; if the route could not be removed because its not stopped<a name="line.789"></a>
+<span class="sourceLineNo">790</span>     * @throws Exception is thrown if the route could not be shutdown for whatever reason<a name="line.790"></a>
+<span class="sourceLineNo">791</span>     */<a name="line.791"></a>
+<span class="sourceLineNo">792</span>    boolean removeRoute(String routeId) throws Exception;<a name="line.792"></a>
+<span class="sourceLineNo">793</span><a name="line.793"></a>
+<span class="sourceLineNo">794</span>    /**<a name="line.794"></a>
+<span class="sourceLineNo">795</span>     * Resumes the given route if it has been previously suspended<a name="line.795"></a>
+<span class="sourceLineNo">796</span>     * &lt;p/&gt;<a name="line.796"></a>
+<span class="sourceLineNo">797</span>     * If the route does &lt;b&gt;not&lt;/b&gt; support suspension the route will be started instead<a name="line.797"></a>
+<span class="sourceLineNo">798</span>     *<a name="line.798"></a>
+<span class="sourceLineNo">799</span>     * @param routeId the route id<a name="line.799"></a>
+<span class="sourceLineNo">800</span>     * @throws Exception is thrown if the route could not be resumed for whatever reason<a name="line.800"></a>
+<span class="sourceLineNo">801</span>     */<a name="line.801"></a>
+<span class="sourceLineNo">802</span>    void resumeRoute(String routeId) throws Exception;<a name="line.802"></a>
+<span class="sourceLineNo">803</span><a name="line.803"></a>
+<span class="sourceLineNo">804</span>    /**<a name="line.804"></a>
+<span class="sourceLineNo">805</span>     * Suspends the given route using {@link org.apache.camel.spi.ShutdownStrategy}.<a name="line.805"></a>
+<span class="sourceLineNo">806</span>     * &lt;p/&gt;<a name="line.806"></a>
+<span class="sourceLineNo">807</span>     * Suspending a route is more gently than stopping, as the route consumers will be suspended (if they support)<a name="line.807"></a>
+<span class="sourceLineNo">808</span>     * otherwise the consumers will be stopped.<a name="line.808"></a>
+<span class="sourceLineNo">809</span>     * &lt;p/&gt;<a name="line.809"></a>
+<span class="sourceLineNo">810</span>     * By suspending the route services will be kept running (if possible) and therefore its faster to resume the route.<a name="line.810"></a>
+<span class="sourceLineNo">811</span>     * &lt;p/&gt;<a name="line.811"></a>
+<span class="sourceLineNo">812</span>     * If the route does &lt;b&gt;not&lt;/b&gt; support suspension the route will be stopped instead<a name="line.812"></a>
+<span class="sourceLineNo">813</span>     *<a name="line.813"></a>
+<span class="sourceLineNo">814</span>     * @param routeId the route id<a name="line.814"></a>
+<span class="sourceLineNo">815</span>     * @throws Exception is thrown if the route could not be suspended for whatever reason<a name="line.815"></a>
+<span class="sourceLineNo">816</span>     */<a name="line.816"></a>
+<span class="sourceLineNo">817</span>    void suspendRoute(String routeId) throws Exception;<a name="line.817"></a>
+<span class="sourceLineNo">818</span><a name="line.818"></a>
+<span class="sourceLineNo">819</span>    /**<a name="line.819"></a>
+<span class="sourceLineNo">820</span>     * Suspends the given route using {@link org.apache.camel.spi.ShutdownStrategy} with a specified timeout.<a name="line.820"></a>
+<span class="sourceLineNo">821</span>     * &lt;p/&gt;<a name="line.821"></a>
+<span class="sourceLineNo">822</span>     * Suspending a route is more gently than stopping, as the route consumers will be suspended (if they support)<a name="line.822"></a>
+<span class="sourceLineNo">823</span>     * otherwise the consumers will be stopped.<a name="line.823"></a>
+<span class="sourceLineNo">824</span>     * &lt;p/&gt;<a name="line.824"></a>
+<span class="sourceLineNo">825</span>     * By suspending the route services will be kept running (if possible) and therefore its faster to resume the route.<a name="line.825"></a>
+<span class="sourceLineNo">826</span>     * &lt;p/&gt;<a name="line.826"></a>
+<span class="sourceLineNo">827</span>     * If the route does &lt;b&gt;not&lt;/b&gt; support suspension the route will be stopped instead<a name="line.827"></a>
+<span class="sourceLineNo">828</span>     *<a name="line.828"></a>
+<span class="sourceLineNo">829</span>     * @param routeId  the route id<a name="line.829"></a>
+<span class="sourceLineNo">830</span>     * @param timeout  timeout<a name="line.830"></a>
+<span class="sourceLineNo">831</span>     * @param timeUnit the unit to use<a name="line.831"></a>
+<span class="sourceLineNo">832</span>     * @throws Exception is thrown if the route could not be suspended for whatever reason<a name="line.832"></a>
+<span class="sourceLineNo">833</span>     */<a name="line.833"></a>
+<span class="sourceLineNo">834</span>    void suspendRoute(String routeId, long timeout, TimeUnit timeUnit) throws Exception;<a name="line.834"></a>
+<span class="sourceLineNo">835</span><a name="line.835"></a>
+<span class="sourceLineNo">836</span>    /**<a name="line.836"></a>
+<span class="sourceLineNo">837</span>     * Returns the current status of the given route<a name="line.837"></a>
+<span class="sourceLineNo">838</span>     *<a name="line.838"></a>
+<span class="sourceLineNo">839</span>     * @param routeId the route id<a name="line.839"></a>
+<span class="sourceLineNo">840</span>     * @return the status for the route<a name="line.840"></a>
+<span class="sourceLineNo">841</span>     */<a name="line.841"></a>
+<span class="sourceLineNo">842</span>    ServiceStatus getRouteStatus(String routeId);<a name="line.842"></a>
+<span class="sourceLineNo">843</span><a name="line.843"></a>
+<span class="sourceLineNo">844</span>    /**<a name="line.844"></a>
+<span class="sourceLineNo">845</span>     * Indicates whether current thread is starting route(s).<a name="line.845"></a>
+<span class="sourceLineNo">846</span>     * &lt;p/&gt;<a name="line.846"></a>
+<span class="sourceLineNo">847</span>     * This can be useful to know by {@link LifecycleStrategy} or the likes, in case<a name="line.847"></a>
+<span class="sourceLineNo">848</span>     * they need to react differently.<a name="line.848"></a>
+<span class="sourceLineNo">849</span>     *<a name="line.849"></a>
+<span class="sourceLineNo">850</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if current thread is starting route(s), or &lt;tt&gt;false&lt;/tt&gt; if not.<a name="line.850"></a>
+<span class="sourceLineNo">851</span>     */<a name="line.851"></a>
+<span class="sourceLineNo">852</span>    boolean isStartingRoutes();<a name="line.852"></a>
+<span class="sourceLineNo">853</span><a name="line.853"></a>
+<span class="sourceLineNo">854</span>    /**<a name="line.854"></a>
+<span class="sourceLineNo">855</span>     * Indicates whether current thread is setting up route(s) as part of starting Camel from spring/blueprint.<a name="line.855"></a>
+<span class="sourceLineNo">856</span>     * &lt;p/&gt;<a name="line.856"></a>
+<span class="sourceLineNo">857</span>     * This can be useful to know by {@link LifecycleStrategy} or the likes, in case<a name="line.857"></a>
+<span class="sourceLineNo">858</span>     * they need to react differently.<a name="line.858"></a>
+<span class="sourceLineNo">859</span>     * &lt;p/&gt;<a name="line.859"></a>
+<span class="sourceLineNo">860</span>     * As the startup procedure of {@link CamelContext} is slightly different when using plain Java versus<a name="line.860"></a>
+<span class="sourceLineNo">861</span>     * Spring or Blueprint, then we need to know when Spring/Blueprint is setting up the routes, which<a name="line.861"></a>
+<span class="sourceLineNo">862</span>     * can happen after the {@link CamelContext} itself is in started state, due the asynchronous event nature<a name="line.862"></a>
+<span class="sourceLineNo">863</span>     * of especially Blueprint.<a name="line.863"></a>
+<span class="sourceLineNo">864</span>     *<a name="line.864"></a>
+<span class="sourceLineNo">865</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if current thread is setting up route(s), or &lt;tt&gt;false&lt;/tt&gt; if not.<a name="line.865"></a>
+<span class="sourceLineNo">866</span>     */<a name="line.866"></a>
+<span class="sourceLineNo">867</span>    boolean isSetupRoutes();<a name="line.867"></a>
+<span class="sourceLineNo">868</span><a name="line.868"></a>
+<span class="sourceLineNo">869</span>    // Properties<a name="line.869"></a>
+<span class="sourceLineNo">870</span>    //-----------------------------------------------------------------------<a name="line.870"></a>
+<span class="sourceLineNo">871</span><a name="line.871"></a>
+<span class="sourceLineNo">872</span>    /**<a name="line.872"></a>
+<span class="sourceLineNo">873</span>     * Returns the type converter used to coerce types from one type to another<a name="line.873"></a>
+<span class="sourceLineNo">874</span>     *<a name="line.874"></a>
+<span class="sourceLineNo">875</span>     * @return the converter<a name="line.875"></a>
+<span class="sourceLineNo">876</span>     */<a name="line.876"></a>
+<span class="sourceLineNo">877</span>    TypeConverter getTypeConverter();<a name="line.877"></a>
+<span class="sourceLineNo">878</span><a name="line.878"></a>
+<span class="sourceLineNo">879</span>    /**<a name="line.879"></a>
+<span class="sourceLineNo">880</span>     * Returns the type converter registry where type converters can be added or looked up<a name="line.880"></a>
+<span class="sourceLineNo">881</span>     *<a name="line.881"></a>
+<span class="sourceLineNo">882</span>     * @return the type converter registry<a name="line.882"></a>
+<span class="sourceLineNo">883</span>     */<a name="line.883"></a>
+<span class="sourceLineNo">884</span>    TypeConverterRegistry getTypeConverterRegistry();<a name="line.884"></a>
+<span class="sourceLineNo">885</span><a name="line.885"></a>
+<span class="sourceLineNo">886</span>    /**<a name="line.886"></a>
+<span class="sourceLineNo">887</span>     * Returns the registry used to lookup components by name and type such as the Spring ApplicationContext,<a name="line.887"></a>
+<span class="sourceLineNo">888</span>     * JNDI or the OSGi Service Registry<a name="line.888"></a>
+<span class="sourceLineNo">889</span>     *<a name="line.889"></a>
+<span class="sourceLineNo">890</span>     * @return the registry<a name="line.890"></a>
+<span class="sourceLineNo">891</span>     */<a name="line.891"></a>
+<span class="sourceLineNo">892</span>    Registry getRegistry();<a name="line.892"></a>
+<span class="sourceLineNo">893</span><a name="line.893"></a>
+<span class="sourceLineNo">894</span>    /**<a name="line.894"></a>
+<span class="sourceLineNo">895</span>     * Returns the registry used to lookup components by name and as the given type<a name="line.895"></a>
+<span class="sourceLineNo">896</span>     *<a name="line.896"></a>
+<span class="sourceLineNo">897</span>     * @param type the registry type such as {@link org.apache.camel.impl.JndiRegistry}<a name="line.897"></a>
+<span class="sourceLineNo">898</span>     * @return the registry, or &lt;tt&gt;null&lt;/tt&gt; if the given type was not found as a registry implementation<a name="line.898"></a>
+<span class="sourceLineNo">899</span>     */<a name="line.899"></a>
+<span class="sourceLineNo">900</span>    &lt;T&gt; T getRegistry(Class&lt;T&gt; type);<a name="line.900"></a>
+<span class="sourceLineNo">901</span><a name="line.901"></a>
+<span class="sourceLineNo">902</span>    /**<a name="line.902"></a>
+<span class="sourceLineNo">903</span>     * Returns the injector used to instantiate objects by type<a name="line.903"></a>
+<span class="sourceLineNo">904</span>     *<a name="line.904"></a>
+<span class="sourceLineNo">905</span>     * @return the injector<a name="line.905"></a>
+<span class="sourceLineNo">906</span>     */<a name="line.906"></a>
+<span class="sourceLineNo">907</span>    Injector getInjector();<a name="line.907"></a>
+<span class="sourceLineNo">908</span><a name="line.908"></a>
+<span class="sourceLineNo">909</span>    /**<a name="line.909"></a>
+<span class="sourceLineNo">910</span>     * Returns the management mbean assembler<a name="line.910"></a>
+<span class="sourceLineNo">911</span>     *<a name="line.911"></a>
+<span class="sourceLineNo">912</span>     * @return the mbean assembler<a name="line.912"></a>
+<span class="sourceLineNo">913</span>     */<a name="line.913"></a>
+<span class="sourceLineNo">914</span>    ManagementMBeanAssembler getManagementMBeanAssembler();<a name="line.914"></a>
+<span class="sourceLineNo">915</span><a name="line.915"></a>
+<span class="sourceLineNo">916</span>    /**<a name="line.916"></a>
+<span class="sourceLineNo">917</span>     * Returns the lifecycle strategies used to handle lifecycle notifications<a name="line.917"></a>
+<span class="sourceLineNo">918</span>     *<a name="line.918"></a>
+<span class="sourceLineNo">919</span>     * @return the lifecycle strategies<a name="line.919"></a>
+<span class="sourceLineNo">920</span>     */<a name="line.920"></a>
+<span class="sourceLineNo">921</span>    List&lt;LifecycleStrategy&gt; getLifecycleStrategies();<a name="line.921"></a>
+<span class="sourceLineNo">922</span><a name="line.922"></a>
+<span class="sourceLineNo">923</span>    /**<a name="line.923"></a>
+<span class="sourceLineNo">924</span>     * Adds the given lifecycle strategy to be used.<a name="line.924"></a>
+<span class="sourceLineNo">925</span>     *<a name="line.925"></a>
+<span class="sourceLineNo">926</span>     * @param lifecycleStrategy the strategy<a name="line.926"></a>
+<span class="sourceLineNo">927</span>     */<a name="line.927"></a>
+<span class="sourceLineNo">928</span>    void addLifecycleStrategy(LifecycleStrategy lifecycleStrategy);<a name="line.928"></a>
+<span class="sourceLineNo">929</span><a name="line.929"></a>
+<span class="sourceLineNo">930</span>    /**<a name="line.930"></a>
+<span class="sourceLineNo">931</span>     * Resolves a language for creating expressions<a name="line.931"></a>
+<span class="sourceLineNo">932</span>     *<a name="line.932"></a>
+<span class="sourceLineNo">933</span>     * @param language name of the language<a name="line.933"></a>
+<span class="sourceLineNo">934</span>     * @return the resolved language<a name="line.934"></a>
+<span class="sourceLineNo">935</span>     */<a name="line.935"></a>
+<span class="sourceLineNo">936</span>    Language resolveLanguage(String language);<a name="line.936"></a>
+<span class="sourceLineNo">937</span><a name="line.937"></a>
+<span class="sourceLineNo">938</span>    /**<a name="line.938"></a>
+<span class="sourceLineNo">939</span>     * Parses the given text and resolve any property placeholders - using {{key}}.<a name="line.939"></a>
+<span class="sourceLineNo">940</span>     *<a name="line.940"></a>
+<span class="sourceLineNo">941</span>     * @param text the text such as an endpoint uri or the likes<a name="line.941"></a>
+<span class="sourceLineNo">942</span>     * @return the text with resolved property placeholders<a name="line.942"></a>
+<span class="sourceLineNo">943</span>     * @throws Exception is thrown if property placeholders was used and there was an error resolving them<a name="line.943"></a>
+<span class="sourceLineNo">944</span>     */<a name="line.944"></a>
+<span class="sourceLineNo">945</span>    String resolvePropertyPlaceholders(String text) throws Exception;<a name="line.945"></a>
+<span class="sourceLineNo">946</span>    <a name="line.946"></a>
+<span class="sourceLineNo">947</span>    /**<a name="line.947"></a>
+<span class="sourceLineNo">948</span>     * Returns the configured property placeholder prefix token if and only if the context has<a name="line.948"></a>
+<span class="sourceLineNo">949</span>     * property placeholder abilities, otherwise returns {@code null}.<a name="line.949"></a>
+<span class="sourceLineNo">950</span>     * <a name="line.950"></a>
+<span class="sourceLineNo">951</span>     * @return the prefix token or {@code null}<a name="line.951"></a>
+<span class="sourceLineNo">952</span>     */<a name="line.952"></a>
+<span class="sourceLineNo">953</span>    String getPropertyPrefixToken();<a name="line.953"></a>
+<span class="sourceLineNo">954</span>    <a name="line.954"></a>
+<span class="sourceLineNo">955</span>    /**<a name="line.955"></a>
+<span class="sourceLineNo">956</span>     * Returns the configured property placeholder suffix token if and only if the context has<a name="line.956"></a>
+<span class="sourceLineNo">957</span>     * property placeholder abilities, otherwise returns {@code null}.<a name="line.957"></a>
+<span class="sourceLineNo">958</span>     * <a name="line.958"></a>
+<span class="sourceLineNo">959</span>     * @return the suffix token or {@code null}<a name="line.959"></a>
+<span class="sourceLineNo">960</span>     */<a name="line.960"></a>
+<span class="sourceLineNo">961</span>    String getPropertySuffixToken();<a name="line.961"></a>
+<span class="sourceLineNo">962</span><a name="line.962"></a>
+<span class="sourceLineNo">963</span>    /**<a name="line.963"></a>
+<span class="sourceLineNo">964</span>     * Gets a readonly list with the names of the languages currently registered.<a name="line.964"></a>
+<span class="sourceLineNo">965</span>     *<a name="line.965"></a>
+<span class="sourceLineNo">966</span>     * @return a readonly list with the names of the the languages<a name="line.966"></a>
+<span class="sourceLineNo">967</span>     */<a name="line.967"></a>
+<span class="sourceLineNo">968</span>    List&lt;String&gt; getLanguageNames();<a name="line.968"></a>
+<span class="sourceLineNo">969</span><a name="line.969"></a>
+<span class="sourceLineNo">970</span>    /**<a name="line.970"></a>
+<span class="sourceLineNo">971</span>     * Creates a new {@link ProducerTemplate} which is &lt;b&gt;started&lt;/b&gt; and therefore ready to use right away.<a name="line.971"></a>
+<span class="sourceLineNo">972</span>     * &lt;p/&gt;<a name="line.972"></a>
+<span class="sourceLineNo">973</span>     * See this FAQ before use: &lt;a href="http://camel.apache.org/why-does-camel-use-too-many-threads-with-producertemplate.html"&gt;<a name="line.973"></a>
+<span class="sourceLineNo">974</span>     * Why does Camel use too many threads with ProducerTemplate?&lt;/a&gt;<a name="line.974"></a>
+<span class="sourceLineNo">975</span>     * &lt;p/&gt;<a name="line.975"></a>
+<span class="sourceLineNo">976</span>     * &lt;b&gt;Important:&lt;/b&gt; Make sure to call {@link org.apache.camel.ProducerTemplate#stop()} when you are done using the template,<a name="line.976"></a>
+<span class="sourceLineNo">977</span>     * to clean up any resources.<a name="line.977"></a>
+<span class="sourceLineNo">978</span>     * &lt;p/&gt;<a name="line.978"></a>
+<span class="sourceLineNo">979</span>     * Will use cache size defined in Camel property with key {@link Exchange#MAXIMUM_CACHE_POOL_SIZE}.<a name="line.979"></a>
+<span class="sourceLineNo">980</span>     * If no key was defined then it will fallback to a default size of 1000.<a name="line.980"></a>
+<span class="sourceLineNo">981</span>     * You can also use the {@link org.apache.camel.ProducerTemplate#setMaximumCacheSize(int)} method to use a custom value<a name="line.981"></a>
+<span class="sourceLineNo">982</span>     * before starting the template.<a name="line.982"></a>
+<span class="sourceLineNo">983</span>     *<a name="line.983"></a>
+<span class="sourceLineNo">984</span>     * @return the template<a name="line.984"></a>
+<span class="sourceLineNo">985</span>     * @throws RuntimeCamelException is thrown if error starting the template<a name="line.985"></a>
+<span class="sourceLineNo">986</span>     */<a name="line.986"></a>
+<span class="sourceLineNo">987</span>    ProducerTemplate createProducerTemplate();<a name="line.987"></a>
+<span class="sourceLineNo">988</span><a name="line.988"></a>
+<span class="sourceLineNo">989</span>    /**<a name="line.989"></a>
+<span class="sourceLineNo">990</span>     * Creates a new {@link ProducerTemplate} which is &lt;b&gt;started&lt;/b&gt; and therefore ready to use right away.<a name="line.990"></a>
+<span class="sourceLineNo">991</span>     * &lt;p/&gt;<a name="line.991"></a>
+<span class="sourceLineNo">992</span>     * See this FAQ before use: &lt;a href="http://camel.apache.org/why-does-camel-use-too-many-threads-with-producertemplate.html"&gt;<a name="line.992"></a>
+<span class="sourceLineNo">993</span>     * Why does Camel use too many threads with ProducerTemplate?&lt;/a&gt;<a name="line.993"></a>
+<span class="sourceLineNo">994</span>     * &lt;p/&gt;<a name="line.994"></a>
+<span class="sourceLineNo">995</span>     * &lt;b&gt;Important:&lt;/b&gt; Make sure to call {@link ProducerTemplate#stop()} when you are done using the template,<a name="line.995"></a>
+<span class="sourceLineNo">996</span>     * to clean up any resources.<a name="line.996"></a>
+<span class="sourceLineNo">997</span>     *<a name="line.997"></a>
+<span class="sourceLineNo">998</span>     * @param maximumCacheSize the maximum cache size<a name="line.998"></a>
+<span class="sourceLineNo">999</span>     * @return the template<a name="line.999"></a>
+<span class="sourceLineNo">1000</span>     * @throws RuntimeCamelException is thrown if error starting the template<a name="line.1000"></a>
+<span class="sourceLineNo">1001</span>     */<a name="line.1001"></a>
+<span class="sourceLineNo">1002</span>    ProducerTemplate createProducerTemplate(int maximumCacheSize);<a name="line.1002"></a>
+<span class="sourceLineNo">1003</span><a name="line.1003"></a>
+<span class="sourceLineNo">1004</span>    /**<a name="line.1004"></a>
+<span class="sourceLineNo">1005</span>     * Creates a new {@link ConsumerTemplate} which is &lt;b&gt;started&lt;/b&gt; and therefore ready to use right away.<a name="line.1005"></a>
+<span class="sourceLineNo">1006</span>     * &lt;p/&gt;<a name="line.1006"></a>
+<span class="sourceLineNo">1007</span>     * See this FAQ before use: &lt;a href="http://camel.apache.org/why-does-camel-use-too-many-threads-with-producertemplate.html"&gt;<a name="line.1007"></a>
+<span class="sourceLineNo">1008</span>     * Why does Camel use too many threads with ProducerTemplate?&lt;/a&gt; as it also applies for ConsumerTemplate.<a name="line.1008"></a>
+<span class="sourceLineNo">1009</span>     * &lt;p/&gt;<a name="line.1009"></a>
+<span class="sourceLineNo">1010</span>     * &lt;b&gt;Important:&lt;/b&gt; Make sure to call {@link ConsumerTemplate#stop()} when you are done using the template,<a name="line.1010"></a>
+<span class="sourceLineNo">1011</span>     * to clean up any resources.<a name="line.1011"></a>
+<span class="sourceLineNo">1012</span>     * &lt;p/&gt;<a name="line.1012"></a>
+<span class="sourceLineNo">1013</span>     * Will use cache size defined in Camel property with key {@link Exchange#MAXIMUM_CACHE_POOL_SIZE}.<a name="line.1013"></a>
+<span class="sourceLineNo">1014</span>     * If no key was defined then it will fallback to a default size of 1000.<a name="line.1014"></a>
+<span class="sourceLineNo">1015</span>     * You can also use the {@link org.apache.camel.ConsumerTemplate#setMaximumCacheSize(int)} method to use a custom value<a name="line.1015"></a>
+<span class="sourceLineNo">1016</span>     * before starting the template.<a name="line.1016"></a>
+<span class="sourceLineNo">1017</span>     *<a name="line.1017"></a>
+<span class="sourceLineNo">1018</span>     * @return the template<a name="line.1018"></a>
+<span class="sourceLineNo">1019</span>     * @throws RuntimeCamelException is thrown if error starting the template<a name="line.1019"></a>
+<span class="sourceLineNo">1020</span>     */<a name="line.1020"></a>
+<span class="sourceLineNo">1021</span>    ConsumerTemplate createConsumerTemplate();<a name="line.1021"></a>
+<span class="sourceLineNo">1022</span><a name="line.1022"></a>
+<span class="sourceLineNo">1023</span>    /**<a name="line.1023"></a>
+<span class="sourceLineNo">1024</span>     * Creates a new {@link ConsumerTemplate} which is &lt;b&gt;started&lt;/b&gt; and therefore ready to use right away.<a name="line.1024"></a>
+<span class="sourceLineNo">1025</span>     * &lt;p/&gt;<a name="line.1025"></a>
+<span class="sourceLineNo">1026</span>     * See this FAQ before use: &lt;a href="http://camel.apache.org/why-does-camel-use-too-many-threads-with-producertemplate.html"&gt;<a name="line.1026"></a>
+<span class="sourceLineNo">1027</span>     * Why does Camel use too many threads with ProducerTemplate?&lt;/a&gt; as it also applies for ConsumerTemplate.<a name="line.1027"></a>
+<span class="sourceLineNo">1028</span>     * &lt;p/&gt;<a name="line.1028"></a>
+<span class="sourceLineNo">1029</span>     * &lt;b&gt;Important:&lt;/b&gt; Make sure to call {@link ConsumerTemplate#stop()} when you are done using the template,<a name="line.1029"></a>
+<span class="sourceLineNo">1030</span>     * to clean up any resources.<a name="line.1030"></a>
+<span class="sourceLineNo">1031</span>     *<a name="line.1031"></a>
+<span class="sourceLineNo">1032</span>     * @param maximumCacheSize the maximum cache size<a name="line.1032"></a>
+<span class="sourceLineNo">1033</span>     * @return the template<a name="line.1033"></a>
+<span class="sourceLineNo">1034</span>     * @throws RuntimeCamelException is thrown if error starting the template<a name="line.1034"></a>
+<span class="sourceLineNo">1035</span>     */<a name="line.1035"></a>
+<span class="sourceLineNo">1036</span>    ConsumerTemplate createConsumerTemplate(int maximumCacheSize);<a name="line.1036"></a>
+<span class="sourceLineNo">1037</span><a name="line.1037"></a>
+<span class="sourceLineNo">1038</span>    /**<a name="line.1038"></a>
+<span class="sourceLineNo">1039</span>     * Adds the given interceptor strategy<a name="line.1039"></a>
+<span class="sourceLineNo">1040</span>     *<a name="line.1040"></a>
+<span class="sourceLineNo">1041</span>     * @param interceptStrategy the strategy<a name="line.1041"></a>
+<span class="sourceLineNo">1042</span>     */<a name="line.1042"></a>
+<span class="sourceLineNo">1043</span>    void addInterceptStrategy(InterceptStrategy interceptStrategy);<a name="line.1043"></a>
+<span class="sourceLineNo">1044</span><a name="line.1044"></a>
+<span class="sourceLineNo">1045</span>    /**<a name="line.1045"></a>
+<span class="sourceLineNo">1046</span>     * Gets the interceptor strategies<a name="line.1046"></a>
+<span class="sourceLineNo">1047</span>     *<a name="line.1047"></a>
+<span class="sourceLineNo">1048</span>     * @return the list of current interceptor strategies<a name="line.1048"></a>
+<span class="sourceLineNo">1049</span>     */<a name="line.1049"></a>
+<span class="sourceLineNo">1050</span>    List&lt;InterceptStrategy&gt; getInterceptStrategies();<a name="line.1050"></a>
+<span class="sourceLineNo">1051</span><a name="line.1051"></a>
+<span class="sourceLineNo">1052</span>    /**<a name="line.1052"></a>
+<span class="sourceLineNo">1053</span>     * Gets the default error handler builder which is inherited by the routes<a name="line.1053"></a>
+<span class="sourceLineNo">1054</span>     *<a name="line.1054"></a>
+<span class="sourceLineNo">1055</span>     * @return the builder<a name="line.1055"></a>
+<span class="sourceLineNo">1056</span>     * @deprecated The return type will be switched to {@link ErrorHandlerFactory} in Camel 3.0<a name="line.1056"></a>
+<span class="sourceLineNo">1057</span>     */<a name="line.1057"></a>
+<span class="sourceLineNo">1058</span>    @Deprecated<a name="line.1058"></a>
+<span class="sourceLineNo">1059</span>    ErrorHandlerBuilder getErrorHandlerBuilder();<a name="line.1059"></a>
+<span class="sourceLineNo">1060</span><a name="line.1060"></a>
+<span class="sourceLineNo">1061</span>    /**<a name="line.1061"></a>
+<span class="sourceLineNo">1062</span>     * Sets the default error handler builder which is inherited by the routes<a name="line.1062"></a>
+<span class="sourceLineNo">1063</span>     *<a name="line.1063"></a>
+<span class="sourceLineNo">1064</span>     * @param errorHandlerBuilder the builder<a name="line.1064"></a>
+<span class="sourceLineNo">1065</span>     */<a name="line.1065"></a>
+<span class="sourceLineNo">1066</span>    void setErrorHandlerBuilder(ErrorHandlerFactory errorHandlerBuilder);<a name="line.1066"></a>
+<span class="sourceLineNo">1067</span><a name="line.1067"></a>
+<span class="sourceLineNo">1068</span>    /**<a name="line.1068"></a>
+<span class="sourceLineNo">1069</span>     * Gets the default shared thread pool for error handlers which<a name="line.1069"></a>
+<span class="sourceLineNo">1070</span>     * leverages this for asynchronous redelivery tasks.<a name="line.1070"></a>
+<span class="sourceLineNo">1071</span>     */<a name="line.1071"></a>
+<span class="sourceLineNo">1072</span>    ScheduledExecutorService getErrorHandlerExecutorService();<a name="line.1072"></a>
+<span class="sourceLineNo">1073</span><a name="line.1073"></a>
+<span class="sourceLineNo">1074</span>    /**<a name="line.1074"></a>
+<span class="sourceLineNo">1075</span>     * Sets the data formats that can be referenced in the routes.<a name="line.1075"></a>
+<span class="sourceLineNo">1076</span>     *<a name="line.1076"></a>
+<span class="sourceLineNo">1077</span>     * @param dataFormats the data formats<a name="line.1077"></a>
+<span class="sourceLineNo">1078</span>     */<a name="line.1078"></a>
+<span class="sourceLineNo">1079</span>    void setDataFormats(Map&lt;String, DataFormatDefinition&gt; dataFormats);<a name="line.1079"></a>
+<span class="sourceLineNo">1080</span><a name="line.1080"></a>
+<span class="sourceLineNo">1081</span>    /**<a name="line.1081"></a>
+<span class="sourceLineNo">1082</span>     * Gets the data formats that can be referenced in the routes.<a name="line.1082"></a>
+<span class="sourceLineNo">1083</span>     *<a name="line.1083"></a>
+<span class="sourceLineNo">1084</span>     * @return the data formats available<a name="line.1084"></a>
+<span class="sourceLineNo">1085</span>     */<a name="line.1085"></a>
+<span class="sourceLineNo">1086</span>    Map&lt;String, DataFormatDefinition&gt; getDataFormats();<a name="line.1086"></a>
+<span class="sourceLineNo">1087</span><a name="line.1087"></a>
+<span class="sourceLineNo">1088</span>    /**<a name="line.1088"></a>
+<span class="sourceLineNo">1089</span>     * Resolve a data format given its name<a name="line.1089"></a>
+<span class="sourceLineNo">1090</span>     *<a name="line.1090"></a>
+<span class="sourceLineNo">1091</span>     * @param name the data format name or a reference to it in the {@link Registry}<a name="line.1091"></a>
+<span class="sourceLineNo">1092</span>     * @return the resolved data format, or &lt;tt&gt;null&lt;/tt&gt; if not found<a name="line.1092"></a>
+<span class="sourceLineNo">1093</span>     */<a name="line.1093"></a>
+<span class="sourceLineNo">1094</span>    DataFormat resolveDataFormat(String name);<a name="line.1094"></a>
+<span class="sourceLineNo">1095</span><a name="line.1095"></a>
+<span class="sourceLineNo">1096</span>    /**<a name="line.1096"></a>
+<span class="sourceLineNo">1097</span>     * Resolve a data format definition given its name<a name="line.1097"></a>
+<span class="sourceLineNo">1098</span>     *<a name="line.1098"></a>
+<span class="sourceLineNo">1099</span>     * @param name the data format definition name or a reference to it in the {@link Registry}<a name="line.1099"></a>
+<span class="sourceLineNo">1100</span>     * @return the resolved data format definition, or &lt;tt&gt;null&lt;/tt&gt; if not found<a name="line.1100"></a>
+<span class="sourceLineNo">1101</span>     */<a name="line.1101"></a>
+<span class="sourceLineNo">1102</span>    DataFormatDefinition resolveDataFormatDefinition(String name);<a name="line.1102"></a>
+<span class="sourceLineNo">1103</span><a name="line.1103"></a>
+<span class="sourceLineNo">1104</span>    /**<a name="line.1104"></a>
+<span class="sourceLineNo">1105</span>     * Gets the current data format resolver<a name="line.1105"></a>
+<span class="sourceLineNo">1106</span>     *<a name="line.1106"></a>
+<span class="sourceLineNo">1107</span>     * @return the resolver<a name="line.1107"></a>
+<span class="sourceLineNo">1108</span>     */<a name="line.1108"></a>
+<span class="sourceLineNo">1109</span>    DataFormatResolver getDataFormatResolver();<a name="line.1109"></a>
+<span class="sourceLineNo">1110</span><a name="line.1110"></a>
+<span class="sourceLineNo">1111</span>    /**<a name="line.1111"></a>
+<span class="sourceLineNo">1112</span>     * Sets a custom data format resolver<a name="line.1112"></a>
+<span class="sourceLineNo">1113</span>     *<a name="line.1113"></a>
+<span class="sourceLineNo">1114</span>     * @param dataFormatResolver the resolver<a name="line.1114"></a>
+<span class="sourceLineNo">1115</span>     */<a name="line.1115"></a>
+<span class="sourceLineNo">1116</span>    void setDataFormatResolver(DataFormatResolver dataFormatResolver);<a name="line.1116"></a>
+<span class="sourceLineNo">1117</span><a name="line.1117"></a>
+<span class="sourceLineNo">1118</span>    /**<a name="line.1118"></a>
+<span class="sourceLineNo">1119</span>     * Sets the properties that can be referenced in the camel context<a name="line.1119"></a>
+<span class="sourceLineNo">1120</span>     *<a name="line.1120"></a>
+<span class="sourceLineNo">1121</span>     * @param properties properties<a name="line.1121"></a>
+<span class="sourceLineNo">1122</span>     */<a name="line.1122"></a>
+<span class="sourceLineNo">1123</span>    void setProperties(Map&lt;String, String&gt; properties);<a name="line.1123"></a>
+<span class="sourceLineNo">1124</span><a name="line.1124"></a>
+<span class="sourceLineNo">1125</span>    /**<a name="line.1125"></a>
+<span class="sourceLineNo">1126</span>     * Gets the properties that can be referenced in the camel context<a name="line.1126"></a>
+<span class="sourceLineNo">1127</span>     *<a name="line.1127"></a>
+<span class="sourceLineNo">1128</span>     * @return the properties<a name="line.1128"></a>
+<span class="sourceLineNo">1129</span>     */<a name="line.1129"></a>
+<span class="sourceLineNo">1130</span>    Map&lt;String, String&gt; getProperties();<a name="line.1130"></a>
+<span class="sourceLineNo">1131</span><a name="line.1131"></a>
+<span class="sourceLineNo">1132</span>    /**<a name="line.1132"></a>
+<span class="sourceLineNo">1133</span>     * Gets the property value that can be referenced in the camel context<a name="line.1133"></a>
+<span class="sourceLineNo">1134</span>     *<a name="line.1134"></a>
+<span class="sourceLineNo">1135</span>     * @return the string value of property<a name="line.1135"></a>
+<span class="sourceLineNo">1136</span>     */<a name="line.1136"></a>
+<span class="sourceLineNo">1137</span>    String getProperty(String name);<a name="line.1137"></a>
+<span class="sourceLineNo">1138</span>    <a name="line.1138"></a>
+<span class="sourceLineNo">1139</span>    /**<a name="line.1139"></a>
+<span class="sourceLineNo">1140</span>     * Gets the default FactoryFinder which will be used for the loading the factory class from META-INF<a name="line.1140"></a>
+<span class="sourceLineNo">1141</span>     *<a name="line.1141"></a>
+<span class="sourceLineNo">1142</span>     * @return the default factory finder<a name="line.1142"></a>
+<span class="sourceLineNo">1143</span>     */<a name="line.1143"></a>
+<span class="sourceLineNo">1144</span>    FactoryFinder getDefaultFactoryFinder();<a name="line.1144"></a>
+<span class="sourceLineNo">1145</span><a name="line.1145"></a>
+<span class="sourceLineNo">1146</span>    /**<a name="line.1146"></a>
+<span class="sourceLineNo">1147</span>     * Sets the factory finder resolver to use.<a name="line.1147"></a>
+<span class="sourceLineNo">1148</span>     *<a name="line.1148"></a>
+<span class="sourceLineNo">1149</span>     * @param resolver the factory finder resolver<a name="line.1149"></a>
+<span class="sourceLineNo">1150</span>     */<a name="line.1150"></a>
+<span class="sourceLineNo">1151</span>    void setFactoryFinderResolver(FactoryFinderResolver resolver);<a name="line.1151"></a>
+<span class="sourceLineNo">1152</span><a name="line.1152"></a>
+<span class="sourceLineNo">1153</span>    /**<a name="line.1153"></a>
+<span class="sourceLineNo">1154</span>     * Gets the FactoryFinder which will be used for the loading the factory class from META-INF in the given path<a name="line.1154"></a>
+<span class="sourceLineNo">1155</span>     *<a name="line.1155"></a>
+<span class="sourceLineNo">1156</span>     * @param path the META-INF path<a name="line.1156"></a>
+<span class="sourceLineNo">1157</span>     * @return the factory finder<a name="line.1157"></a>
+<span class="sourceLineNo">1158</span>     * @throws NoFactoryAvailableException is thrown if a factory could not be found<a name="line.1158"></a>
+<span class="sourceLineNo">1159</span>     */<a name="line.1159"></a>
+<span class="sourceLineNo">1160</span>    FactoryFinder getFactoryFinder(String path) throws NoFactoryAvailableException;<a name="line.1160"></a>
+<span class="sourceLineNo">1161</span><a name="line.1161"></a>
+<span class="sourceLineNo">1162</span>    /**<a name="line.1162"></a>
+<span class="sourceLineNo">1163</span>     * Returns the class resolver to be used for loading/lookup of classes.<a name="line.1163"></a>
+<span class="sourceLineNo">1164</span>     *<a name="line.1164"></a>
+<span class="sourceLineNo">1165</span>     * @return the resolver<a name="line.1165"></a>
+<span class="sourceLineNo">1166</span>     */<a name="line.1166"></a>
+<span class="sourceLineNo">1167</span>    ClassResolver getClassResolver();<a name="line.1167"></a>
+<span class="sourceLineNo">1168</span><a name="line.1168"></a>
+<span class="sourceLineNo">1169</span>    /**<a name="line.1169"></a>
+<span class="sourceLineNo">1170</span>     * Returns the package scanning class resolver<a name="line.1170"></a>
+<span class="sourceLineNo">1171</span>     *<a name="line.1171"></a>
+<span class="sourceLineNo">1172</span>     * @return the resolver<a name="line.1172"></a>
+<span class="sourceLineNo">1173</span>     */<a name="line.1173"></a>
+<span class="sourceLineNo">1174</span>    PackageScanClassResolver getPackageScanClassResolver();<a name="line.1174"></a>
+<span class="sourceLineNo">1175</span><a name="line.1175"></a>
+<span class="sourceLineNo">1176</span>    /**<a name="line.1176"></a>
+<span class="sourceLineNo">1177</span>     * Sets the class resolver to be use<a name="line.1177"></a>
+<span class="sourceLineNo">1178</span>     *<a name="line.1178"></a>
+<span class="sourceLineNo">1179</span>     * @param resolver the resolver<a name="line.1179"></a>
+<span class="sourceLineNo">1180</span>     */<a name="line.1180"></a>
+<span class="sourceLineNo">1181</span>    void setClassResolver(ClassResolver resolver);<a name="line.1181"></a>
+<span class="sourceLineNo">1182</span><a name="line.1182"></a>
+<span class="sourceLineNo">1183</span>    /**<a name="line.1183"></a>
+<span class="sourceLineNo">1184</span>     * Sets the package scanning class resolver to use<a name="line.1184"></a>
+<span class="sourceLineNo">1185</span>     *<a name="line.1185"></a>
+<span class="sourceLineNo">1186</span>     * @param resolver the resolver<a name="line.1186"></a>
+<span class="sourceLineNo">1187</span>     */<a name="line.1187"></a>
+<span class="sourceLineNo">1188</span>    void setPackageScanClassResolver(PackageScanClassResolver resolver);<a name="line.1188"></a>
+<span class="sourceLineNo">1189</span><a name="line.1189"></a>
+<span class="sourceLineNo">1190</span>    /**<a name="line.1190"></a>
+<span class="sourceLineNo">1191</span>     * Sets a pluggable service pool to use for {@link Producer} pooling.<a name="line.1191"></a>
+<span class="sourceLineNo">1192</span>     *<a name="line.1192"></a>
+<span class="sourceLineNo">1193</span>     * @param servicePool the pool<a name="line.1193"></a>
+<span class="sourceLineNo">1194</span>     */<a name="line.1194"></a>
+<span class="sourceLineNo">1195</span>    void setProducerServicePool(ServicePool&lt;Endpoint, Producer&gt; servicePool);<a name="line.1195"></a>
+<span class="sourceLineNo">1196</span><a name="line.1196"></a>
+<span class="sourceLineNo">1197</span>    /**<a name="line.1197"></a>
+<span class="sourceLineNo">1198</span>     * Gets the service pool for {@link Producer} pooling.<a name="line.1198"></a>
+<span class="sourceLineNo">1199</span>     *<a name="line.1199"></a>
+<span class="sourceLineNo">1200</span>     * @return the service pool<a name="line.1200"></a>
+<span class="sourceLineNo">1201</span>     */<a name="line.1201"></a>
+<span class="sourceLineNo">1202</span>    ServicePool&lt;Endpoint, Producer&gt; getProducerServicePool();<a name="line.1202"></a>
+<span class="sourceLineNo">1203</span>    <a name="line.1203"></a>
+<span class="sourceLineNo">1204</span>    /**<a name="line.1204"></a>
+<span class="sourceLineNo">1205</span>     * Sets a pluggable service pool to use for {@link PollingConsumer} pooling.<a name="line.1205"></a>
+<span class="sourceLineNo">1206</span>     *<a name="line.1206"></a>
+<span class="sourceLineNo">1207</span>     * @param servicePool the pool<a name="line.1207"></a>
+<span class="sourceLineNo">1208</span>     */<a name="line.1208"></a>
+<span class="sourceLineNo">1209</span>    void setPollingConsumerServicePool(ServicePool&lt;Endpoint, PollingConsumer&gt; servicePool);<a name="line.1209"></a>
+<span class="sourceLineNo">1210</span><a name="line.1210"></a>
+<span class="sourceLineNo">1211</span>    /**<a name="line.1211"></a>
+<span class="sourceLineNo">1212</span>     * Gets the service pool for {@link Producer} pooling.<a name="line.1212"></a>
+<span class="sourceLineNo">1213</span>     *<a name="line.1213"></a>
+<span class="sourceLineNo">1214</span>     * @return the service pool<a name="line.1214"></a>
+<span class="sourceLineNo">1215</span>     */<a name="line.1215"></a>
+<span class="sourceLineNo">1216</span>    ServicePool&lt;Endpoint, PollingConsumer&gt; getPollingConsumerServicePool();<a name="line.1216"></a>
+<span class="sourceLineNo">1217</span>    <a name="line.1217"></a>
+<span class="sourceLineNo">1218</span>    /**<a name="line.1218"></a>
+<span class="sourceLineNo">1219</span>     * Uses a custom node id factory when generating auto assigned ids to the nodes in the route definitions<a name="line.1219"></a>
+<span class="sourceLineNo">1220</span>     *<a name="line.1220"></a>
+<span class="sourceLineNo">1221</span>     * @param factory custom factory to use<a name="line.1221"></a>
+<span class="sourceLineNo">1222</span>     */<a name="line.1222"></a>
+<span class="sourceLineNo">1223</span>    void setNodeIdFactory(NodeIdFactory factory);<a name="line.1223"></a>
+<span class="sourceLineNo">1224</span><a name="line.1224"></a>
+<span class="sourceLineNo">1225</span>    /**<a name="line.1225"></a>
+<span class="sourceLineNo">1226</span>     * Gets the node id factory<a name="line.1226"></a>
+<span class="sourceLineNo">1227</span>     *<a name="line.1227"></a>
+<span class="sourceLineNo">1228</span>     * @return the node id factory<a name="line.1228"></a>
+<span class="sourceLineNo">1229</span>     */<a name="line.1229"></a>
+<span class="sourceLineNo">1230</span>    NodeIdFactory getNodeIdFactory();<a name="line.1230"></a>
+<span class="sourceLineNo">1231</span><a name="line.1231"></a>
+<span class="sourceLineNo">1232</span>    /**<a name="line.1232"></a>
+<span class="sourceLineNo">1233</span>     * Gets the management strategy<a name="line.1233"></a>
+<span class="sourceLineNo">1234</span>     *<a name="line.1234"></a>
+<span class="sourceLineNo">1235</span>     * @return the management strategy<a name="line.1235"></a>
+<span class="sourceLineNo">1236</span>     */<a name="line.1236"></a>
+<span class="sourceLineNo">1237</span>    ManagementStrategy getManagementStrategy();<a name="line.1237"></a>
+<span class="sourceLineNo">1238</span><a name="line.1238"></a>
+<span class="sourceLineNo">1239</span>    /**<a name="line.1239"></a>
+<span class="sourceLineNo">1240</span>     * Sets the management strategy to use<a name="line.1240"></a>
+<span class="sourceLineNo">1241</span>     *<a name="line.1241"></a>
+<span class="sourceLineNo">1242</span>     * @param strategy the management strategy<a name="line.1242"></a>
+<span class="sourceLineNo">1243</span>     */<a name="line.1243"></a>
+<span class="sourceLineNo">1244</span>    void setManagementStrategy(ManagementStrategy strategy);<a name="line.1244"></a>
+<span class="sourceLineNo">1245</span><a name="line.1245"></a>
+<span class="sourceLineNo">1246</span>    /**<a name="line.1246"></a>
+<span class="sourceLineNo">1247</span>     * Gets the default tracer<a name="line.1247"></a>
+<span class="sourceLineNo">1248</span>     *<a name="line.1248"></a>
+<span class="sourceLineNo">1249</span>     * @return the default tracer<a name="line.1249"></a>
+<span class="sourceLineNo">1250</span>     */<a name="line.1250"></a>
+<span class="sourceLineNo">1251</span>    InterceptStrategy getDefaultTracer();<a name="line.1251"></a>
+<span class="sourceLineNo">1252</span><a name="line.1252"></a>
+<span class="sourceLineNo">1253</span>    /**<a name="line.1253"></a>
+<span class="sourceLineNo">1254</span>     * Sets a custom tracer to be used as the default tracer.<a name="line.1254"></a>
+<span class="sourceLineNo">1255</span>     * &lt;p/&gt;<a name="line.1255"></a>
+<span class="sourceLineNo">1256</span>     * &lt;b&gt;Note:&lt;/b&gt; This must be set before any routes are created,<a name="line.1256"></a>
+<span class="sourceLineNo">1257</span>     * changing the default tracer for existing routes is not supported.<a name="line.1257"></a>
+<span class="sourceLineNo">1258</span>     *<a name="line.1258"></a>
+<span class="sourceLineNo">1259</span>     * @param tracer the custom tracer to use as default tracer<a name="line.1259"></a>
+<span class="sourceLineNo">1260</span>     */<a name="line.1260"></a>
+<span class="sourceLineNo">1261</span>    void setDefaultTracer(InterceptStrategy tracer);<a name="line.1261"></a>
+<span class="sourceLineNo">1262</span><a name="line.1262"></a>
+<span class="sourceLineNo">1263</span>    /**<a name="line.1263"></a>
+<span class="sourceLineNo">1264</span>     * Gets the default backlog tracer<a name="line.1264"></a>
+<span class="sourceLineNo">1265</span>     *<a name="line.1265"></a>
+<span class="sourceLineNo">1266</span>     * @return the default backlog tracer<a name="line.1266"></a>
+<span class="sourceLineNo">1267</span>     */<a name="line.1267"></a>
+<span class="sourceLineNo">1268</span>    InterceptStrategy getDefaultBacklogTracer();<a name="line.1268"></a>
+<span class="sourceLineNo">1269</span><a name="line.1269"></a>
+<span class="sourceLineNo">1270</span>    /**<a name="line.1270"></a>
+<span class="sourceLineNo">1271</span>     * Sets a custom backlog tracer to be used as the default backlog tracer.<a name="line.1271"></a>
+<span class="sourceLineNo">1272</span>     * &lt;p/&gt;<a name="line.1272"></a>
+<span class="sourceLineNo">1273</span>     * &lt;b&gt;Note:&lt;/b&gt; This must be set before any routes are created,<a name="line.1273"></a>
+<span class="sourceLineNo">1274</span>     * changing the default backlog tracer for existing routes is not supported.<a name="line.1274"></a>
+<span class="sourceLineNo">1275</span>     *<a name="line.1275"></a>
+<span class="sourceLineNo">1276</span>     * @param backlogTracer the custom tracer to use as default backlog tracer<a name="line.1276"></a>
+<span class="sourceLineNo">1277</span>     */<a name="line.1277"></a>
+<span class="sourceLineNo">1278</span>    void setDefaultBacklogTracer(InterceptStrategy backlogTracer);<a name="line.1278"></a>
+<span class="sourceLineNo">1279</span><a name="line.1279"></a>
+<span class="sourceLineNo">1280</span>    /**<a name="line.1280"></a>
+<span class="sourceLineNo">1281</span>     * Gets the default backlog debugger<a name="line.1281"></a>
+<span class="sourceLineNo">1282</span>     *<a name="line.1282"></a>
+<span class="sourceLineNo">1283</span>     * @return the default backlog debugger<a name="line.1283"></a>
+<span class="sourceLineNo">1284</span>     */<a name="line.1284"></a>
+<span class="sourceLineNo">1285</span>    InterceptStrategy getDefaultBacklogDebugger();<a name="line.1285"></a>
+<span class="sourceLineNo">1286</span><a name="line.1286"></a>
+<span class="sourceLineNo">1287</span>    /**<a name="line.1287"></a>
+<span class="sourceLineNo">1288</span>     * Sets a custom backlog debugger to be used as the default backlog debugger.<a name="line.1288"></a>
+<span class="sourceLineNo">1289</span>     * &lt;p/&gt;<a name="line.1289"></a>
+<span class="sourceLineNo">1290</span>     * &lt;b&gt;Note:&lt;/b&gt; This must be set before any routes are created,<a name="line.1290"></a>
+<span class="sourceLineNo">1291</span>     * changing the default backlog debugger for existing routes is not supported.<a name="line.1291"></a>
+<span class="sourceLineNo">1292</span>     *<a name="line.1292"></a>
+<span class="sourceLineNo">1293</span>     * @param backlogDebugger the custom debugger to use as default backlog debugger<a name="line.1293"></a>
+<span class="sourceLineNo">1294</span>     */<a name="line.1294"></a>
+<span class="sourceLineNo">1295</span>    void setDefaultBacklogDebugger(InterceptStrategy backlogDebugger);<a name="line.1295"></a>
+<span class="sourceLineNo">1296</span><a name="line.1296"></a>
+<span class="sourceLineNo">1297</span>    /**<a name="line.1297"></a>
+<span class="sourceLineNo">1298</span>     * Disables using JMX as {@link org.apache.camel.spi.ManagementStrategy}.<a name="line.1298"></a>
+<span class="sourceLineNo">1299</span>     * &lt;p/&gt;<a name="line.1299"></a>
+<span class="sourceLineNo">1300</span>     * &lt;b&gt;Important:&lt;/b&gt; This method must be called &lt;b&gt;before&lt;/b&gt; the {@link CamelContext} is started.<a name="line.1300"></a>
+<span class="sourceLineNo">1301</span>     *<a name="line.1301"></a>
+<span class="sourceLineNo">1302</span>     * @throws IllegalStateException is thrown if the {@link CamelContext} is not in stopped state.<a name="line.1302"></a>
+<span class="sourceLineNo">1303</span>     */<a name="line.1303"></a>
+<span class="sourceLineNo">1304</span>    void disableJMX() throws IllegalStateException;<a name="line.1304"></a>
+<span class="sourceLineNo">1305</span><a name="line.1305"></a>
+<span class="sourceLineNo">1306</span>    /**<a name="line.1306"></a>
+<span class="sourceLineNo">1307</span>     * Gets the inflight repository<a name="line.1307"></a>
+<span class="sourceLineNo">1308</span>     *<a name="line.1308"></a>
+<span class="sourceLineNo">1309</span>     * @return the repository<a name="line.1309"></a>
+<span class="sourceLineNo">1310</span>     */<a name="line.1310"></a>
+<span class="sourceLineNo">1311</span>    InflightRepository getInflightRepository();<a name="line.1311"></a>
+<span class="sourceLineNo">1312</span><a name="line.1312"></a>
+<span class="sourceLineNo">1313</span>    /**<a name="line.1313"></a>
+<span class="sourceLineNo">1314</span>     * Sets a custom inflight repository to use<a name="line.1314"></a>
+<span class="sourceLineNo">1315</span>     *<a name="line.1315"></a>
+<span class="sourceLineNo">1316</span>     * @param repository the repository<a name="line.1316"></a>
+<span class="sourceLineNo">1317</span>     */<a name="line.1317"></a>
+<span class="sourceLineNo">1318</span>    void setInflightRepository(InflightRepository repository);<a name="line.1318"></a>
+<span class="sourceLineNo">1319</span><a name="line.1319"></a>
+<span class="sourceLineNo">1320</span>    /**<a name="line.1320"></a>
+<span class="sourceLineNo">1321</span>     * Gets the {@link org.apache.camel.AsyncProcessor} await manager.<a name="line.1321"></a>
+<span class="sourceLineNo">1322</span>     *<a name="line.1322"></a>
+<span class="sourceLineNo">1323</span>     * @return the manager<a name="line.1323"></a>
+<span class="sourceLineNo">1324</span>     */<a name="line.1324"></a>
+<span class="sourceLineNo">1325</span>    AsyncProcessorAwaitManager getAsyncProcessorAwaitManager();<a name="line.1325"></a>
+<span class="sourceLineNo">1326</span><a name="line.1326"></a>
+<span class="sourceLineNo">1327</span>    /**<a name="line.1327"></a>
+<span class="sourceLineNo">1328</span>     * Sets a custom  {@link org.apache.camel.AsyncProcessor} await manager.<a name="line.1328"></a>
+<span class="sourceLineNo">1329</span>     *<a name="line.1329"></a>
+<span class="sourceLineNo">1330</span>     * @param manager the manager<a name="line.1330"></a>
+<span class="sourceLineNo">1331</span>     */<a name="line.1331"></a>
+<span class="sourceLineNo">1332</span>    void setAsyncProcessorAwaitManager(AsyncProcessorAwaitManager manager);<a name="line.1332"></a>
+<span class="sourceLineNo">1333</span><a name="line.1333"></a>
+<span class="sourceLineNo">1334</span>    /**<a name="line.1334"></a>
+<span class="sourceLineNo">1335</span>     * Gets the the application context class loader which may be helpful for running camel in other containers<a name="line.1335"></a>
+<span class="sourceLineNo">1336</span>     *<a name="line.1336"></a>
+<span class="sourceLineNo">1337</span>     * @return the application context class loader<a name="line.1337"></a>
+<span class="sourceLineNo">1338</span>     */<a name="line.1338"></a>
+<span class="sourceLineNo">1339</span>    ClassLoader getApplicationContextClassLoader();<a name="line.1339"></a>
+<span class="sourceLineNo">1340</span><a name="line.1340"></a>
+<span class="sourceLineNo">1341</span>    /**<a name="line.1341"></a>
+<span class="sourceLineNo">1342</span>     * Sets the application context class loader<a name="line.1342"></a>
+<span class="sourceLineNo">1343</span>     *<a name="line.1343"></a>
+<span class="sourceLineNo">1344</span>     * @param classLoader the class loader<a name="line.1344"></a>
+<span class="sourceLineNo">1345</span>     */<a name="line.1345"></a>
+<span class="sourceLineNo">1346</span>    void setApplicationContextClassLoader(ClassLoader classLoader);<a name="line.1346"></a>
+<span class="sourceLineNo">1347</span><a name="line.1347"></a>
+<span class="sourceLineNo">1348</span>    /**<a name="line.1348"></a>
+<span class="sourceLineNo">1349</span>     * Gets the current shutdown strategy<a name="line.1349"></a>
+<span class="sourceLineNo">1350</span>     *<a name="line.1350"></a>
+<span class="sourceLineNo">1351</span>     * @return the strategy<a name="line.1351"></a>
+<span class="sourceLineNo">1352</span>     */<a name="line.1352"></a>
+<span class="sourceLineNo">1353</span>    ShutdownStrategy getShutdownStrategy();<a name="line.1353"></a>
+<span class="sourceLineNo">1354</span><a name="line.1354"></a>
+<span class="sourceLineNo">1355</span>    /**<a name="line.1355"></a>
+<span class="sourceLineNo">1356</span>     * Sets a custom shutdown strategy<a name="line.1356"></a>
+<span class="sourceLineNo">1357</span>     *<a name="line.1357"></a>
+<span class="sourceLineNo">1358</span>     * @param shutdownStrategy the custom strategy<a name="line.1358"></a>
+<span class="sourceLineNo">1359</span>     */<a name="line.1359"></a>
+<span class="sourceLineNo">1360</span>    void setShutdownStrategy(ShutdownStrategy shutdownStrategy);<a name="line.1360"></a>
+<span class="sourceLineNo">1361</span><a name="line.1361"></a>
+<span class="sourceLineNo">1362</span>    /**<a name="line.1362"></a>
+<span class="sourceLineNo">1363</span>     * Gets the current {@link org.apache.camel.spi.ExecutorServiceManager}<a name="line.1363"></a>
+<span class="sourceLineNo">1364</span>     *<a name="line.1364"></a>
+<span class="sourceLineNo">1365</span>     * @return the manager<a name="line.1365"></a>
+<span class="sourceLineNo">1366</span>     */<a name="line.1366"></a>
+<span class="sourceLineNo">1367</span>    ExecutorServiceManager getExecutorServiceManager();<a name="line.1367"></a>
+<span class="sourceLineNo">1368</span><a name="line.1368"></a>
+<span class="sourceLineNo">1369</span>    /**<a name="line.1369"></a>
+<span class="sourceLineNo">1370</span>     * Gets the current {@link org.apache.camel.spi.ExecutorServiceStrategy}<a name="line.1370"></a>
+<span class="sourceLineNo">1371</span>     *<a name="line.1371"></a>
+<span class="sourceLineNo">1372</span>     * @return the manager<a name="line.1372"></a>
+<span class="sourceLineNo">1373</span>     * @deprecated use {@link #getExecutorServiceManager()}<a name="line.1373"></a>
+<span class="sourceLineNo">1374</span>     */<a name="line.1374"></a>
+<span class="sourceLineNo">1375</span>    @Deprecated<a name="line.1375"></a>
+<span class="sourceLineNo">1376</span>    org.apache.camel.spi.ExecutorServiceStrategy getExecutorServiceStrategy();<a name="line.1376"></a>
+<span class="sourceLineNo">1377</span><a name="line.1377"></a>
+<span class="sourceLineNo">1378</span>    /**<a name="line.1378"></a>
+<span class="sourceLineNo">1379</span>     * Sets a custom {@link org.apache.camel.spi.ExecutorServiceManager}<a name="line.1379"></a>
+<span class="sourceLineNo">1380</span>     *<a name="line.1380"></a>
+<span class="sourceLineNo">1381</span>     * @param executorServiceManager the custom manager<a name="line.1381"></a>
+<span class="sourceLineNo">1382</span>     */<a name="line.1382"></a>
+<span class="sourceLineNo">1383</span>    void setExecutorServiceManager(ExecutorServiceManager executorServiceManager);<a name="line.1383"></a>
+<span class="sourceLineNo">1384</span><a name="line.1384"></a>
+<span class="sourceLineNo">1385</span>    /**<a name="line.1385"></a>
+<span class="sourceLineNo">1386</span>     * Gets the current {@link org.apache.camel.spi.ProcessorFactory}<a name="line.1386"></a>
+<span class="sourceLineNo">1387</span>     *<a name="line.1387"></a>
+<span class="sourceLineNo">1388</span>     * @return the factory, can be &lt;tt&gt;null&lt;/tt&gt; if no custom factory has been set<a name="line.1388"></a>
+<span class="sourceLineNo">1389</span>     */<a name="line.1389"></a>
+<span class="sourceLineNo">1390</span>    ProcessorFactory getProcessorFactory();<a name="line.1390"></a>
+<span class="sourceLineNo">1391</span><a name="line.1391"></a>
+<span class="sourceLineNo">1392</span>    /**<a name="line.1392"></a>
+<span class="sourceLineNo">1393</span>     * Sets a custom {@link org.apache.camel.spi.ProcessorFactory}<a name="line.1393"></a>
+<span class="sourceLineNo">1394</span>     *<a name="line.1394"></a>
+<span class="sourceLineNo">1395</span>     * @param processorFactory the custom factory<a name="line.1395"></a>
+<span class="sourceLineNo">1396</span>     */<a name="line.1396"></a>
+<span class="sourceLineNo">1397</span>    void setProcessorFactory(ProcessorFactory processorFactory);<a name="line.1397"></a>
+<span class="sourceLineNo">1398</span><a name="line.1398"></a>
+<span class="sourceLineNo">1399</span>    /**<a name="line.1399"></a>
+<span class="sourceLineNo">1400</span>     * Gets the current {@link org.apache.camel.spi.MessageHistoryFactory}<a name="line.1400"></a>
+<span class="sourceLineNo">1401</span>     *<a name="line.1401"></a>
+<span class="sourceLineNo">1402</span>     * @return the factory<a name="line.1402"></a>
+<span class="sourceLineNo">1403</span>     */<a name="line.1403"></a>
+<span class="sourceLineNo">1404</span>    MessageHistoryFactory getMessageHistoryFactory();<a name="line.1404"></a>
+<span class="sourceLineNo">1405</span><a name="line.1405"></a>
+<span class="sourceLineNo">1406</span>    /**<a name="line.1406"></a>
+<span class="sourceLineNo">1407</span>     * Sets a custom {@link org.apache.camel.spi.MessageHistoryFactory}<a name="line.1407"></a>
+<span class="sourceLineNo">1408</span>     *<a name="line.1408"></a>
+<span class="sourceLineNo">1409</span>     * @param messageHistoryFactory the custom factory<a name="line.1409"></a>
+<span class="sourceLineNo">1410</span>     */<a name="line.1410"></a>
+<span class="sourceLineNo">1411</span>    void setMessageHistoryFactory(MessageHistoryFactory messageHistoryFactory);<a name="line.1411"></a>
+<span class="sourceLineNo">1412</span><a name="line.1412"></a>
+<span class="sourceLineNo">1413</span>    /**<a name="line.1413"></a>
+<span class="sourceLineNo">1414</span>     * Gets the current {@link Debugger}<a name="line.1414"></a>
+<span class="sourceLineNo">1415</span>     *<a name="line.1415"></a>
+<span class="sourceLineNo">1416</span>     * @return the debugger<a name="line.1416"></a>
+<span class="sourceLineNo">1417</span>     */<a name="line.1417"></a>
+<span class="sourceLineNo">1418</span>    Debugger getDebugger();<a name="line.1418"></a>
+<span class="sourceLineNo">1419</span><a name="line.1419"></a>
+<span class="sourceLineNo">1420</span>    /**<a name="line.1420"></a>
+<span class="sourceLineNo">1421</span>     * Sets a custom {@link Debugger}<a name="line.1421"></a>
+<span class="sourceLineNo">1422</span>     *<a name="line.1422"></a>
+<span class="sourceLineNo">1423</span>     * @param debugger the debugger<a name="line.1423"></a>
+<span class="sourceLineNo">1424</span>     */<a name="line.1424"></a>
+<span class="sourceLineNo">1425</span>    void setDebugger(Debugger debugger);<a name="line.1425"></a>
+<span class="sourceLineNo">1426</span><a name="line.1426"></a>
+<span class="sourceLineNo">1427</span>    /**<a name="line.1427"></a>
+<span class="sourceLineNo">1428</span>     * Gets the current {@link UuidGenerator}<a name="line.1428"></a>
+<span class="sourceLineNo">1429</span>     *<a name="line.1429"></a>
+<span class="sourceLineNo">1430</span>     * @return the uuidGenerator<a name="line.1430"></a>
+<span class="sourceLineNo">1431</span>     */<a name="line.1431"></a>
+<span class="sourceLineNo">1432</span>    UuidGenerator getUuidGenerator();<a name="line.1432"></a>
+<span class="sourceLineNo">1433</span>    <a name="line.1433"></a>
+<span class="sourceLineNo">1434</span>    /**<a name="line.1434"></a>
+<span class="sourceLineNo">1435</span>     * Sets a custom {@link UuidGenerator} (should only be set once) <a name="line.1435"></a>
+<span class="sourceLineNo">1436</span>     *<a name="line.1436"></a>
+<span class="sourceLineNo">1437</span>     * @param uuidGenerator the UUID Generator<a name="line.1437"></a>
+<span class="sourceLineNo">1438</span>     */<a name="line.1438"></a>
+<span class="sourceLineNo">1439</span>    void setUuidGenerator(UuidGenerator uuidGenerator);<a name="line.1439"></a>
+<span class="sourceLineNo">1440</span><a name="line.1440"></a>
+<span class="sourceLineNo">1441</span>    /**<a name="line.1441"></a>
+<span class="sourceLineNo">1442</span>     * Whether or not type converters should be loaded lazy<a name="line.1442"></a>
+<span class="sourceLineNo">1443</span>     *<a name="line.1443"></a>
+<span class="sourceLineNo">1444</span>     * @return &lt;tt&gt;true&lt;/tt&gt; to load lazy, &lt;tt&gt;false&lt;/tt&gt; to load on startup<a name="line.1444"></a>
+<span class="sourceLineNo">1445</span>     * @deprecated this option is no longer supported, will be removed in a future Camel release.<a name="line.1445"></a>
+<span class="sourceLineNo">1446</span>     */<a name="line.1446"></a>
+<span class="sourceLineNo">1447</span>    @Deprecated<a name="line.1447"></a>
+<span class="sourceLineNo">1448</span>    Boolean isLazyLoadTypeConverters();<a name="line.1448"></a>
+<span class="sourceLineNo">1449</span><a name="line.1449"></a>
+<span class="sourceLineNo">1450</span>    /**<a name="line.1450"></a>
+<span class="sourceLineNo">1451</span>     * Sets whether type converters should be loaded lazy<a name="line.1451"></a>
+<span class="sourceLineNo">1452</span>     *<a name="line.1452"></a>
+<span class="sourceLineNo">1453</span>     * @param lazyLoadTypeConverters &lt;tt&gt;true&lt;/tt&gt; to load lazy, &lt;tt&gt;false&lt;/tt&gt; to load on startup<a name="line.1453"></a>
+<span class="sourceLineNo">1454</span>     * @deprecated this option is no longer supported, will be removed in a future Camel release.<a name="line.1454"></a>
+<span class="sourceLineNo">1455</span>     */<a name="line.1455"></a>
+<span class="sourceLineNo">1456</span>    @Deprecated<a name="line.1456"></a>
+<span class="sourceLineNo">1457</span>    void setLazyLoadTypeConverters(Boolean lazyLoadTypeConverters);<a name="line.1457"></a>
+<span class="sourceLineNo">1458</span><a name="line.1458"></a>
+<span class="sourceLineNo">1459</span>    /**<a name="line.1459"></a>
+<span class="sourceLineNo">1460</span>     * Whether or not type converter statistics is enabled.<a name="line.1460"></a>
+<span class="sourceLineNo">1461</span>     * &lt;p/&gt;<a name="line.1461"></a>
+<span class="sourceLineNo">1462</span>     * By default the type converter utilization statistics is disabled.<a name="line.1462"></a>
+<span class="sourceLineNo">1463</span>     * &lt;b&gt;Notice:&lt;/b&gt; If enabled then there is a slight performance impact under very heavy load.<a name="line.1463"></a>
+<span class="sourceLineNo">1464</span>     *<a name="line.1464"></a>
+<span class="sourceLineNo">1465</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if enabled, &lt;tt&gt;false&lt;/tt&gt; if disabled (default).<a name="line.1465"></a>
+<span class="sourceLineNo">1466</span>     */<a name="line.1466"></a>
+<span class="sourceLineNo">1467</span>    Boolean isTypeConverterStatisticsEnabled();<a name="line.1467"></a>
+<span class="sourceLineNo">1468</span><a name="line.1468"></a>
+<span class="sourceLineNo">1469</span>    /**<a name="line.1469"></a>
+<span class="sourceLineNo">1470</span>     * Sets whether or not type converter statistics is enabled.<a name="line.1470"></a>
+<span class="sourceLineNo">1471</span>     * &lt;p/&gt;<a name="line.1471"></a>
+<span class="sourceLineNo">1472</span>     * By default the type converter utilization statistics is disabled.<a name="line.1472"></a>
+<span class="sourceLineNo">1473</span>     * &lt;b&gt;Notice:&lt;/b&gt; If enabled then there is a slight performance impact under very heavy load.<a name="line.1473"></a>
+<span class="sourceLineNo">1474</span>     * &lt;p/&gt;<a name="line.1474"></a>
+<span class="sourceLineNo">1475</span>     * You can enable/disable the statistics at runtime using the<a name="line.1475"></a>
+<span class="sourceLineNo">1476</span>     * {@link org.apache.camel.spi.TypeConverterRegistry#getStatistics()#setTypeConverterStatisticsEnabled(Boolean)} method,<a name="line.1476"></a>
+<span class="sourceLineNo">1477</span>     * or from JMX on the {@link org.apache.camel.api.management.mbean.ManagedTypeConverterRegistryMBean} mbean.<a name="line.1477"></a>
+<span class="sourceLineNo">1478</span>     *<a name="line.1478"></a>
+<span class="sourceLineNo">1479</span>     * @param typeConverterStatisticsEnabled &lt;tt&gt;true&lt;/tt&gt; to enable, &lt;tt&gt;false&lt;/tt&gt; to disable<a name="line.1479"></a>
+<span class="sourceLineNo">1480</span>     */<a name="line.1480"></a>
+<span class="sourceLineNo">1481</span>    void setTypeConverterStatisticsEnabled(Boolean typeConverterStatisticsEnabled);<a name="line.1481"></a>
+<span class="sourceLineNo">1482</span><a name="line.1482"></a>
+<span class="sourceLineNo">1483</span>    /**<a name="line.1483"></a>
+<span class="sourceLineNo">1484</span>     * Whether or not &lt;a href="http://www.slf4j.org/api/org/slf4j/MDC.html"&gt;MDC&lt;/a&gt; logging is being enabled.<a name="line.1484"></a>
+<span class="sourceLineNo">1485</span>     *<a name="line.1485"></a>
+<span class="sourceLineNo">1486</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if MDC logging is enabled<a name="line.1486"></a>
+<span class="sourceLineNo">1487</span>     */<a name="line.1487"></a>
+<span class="sourceLineNo">1488</span>    Boolean isUseMDCLogging();<a name="line.1488"></a>
+<span class="sourceLineNo">1489</span><a name="line.1489"></a>
+<span class="sourceLineNo">1490</span>    /**<a name="line.1490"></a>
+<span class="sourceLineNo">1491</span>     * Set whether &lt;a href="http://www.slf4j.org/api/org/slf4j/MDC.html"&gt;MDC&lt;/a&gt; is enabled.<a name="line.1491"></a>
+<span class="sourceLineNo">1492</span>     *<a name="line.1492"></a>
+<span class="sourceLineNo">1493</span>     * @param useMDCLogging &lt;tt&gt;true&lt;/tt&gt; to enable MDC logging, &lt;tt&gt;false&lt;/tt&gt; to disable<a name="line.1493"></a>
+<span class="sourceLineNo">1494</span>     */<a name="line.1494"></a>
+<span class="sourceLineNo">1495</span>    void setUseMDCLogging(Boolean useMDCLogging);<a name="line.1495"></a>
+<span class="sourceLineNo">1496</span><a name="line.1496"></a>
+<span class="sourceLineNo">1497</span>    /**<a name="line.1497"></a>
+<span class="sourceLineNo">1498</span>     * Whether or not breadcrumb is enabled.<a name="line.1498"></a>
+<span class="sourceLineNo">1499</span>     *<a name="line.1499"></a>
+<span class="sourceLineNo">1500</span>     * @return &lt;tt&gt;true&lt;/tt&gt; if breadcrumb is enabled<a name="line.1500"></a>
+<span class="sourceLineNo">1501</span>     */<a name="line.1501"></a>
+<span class="sourceLineNo">1502</span>    Boolean isUseBreadcrumb();<a name="line.1502"></a>
+<span class="sourceLineNo">1503</span><a name="line.1503"></a>
+<span class="sourceLineNo">1504</span>    /**<a name="line.1504"></a>
+<span class="sourceLineNo">1505</span>     * Set whether breadcrumb is enabled.<a name="line.1505"></a>
+<span class="sourceLineNo">1506</span>     *<a name="line.1506"></a>
+<span class="sourceLineNo">1507</span>     * @param useBreadcrumb &lt;tt&gt;true&lt;/tt&gt; to enable breadcrumb, &lt;tt&gt;false&lt;/tt&gt; to disable<a name="line.1507"></a>
+<span class="sourceLineNo">1508</span>     */<a name="line.1508"></a>
+<span class="sourceLineNo">1509</span>    void setUseBreadcrumb(Boolean useBreadcrumb);<a name="line.1509"></a>
+<span class="sourceLineNo">1510</span><a name="line.1510"></a>
+<span class="sourceLineNo">1511</span>    /**<a name="line.1511"></a>
+<span class="sourceLineNo">1512</span>     * Resolves a component's default name from its java type.<a name="line.1512"></a>
+<span class="sourceLineNo">1513</span>     * &lt;p/&gt;<a name="line.1513"></a>
+<span class="sourceLineNo">1514</span>     * A component may be used with a non default name such as &lt;tt&gt;activemq&lt;/tt&gt;, &lt;tt&gt;wmq&lt;/tt&gt; for the JMS component.<a name="line.1514"></a>
+<span class="sourceLineNo">1515</span>     * This method can resolve the default component name by its java type.<a name="line.1515"></a>
+<span class="sourceLineNo">1516</span>     *<a name="line.1516"></a>
+<span class="sourceLineNo">1517</span>     * @param javaType the FQN name of the java type<a name="line.1517"></a>
+<span class="sourceLineNo">1518</span>     * @return the default component name.<a name="line.1518"></a>
+<span class="sourceLineNo">1519</span>     */<a name="line.1519"></a>
+<span class="sourceLineNo">1520</span>    String resolveComponentDefaultName(String javaType);<a name="line.1520"></a>
+<span class="sourceLineNo">1521</span><a name="line.1521"></a>
+<span class="sourceLineNo">1522</span>    /**<a name="line.1522"></a>
+<span class="sourceLineNo">1523</span>     * Find information about all the Camel components available in the classpath and {@link org.apache.camel.spi.Registry}.<a name="line.1523"></a>
+<span class="sourceLineNo">1524</span>     *<a name="line.1524"></a>
+<span class="sourceLineNo">1525</span>     * @return a map with the component name, and value with component details.<a name="line.1525"></a>
+<span class="sourceLineNo">1526</span>     * @throws LoadPropertiesException is thrown if error during classpath discovery of the components<a name="line.1526"></a>
+<span class="sourceLineNo">1527</span>     * @throws IOException is thrown if error during classpath discovery of the components<a name="line.1527"></a>
+<span class="sourceLineNo">1528</span>     */<a name="line.1528"></a>
+<span class="sourceLineNo">1529</span>    Map&lt;String, Properties&gt; findComponents() throws LoadPropertiesException, IOException;<a name="line.1529"></a>
+<span class="sourceLineNo">1530</span><a name="line.1530"></a>
+<span class="sourceLineNo">1531</span>    /**<a name="line.1531"></a>
+<span class="sourceLineNo">1532</span>     * Find information about all the EIPs from camel-core.<a name="line.1532"></a>
+<span class="sourceLineNo">1533</span>     *<a name="line.1533"></a>
+<span class="sourceLineNo">1534</span>     * @return a map with node id, and value with EIP details.<a name="line.1534"></a>
+<span class="sourceLineNo">1535</span>     * @throws LoadPropertiesException is thrown if error during classpath discovery of the EIPs<a name="line.1535"></a>
+<span class="sourceLineNo">1536</span>     * @throws IOException is thrown if error during classpath discovery of the EIPs<a name="line.1536"></a>
+<span class="sourceLineNo">1537</span>     */<a name="line.1537"></a>
+<span class="sourceLineNo">1538</span>    Map&lt;String, Properties&gt; findEips() throws LoadPropertiesException, IOException;<a name="line.1538"></a>
+<span class="sourceLineNo">1539</span><a name="line.1539"></a>
+<span class="sourceLineNo">1540</span>    /**<a name="line.1540"></a>
+<span class="sourceLineNo">1541</span>     * Returns the HTML documentation for the given Camel component<a name="line.1541"></a>
+<span class="sourceLineNo">1542</span>     *<a name="line.1542"></a>
+<span class="sourceLineNo">1543</span>     * @return the HTML or &lt;tt&gt;null&lt;/tt&gt; if the component is &lt;b&gt;not&lt;/b&gt; built with HTML document included.<a name="line.1543"></a>
+<span class="sourceLineNo">1544</span>     */<a name="line.1544"></a>
+<span class="sourceLineNo">1545</span>    String getComponentDocumentation(String componentName) throws IOException;<a name="line.1545"></a>
+<span class="sourceLineNo">1546</span><a name="line.1546"></a>
+<span class="sourceLineNo">1547</span>    /**<a name="line.1547"></a>
+<span class="sourceLineNo">1548</span>     * Returns the JSON schema representation of the component and endpoint parameters for the given component name.<a name="line.1548"></a>
+<span class="sourceLineNo">1549</span>     *<a name="line.1549"></a>
+<span class="sourceLineNo">1550</span>     * @return the json or &lt;tt&gt;null&lt;/tt&gt; if the component is &lt;b&gt;not&lt;/b&gt; built with JSon schema support<a name="line.1550"></a>
+<span class="sourceLineNo">1551</span>     */<a name="line.1551"></a>
+<span class="sourceLineNo">1552</span>    String getComponentParameterJsonSchema(String componentName) throws IOException;<a name="line.1552"></a>
+<span class="sourceLineNo">1553</span><a name="line.1553"></a>
+<span class="sourceLineNo">1554</span>    /**<a name="line.1554"></a>
+<span class="sourceLineNo">1555</span>     * Returns the JSON schema representation of the {@link DataFormat} parameters for the given data format name.<a name="line.1555"></a>
+<span class="sourceLineNo">1556</span>     *<a name="line.1556"></a>
+<span class="sourceLineNo">1557</span>     * @return the json or &lt;tt&gt;null&lt;/tt&gt; if the data format does not exist<a name="line.1557"></a>
+<span class="sourceLineNo">1558</span>     */<a name="line.1558"></a>
+<span class="sourceLineNo">1559</span>    String getDataFormatParameterJsonSchema(String dataFormatName) throws IOException;<a name="line.1559"></a>
+<span class="sourceLineNo">1560</span><a name="line.1560"></a>
+<span class="sourceLineNo">1561</span>    /**<a name="line.1561"></a>
+<span class="sourceLineNo">1562</span>     * Returns the JSON schema representation of the {@link Language} parameters for the given language name.<a name="line.1562"></a>
+<span class="sourceLineNo">1563</span>     *<a name="line.1563"></a>
+<span class="sourceLineNo">1564</span>     * @return the json or &lt;tt&gt;null&lt;/tt&gt; if the language does not exist<a name="line.1564"></a>
+<span class="sourceLineNo">1565</span>     */<a name="line.1565"></a>
+<span class="sourceLineNo">1566</span>    String getLanguageParameterJsonSchema(String languageName) throws IOException;<a name="line.1566"></a>
+<span class="sourceLineNo">1567</span><a name="line.1567"></a>
+<span class="sourceLineNo">1568</span>    /**<a name="line.1568"></a>
+<span class="sourceLineNo">1569</span>     * Returns the JSON schema representation of the EIP parameters for the given EIP name.<a name="line.1569"></a>
+<span class="sourceLineNo">1570</span>     *<a name="line.1570"></a>
+<span class="sourceLineNo">1571</span>     * @return the json or &lt;tt&gt;null&lt;/tt&gt; if the EIP does not exist<a name="line.1571"></a>
+<span class="sourceLineNo">1572</span>     */<a name="line.1572"></a>
+<span class="sourceLineNo">1573</span>    String getEipParameterJsonSchema(String eipName) throws IOException;<a name="line.1573"></a>
+<span class="sourceLineNo">1574</span><a name="line.1574"></a>
+<span class="sourceLineNo">1575</span>    /**<a name="line.1575"></a>
+<span class="sourceLineNo">1576</span>     * Returns a JSON schema representation of the EIP parameters for the given EIP by its id.<a name="line.1576"></a>
+<span class="sourceLineNo">1577</span>     *<a name="line.1577"></a>
+<span class="sourceLineNo">1578</span>     * @param nameOrId the name of the EIP ({@link NamedNode#getShortName()} or a node id to refer to a specific node from the routes.<a name="line.1578"></a>
+<span class="sourceLineNo">1579</span>     * @param includeAllOptions whether to include non configured options also (eg default options)<a name="line.1579"></a>
+<span class="sourceLineNo">1580</span>     * @return the json or &lt;tt&gt;null&lt;/tt&gt; if the eipName or the id was not found<a name="line.1580"></a>
+<span class="sourceLineNo">1581</span>     */<a name="line.1581"></a>
+<span class="sourceLineNo">1582</span>    String explainEipJson(String nameOrId, boolean includeAllOptions);<a name="line.1582"></a>
+<span class="sourceLineNo">1583</span><a name="line.1583"></a>
+<span class="sourceLineNo">1584</span>    /**<a name="line.1584"></a>
+<span class="sourceLineNo">1585</span>     * Returns a JSON schema representation of the component parameters (not endpoint parameters) for the given component by its id.<a name="line.1585"></a>
+<span class="sourceLineNo">1586</span>     *<a name="line.1586"></a>
+<span class="sourceLineNo">1587</span>     * @param componentName the name of the component.<a name="line.1587"></a>
+<span class="sourceLineNo">1588</span>     * @param includeAllOptions whether to include non configured options also (eg default options)<a name="line.1588"></a>
+<span class="sourceLineNo">1589</span>     * @return the json or &lt;tt&gt;null&lt;/tt&gt; if the component was not found<a name="line.1589"></a>
+<span class="sourceLineNo">1590</span>     */<a name="line.1590"></a>
+<span class="sourceLineNo">1591</span>    String explainComponentJson(String componentName, boolean includeAllOptions);<a name="line.1591"></a>
+<span class="sourceLineNo">1592</span><a name="line.1592"></a>
+<span class="sourceLineNo">1593</span>    /**<a name="line.1593"></a>
+<span class="sourceLineNo">1594</span>     * Returns a JSON schema representation of the component parameters (not endpoint parameters) for the given component by its id.<a name="line.1594"></a>
+<span class="sourceLineNo">1595</span>     *<a name="line.1595"></a>
+<span class="sourceLineNo">1596</span>     * @param dataFormat the data format instance.<a name="line.1596"></a>
+<span class="sourceLineNo">1597</span>     * @param includeAllOptions whether to include non configured options also (eg default options)<a name="line.1597"></a>
+<span class="sourceLineNo">1598</span>     * @return the json<a name="line.1598"></a>
+<span class="sourceLineNo">1599</span>     */<a name="line.1599"></a>
+<span class="sourceLineNo">1600</span>    String explainDataFormatJson(String dataFormatName, DataFormat dataFormat, boolean includeAllOptions);<a name="line.1600"></a>
+<span class="sourceLineNo">1601</span><a name="line.1601"></a>
+<span class="sourceLineNo">1602</span>    /**<a name="line.1602"></a>
+<span class="sourceLineNo">1603</span>     * Returns a JSON schema representation of the endpoint parameters for the given endpoint uri.<a name="line.1603"></a>
+<span class="sourceLineNo">1604</span>     *<a name="line.1604"></a>
+<span class="sourceLineNo">1605</span>     * @param uri the endpoint uri<a name="line.1605"></a>
+<span class="sourceLineNo">1606</span>     * @param includeAllOptions whether to include non configured options also (eg default options)<a name="line.1606"></a>
+<span class="sourceLineNo">1607</span>     * @return the json or &lt;tt&gt;null&lt;/tt&gt; if uri parameters is invalid, or the component is &lt;b&gt;not&lt;/b&gt; built with JSon schema support<a name="line.1607"></a>
+<span class="sourceLineNo">1608</span>     */<a name="line.1608"></a>
+<span class="sourceLineNo">1609</span>    String explainEndpointJson(String uri, boolean includeAllOptions);<a name="line.1609"></a>
+<span class="sourceLineNo">1610</span><a name="line.1610"></a>
+<span class="sourceLineNo">1611</span>    /**<a name="line.1611"></a>
+<span class="sourceLineNo">1612</span>     * Creates a JSON representation of all the &lt;b&gt;static&lt;/b&gt; and &lt;b&gt;dynamic&lt;/b&gt; configured endpoints defined in the given route(s).<a name="line.1612"></a>
+<span class="sourceLineNo">1613</span>     *<a name="line.1613"></a>
+<span class="sourceLineNo">1614</span>     * @param routeId for a particular route, or &lt;tt&gt;null&lt;/tt&gt; for all routes<a name="line.1614"></a>
+<span class="sourceLineNo">1615</span>     * @return a JSON string<a name="line.1615"></a>
+<span class="sourceLineNo">1616</span>     */<a name="line.1616"></a>
+<span class="sourceLineNo">1617</span>    String createRouteStaticEndpointJson(String routeId);<a name="line.1617"></a>
+<span class="sourceLineNo">1618</span><a name="line.1618"></a>
+<span class="sourceLineNo">1619</span>    /**<a name="line.1619"></a>
+<span class="sourceLineNo">1620</span>     * Creates a JSON representation of all the &lt;b&gt;static&lt;/b&gt; (and possible &lt;b&gt;dynamic&lt;/b&gt;) configured endpoints defined in the given route(s).<a name="line.1620"></a>
+<span class="sourceLineNo">1621</span>     *<a name="line.1621"></a>
+<span class="sourceLineNo">1622</span>     * @param routeId for a particular route, or &lt;tt&gt;null&lt;/tt&gt; for all routes<a name="line.1622"></a>
+<span class="sourceLineNo">1623</span>     * @param includeDynamic whether to include dynamic endpoints<a name="line.1623"></a>
+<span class="sourceLineNo">1624</span>     * @return a JSON string<a name="line.1624"></a>
+<span class="sourceLineNo">1625</span>     */<a name="line.1625"></a>
+<span class="sourceLineNo">1626</span>    String createRouteStaticEndpointJson(String routeId, boolean includeDynamic);<a name="line.1626"></a>
+<span class="sourceLineNo">1627</span><a name="line.1627"></a>
+<span class="sourceLineNo">1628</span>    /**<a name="line.1628"></a>
+<span class="sourceLineNo">1629</span>     * Gets the {@link StreamCachingStrategy} to use.<a name="line.1629"></a>
+<span class="sourceLineNo">1630</span>     */<a name="line.1630"></a>
+<span class="sourceLineNo">1631</span>    StreamCachingStrategy getStreamCachingStrategy();<a name="line.1631"></a>
+<span class="sourceLineNo">1632</span><a name="line.1632"></a>
+<span class="sourceLineNo">1633</span>    /**<a name="line.1633"></a>
+<span class="sourceLineNo">1634</span>     * Sets a custom {@link StreamCachingStrategy} to use.<a name="line.1634"></a>
+<span class="sourceLineNo">1635</span>     */<a name="line.1635"></a>
+<span class="sourceLineNo">1636</span>    void setStreamCachingStrategy(StreamCachingStrategy streamCachingStrategy);<a name="line.1636"></a>
+<span class="sourceLineNo">1637</span><a name="line.1637"></a>
+<span class="sourceLineNo">1638</span>    /**<a name="line.1638"></a>
+<span class="sourceLineNo">1639</span>     * Gets the {@link UnitOfWorkFactory} to use.<a name="line.1639"></a>
+<span class="sourceLineNo">1640</span>     */<a name="line.1640"></a>
+<span class="sourceLineNo">1641</span>    UnitOfWorkFactory getUnitOfWorkFactory();<a name="line.1641"></a>
+<span class="sourceLineNo">1642</span><a name="line.1642"></a>
+<span class="sourceLineNo">1643</span>    /**<a name="line.1643"></a>
+<span class="sourceLineNo">1644</span>     * Sets a custom {@link UnitOfWorkFactory} to use.<a name="line.1644"></a>
+<span class="sourceLineNo">1645</span>     */<a name="line.1645"></a>
+<span class="sourceLineNo">1646</span>    void setUnitOfWorkFactory(UnitOfWorkFactory unitOfWorkFactory);<a name="line.1646"></a>
+<span class="sourceLineNo">1647</span><a name="line.1647"></a>
+<span class="sourceLineNo">1648</span>    /**<a name="line.1648"></a>
+<span class="sourceLineNo">1649</span>     * Gets the {@link org.apache.camel.spi.RuntimeEndpointRegistry} to use, or &lt;tt&gt;null&lt;/tt&gt; if none is in use.<a name="line.1649"></a>
+<span class="sourceLineNo">1650</span>     */<a name="line.1650"></a>
+<span class="sourceLineNo">1651</span>    RuntimeEndpointRegistry getRuntimeEndpointRegistry();<a name="line.1651"></a>
+<span class="sourceLineNo">1652</span><a name="line.1652"></a>
+<span class="sourceLineNo">1653</span>    /**<a name="line.1653"></a>
+<span class="sourceLineNo">1654</span>     * Sets a custom {@link org.apache.camel.spi.RuntimeEndpointRegistry} to use.<a name="line.1654"></a>
+<span class="sourceLineNo">1655</span>     */<a name="line.1655"></a>
+<span class="sourceLineNo">1656</span>    void setRuntimeEndpointRegistry(RuntimeEndpointRegistry runtimeEndpointRegistry);<a name="line.1656"></a>
+<span class="sourceLineNo">1657</span><a name="line.1657"></a>
+<span class="sourceLineNo">1658</span>    /**<a name="line.1658"></a>
+<span class="sourceLineNo">1659</span>     * Gets the {@link org.apache.camel.spi.RestRegistry} to use<a name="line.1659"></a>
+<span class="sourceLineNo">1660</span>     */<a name="line.1660"></a>
+<span class="sourceLineNo">1661</span>    RestRegistry getRestRegistry();<a name="line.1661"></a>
+<span class="sourceLineNo">1662</span><a name="line.1662"></a>
+<span class="sourceLineNo">1663</span>    /**<a name="line.1663"></a>
+<span class="sourceLineNo">1664</span>     * Sets a custom {@link org.apache.camel.spi.RestRegistry} to use.<a name="line.1664"></a>
+<span class="sourceLineNo">1665</span>     */<a name="line.1665"></a>
+<span class="sourceLineNo">1666</span>    void setRestRegistry(RestRegistry restRegistry);<a name="line.1666"></a>
+<span class="sourceLineNo">1667</span><a name="line.1667"></a>
+<span class="sourceLineNo">1668</span>    /**<a name="line.1668"></a>
+<span class="sourceLineNo">1669</span>     * Adds the given route policy factory<a name="line.1669"></a>
+<span class="sourceLineNo">1670</span>     *<a name="line.1670"></a>
+<span class="sourceLineNo">1671</span>     * @param routePolicyFactory the factory<a name="line.1671"></a>
+<span class="sourceLineNo">1672</span>     */<a name="line.1672"></a>
+<span class="sourceLineNo">1673</span>    void addRoutePolicyFactory(RoutePolicyFactory routePolicyFactory);<a name="line.1673"></a>
+<span class="sourceLineNo">1674</span><a name="line.1674"></a>
+<span class="sourceLineNo">1675</span>    /**<a name="line.1675"></a>
+<span class="sourceLineNo">1676</span>     * Gets the route policy factories<a name="line.1676"></a>
+<span class="sourceLineNo">1677</span>     *<a name="line.1677"></a>
+<span class="sourceLineNo">1678</span>     * @return the list of current route policy factories<a name="line.1678"></a>
+<span class="sourceLineNo">1679</span>     */<a name="line.1679"></a>
+<span class="sourceLineNo">1680</span>    List&lt;RoutePolicyFactory&gt; getRoutePolicyFactories();<a name="line.1680"></a>
+<span class="sourceLineNo">1681</span><a name="line.1681"></a>
+<span class="sourceLineNo">1682</span>    /**<a name="line.1682"></a>
+<span class="sourceLineNo">1683</span>     * Returns the JAXB Context factory used to create Models.<a name="line.1683"></a>
+<span class="sourceLineNo">1684</span>     *<a name="line.1684"></a>
+<span class="sourceLineNo">1685</span>     * @return the JAXB Context factory used to create Models.<a name="line.1685"></a>
+<span class="sourceLineNo">1686</span>     */<a name="line.1686"></a>
+<span class="sourceLineNo">1687</span>    ModelJAXBContextFactory getModelJAXBContextFactory();<a name="line.1687"></a>
+<span class="sourceLineNo">1688</span><a name="line.1688"></a>
+<span class="sourceLineNo">1689</span>    /**<a name="line.1689"></a>
+<span class="sourceLineNo">1690</span>     * Sets a custom JAXB Context factory to be used<a name="line.1690"></a>
+<span class="sourceLineNo">1691</span>     *<a name="line.1691"></a>
+<span class="sourceLineNo">1692</span>     * @param modelJAXBContextFactory a JAXB Context factory<a name="line.1692"></a>
+<span class="sourceLineNo">1693</span>     */<a name="line.1693"></a>
+<span class="sourceLineNo">1694</span>    void setModelJAXBContextFactory(ModelJAXBContextFactory modelJAXBContextFactory);<a name="line.1694"></a>
+<span class="sourceLineNo">1695</span><a name="line.1695"></a>
+<span class="sourceLineNo">1696</span>}<a name="line.1696"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>

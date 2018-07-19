@@ -1,0 +1,11 @@
+org.apache.felix.gogo.commands
+org.apache.felix.gogo.commands.basic
+org.apache.felix.gogo.commands.converter
+org.apache.felix.gogo.runtime
+org.apache.karaf.shell.console
+org.apache.karaf.shell.console.commands
+org.apache.karaf.shell.console.completer
+org.apache.karaf.shell.console.help
+org.apache.karaf.shell.console.jline
+org.apache.karaf.shell.console.util
+org.apache.karaf.shell.security.impl

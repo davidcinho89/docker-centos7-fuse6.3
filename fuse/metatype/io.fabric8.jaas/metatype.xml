@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/io.fabric8.jaas.FabricJaasRealm">
+    <OCD id="io.fabric8.jaas" name="%io.fabric8.jaas.name" description="%io.fabric8.jaas.description">
+        <AD id="org.apache.karaf.jaas.module" type="String" default="io.fabric8.jaas.ZookeeperLoginModule" name="%io.fabric8.jaas.org.apache.karaf.jaas.module.name" description="%io.fabric8.jaas.org.apache.karaf.jaas.module.description"/>
+        <AD id="encryption.name" type="String" default="basic" name="%io.fabric8.jaas.encryption.name.name" description="%io.fabric8.jaas.encryption.name.description"/>
+        <AD id="encryption.enabled" type="Boolean" default="true" name="%io.fabric8.jaas.encryption.enabled.name" description="%io.fabric8.jaas.encryption.enabled.description"/>
+        <AD id="encryption.prefix" type="String" default="{CRYPT}" name="%io.fabric8.jaas.encryption.prefix.name" description="%io.fabric8.jaas.encryption.prefix.description"/>
+        <AD id="encryption.suffix" type="String" default="{CRYPT}" name="%io.fabric8.jaas.encryption.suffix.name" description="%io.fabric8.jaas.encryption.suffix.description"/>
+        <AD id="encryption.algorithm" type="String" default="MD5" name="%io.fabric8.jaas.encryption.algorithm.name" description="%io.fabric8.jaas.encryption.algorithm.description"/>
+        <AD id="encryption.encoding" type="String" default="hexadecimal" name="%io.fabric8.jaas.encryption.encoding.name" description="%io.fabric8.jaas.encryption.encoding.description"/>
+        <AD id="path" type="String" default="/fabric/authentication/users" name="%io.fabric8.jaas.path.name" description="%io.fabric8.jaas.path.description"/>
+    </OCD>
+    <Designate pid="io.fabric8.jaas">
+        <Object ocdref="io.fabric8.jaas"/>
+    </Designate>
+</metatype:MetaData>

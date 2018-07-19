@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/io.fabric8.jolokia.FabricJolokia">
+    <OCD id="io.fabric8.jolokia" name="%io.fabric8.jolokia.name" description="%io.fabric8.jolokia.description">
+        <AD id="alias" type="String" default="/jolokia" name="%io.fabric8.jolokia.alias.name" description="%io.fabric8.jolokia.alias.description"/>
+        <AD id="realm" type="String" default="karaf" name="%io.fabric8.jolokia.realm.name" description="%io.fabric8.jolokia.realm.description"/>
+        <AD id="role" type="String" default="admin\,manager\,viewer\,Monitor\,Operator\,Maintainer\,Deployer\,Auditor\,Administrator\,SuperUser" name="%io.fabric8.jolokia.role.name" description="%io.fabric8.jolokia.role.description"/>
+    </OCD>
+    <Designate pid="io.fabric8.jolokia">
+        <Object ocdref="io.fabric8.jolokia"/>
+    </Designate>
+</metatype:MetaData>

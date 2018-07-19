@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/io.fabric8.tooling.archetype.ArchetypeServiceImpl">
+    <OCD id="io.fabric8.tooling.archetype.ArchetypeService" name="%io.fabric8.tooling.archetype.ArchetypeService.name" description="%io.fabric8.tooling.archetype.ArchetypeService.description"/>
+    <Designate pid="io.fabric8.tooling.archetype.ArchetypeService">
+        <Object ocdref="io.fabric8.tooling.archetype.ArchetypeService"/>
+    </Designate>
+</metatype:MetaData>

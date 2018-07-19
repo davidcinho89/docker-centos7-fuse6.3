@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?><metatype:MetaData xmlns:metatype="http://www.osgi.org/xmlns/metatype/v1.0.0" localization="OSGI-INF/metatype/io.fabric8.internal.ProfileDependencyConfig">
+    <OCD id="io.fabric8.profile.dependency" name="%io.fabric8.profile.dependency.name" description="%io.fabric8.profile.dependency.description">
+        <AD id="kind" type="String" name="%io.fabric8.profile.dependency.kind.name" description="%io.fabric8.profile.dependency.kind.description">
+            <Option value="Zookeeper Service" label="ZOOKEEPER_SERVICE"/>
+        </AD>
+        <AD id="zookeeperPath" type="String" name="%io.fabric8.profile.dependency.zookeeperPath.name" description="%io.fabric8.profile.dependency.zookeeperPath.description"/>
+        <AD id="summary" type="String" name="%io.fabric8.profile.dependency.summary.name" description="%io.fabric8.profile.dependency.summary.description"/>
+        <AD id="profileWildcards" type="String" name="%io.fabric8.profile.dependency.profileWildcards.name" description="%io.fabric8.profile.dependency.profileWildcards.description" cardinality="2147483647"/>
+        <AD id="profileTags" type="String" name="%io.fabric8.profile.dependency.profileTags.name" description="%io.fabric8.profile.dependency.profileTags.description" cardinality="2147483647"/>
+    </OCD>
+    <Designate pid="io.fabric8.profile.dependency">
+        <Object ocdref="io.fabric8.profile.dependency"/>
+    </Designate>
+</metatype:MetaData>

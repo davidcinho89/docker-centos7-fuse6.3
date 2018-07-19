@@ -1,0 +1,29 @@
+// ------------------------------------------------------------------
+// Transitive dependencies of this project determined from the
+// maven pom organized by organization.
+// ------------------------------------------------------------------
+
+Camel :: Core
+
+
+From: 'an unknown organization'
+  - ConcurrentLinkedHashMap (http://code.google.com/p/concurrentlinkedhashmap) com.googlecode.concurrentlinkedhashmap:concurrentlinkedhashmap-lru:jar:1.4.2
+    License: The Apache Software License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+From: 'Oracle Corporation' (http://www.oracle.com/)
+  - Old JAXB Core (http://jaxb.java.net/jaxb-bundles/jaxb-core) com.sun.xml.bind:jaxb-core:jar:2.2.11
+    License: CDDL+GPL License  (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+  - Old JAXB Runtime (http://jaxb.java.net/jaxb-bundles/jaxb-impl) com.sun.xml.bind:jaxb-impl:jar:2.2.11
+    License: CDDL+GPL License  (http://glassfish.java.net/public/CDDL+GPL_1_1.html)
+
+From: 'QOS.ch' (http://www.qos.ch)
+  - SLF4J API Module (http://www.slf4j.org) org.slf4j:slf4j-api:jar:1.7.7.redhat-2
+    License: MIT License  (http://www.opensource.org/licenses/mit-license.php)
+
+From: 'The Apache Software Foundation' (http://www.apache.org/)
+  - Camel :: SPI Annotations (http://camel.apache.org/camel-parent/tooling/spi-annotations) org.apache.camel:spi-annotations:jar:2.17.0.redhat-630187
+    License: Apache License, Version 2.0  (http://www.apache.org/licenses/LICENSE-2.0.txt)
+
+
+
+

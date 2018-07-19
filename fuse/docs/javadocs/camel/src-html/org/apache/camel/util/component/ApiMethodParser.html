@@ -1,0 +1,449 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html lang="en">
+<head>
+<title>Source code</title>
+<link rel="stylesheet" type="text/css" href="../../../../../../stylesheet.css" title="Style">
+</head>
+<body>
+<div class="sourceContainer">
+<pre><span class="sourceLineNo">001</span>/**<a name="line.1"></a>
+<span class="sourceLineNo">002</span> * Licensed to the Apache Software Foundation (ASF) under one or more<a name="line.2"></a>
+<span class="sourceLineNo">003</span> * contributor license agreements.  See the NOTICE file distributed with<a name="line.3"></a>
+<span class="sourceLineNo">004</span> * this work for additional information regarding copyright ownership.<a name="line.4"></a>
+<span class="sourceLineNo">005</span> * The ASF licenses this file to You under the Apache License, Version 2.0<a name="line.5"></a>
+<span class="sourceLineNo">006</span> * (the "License"); you may not use this file except in compliance with<a name="line.6"></a>
+<span class="sourceLineNo">007</span> * the License.  You may obtain a copy of the License at<a name="line.7"></a>
+<span class="sourceLineNo">008</span> *<a name="line.8"></a>
+<span class="sourceLineNo">009</span> *      http://www.apache.org/licenses/LICENSE-2.0<a name="line.9"></a>
+<span class="sourceLineNo">010</span> *<a name="line.10"></a>
+<span class="sourceLineNo">011</span> * Unless required by applicable law or agreed to in writing, software<a name="line.11"></a>
+<span class="sourceLineNo">012</span> * distributed under the License is distributed on an "AS IS" BASIS,<a name="line.12"></a>
+<span class="sourceLineNo">013</span> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.<a name="line.13"></a>
+<span class="sourceLineNo">014</span> * See the License for the specific language governing permissions and<a name="line.14"></a>
+<span class="sourceLineNo">015</span> * limitations under the License.<a name="line.15"></a>
+<span class="sourceLineNo">016</span> */<a name="line.16"></a>
+<span class="sourceLineNo">017</span>package org.apache.camel.util.component;<a name="line.17"></a>
+<span class="sourceLineNo">018</span><a name="line.18"></a>
+<span class="sourceLineNo">019</span>import java.lang.reflect.Array;<a name="line.19"></a>
+<span class="sourceLineNo">020</span>import java.lang.reflect.Method;<a name="line.20"></a>
+<span class="sourceLineNo">021</span>import java.util.ArrayList;<a name="line.21"></a>
+<span class="sourceLineNo">022</span>import java.util.Collections;<a name="line.22"></a>
+<span class="sourceLineNo">023</span>import java.util.Comparator;<a name="line.23"></a>
+<span class="sourceLineNo">024</span>import java.util.HashMap;<a name="line.24"></a>
+<span class="sourceLineNo">025</span>import java.util.List;<a name="line.25"></a>
+<span class="sourceLineNo">026</span>import java.util.Map;<a name="line.26"></a>
+<span class="sourceLineNo">027</span>import java.util.regex.Matcher;<a name="line.27"></a>
+<span class="sourceLineNo">028</span>import java.util.regex.Pattern;<a name="line.28"></a>
+<span class="sourceLineNo">029</span><a name="line.29"></a>
+<span class="sourceLineNo">030</span>import org.apache.camel.util.ObjectHelper;<a name="line.30"></a>
+<span class="sourceLineNo">031</span>import org.slf4j.Logger;<a name="line.31"></a>
+<span class="sourceLineNo">032</span>import org.slf4j.LoggerFactory;<a name="line.32"></a>
+<span class="sourceLineNo">033</span><a name="line.33"></a>
+<span class="sourceLineNo">034</span>/**<a name="line.34"></a>
+<span class="sourceLineNo">035</span> * Parser base class for generating ApiMethod enumerations.<a name="line.35"></a>
+<span class="sourceLineNo">036</span> */<a name="line.36"></a>
+<span class="sourceLineNo">037</span>public abstract class ApiMethodParser&lt;T&gt; {<a name="line.37"></a>
+<span class="sourceLineNo">038</span><a name="line.38"></a>
+<span class="sourceLineNo">039</span>    // also used by JavadocApiMethodGeneratorMojo<a name="line.39"></a>
+<span class="sourceLineNo">040</span>    public static final Pattern ARGS_PATTERN = Pattern.compile("\\s*([^&lt;\\s]+)\\s*(&lt;[^&gt;]+&gt;)?\\s+([^\\s,]+)\\s*,?");<a name="line.40"></a>
+<span class="sourceLineNo">041</span><a name="line.41"></a>
+<span class="sourceLineNo">042</span>    private static final String METHOD_PREFIX = "^(\\s*(public|final|synchronized|native)\\s+)*(\\s*&lt;[^&gt;]&gt;)?\\s*(\\S+)\\s+([^\\(]+\\s*)\\(";<a name="line.42"></a>
+<span class="sourceLineNo">043</span>    private static final Pattern METHOD_PATTERN = Pattern.compile("\\s*([^&lt;\\s]+)\\s*(&lt;[^&gt;]+&gt;)?\\s+(\\S+)\\s*\\(\\s*([\\S\\s,]*)\\)\\s*;?\\s*");<a name="line.43"></a>
+<span class="sourceLineNo">044</span><a name="line.44"></a>
+<span class="sourceLineNo">045</span>    private static final String JAVA_LANG = "java.lang.";<a name="line.45"></a>
+<span class="sourceLineNo">046</span>    private static final Map&lt;String, Class&lt;?&gt;&gt; PRIMITIVE_TYPES;<a name="line.46"></a>
+<span class="sourceLineNo">047</span><a name="line.47"></a>
+<span class="sourceLineNo">048</span>    static {<a name="line.48"></a>
+<span class="sourceLineNo">049</span>        PRIMITIVE_TYPES = new HashMap&lt;String, Class&lt;?&gt;&gt;();<a name="line.49"></a>
+<span class="sourceLineNo">050</span>        PRIMITIVE_TYPES.put("int", Integer.TYPE);<a name="line.50"></a>
+<span class="sourceLineNo">051</span>        PRIMITIVE_TYPES.put("long", Long.TYPE);<a name="line.51"></a>
+<span class="sourceLineNo">052</span>        PRIMITIVE_TYPES.put("double", Double.TYPE);<a name="line.52"></a>
+<span class="sourceLineNo">053</span>        PRIMITIVE_TYPES.put("float", Float.TYPE);<a name="line.53"></a>
+<span class="sourceLineNo">054</span>        PRIMITIVE_TYPES.put("boolean", Boolean.TYPE);<a name="line.54"></a>
+<span class="sourceLineNo">055</span>        PRIMITIVE_TYPES.put("char", Character.TYPE);<a name="line.55"></a>
+<span class="sourceLineNo">056</span>        PRIMITIVE_TYPES.put("byte", Byte.TYPE);<a name="line.56"></a>
+<span class="sourceLineNo">057</span>        PRIMITIVE_TYPES.put("void", Void.TYPE);<a name="line.57"></a>
+<span class="sourceLineNo">058</span>        PRIMITIVE_TYPES.put("short", Short.TYPE);<a name="line.58"></a>
+<span class="sourceLineNo">059</span>    }<a name="line.59"></a>
+<span class="sourceLineNo">060</span><a name="line.60"></a>
+<span class="sourceLineNo">061</span><a name="line.61"></a>
+<span class="sourceLineNo">062</span>    private final Logger log = LoggerFactory.getLogger(getClass());<a name="line.62"></a>
+<span class="sourceLineNo">063</span><a name="line.63"></a>
+<span class="sourceLineNo">064</span>    private final Class&lt;T&gt; proxyType;<a name="line.64"></a>
+<span class="sourceLineNo">065</span>    private List&lt;String&gt; signatures;<a name="line.65"></a>
+<span class="sourceLineNo">066</span>    private ClassLoader classLoader = ApiMethodParser.class.getClassLoader();<a name="line.66"></a>
+<span class="sourceLineNo">067</span><a name="line.67"></a>
+<span class="sourceLineNo">068</span>    public ApiMethodParser(Class&lt;T&gt; proxyType) {<a name="line.68"></a>
+<span class="sourceLineNo">069</span>        this.proxyType = proxyType;<a name="line.69"></a>
+<span class="sourceLineNo">070</span>    }<a name="line.70"></a>
+<span class="sourceLineNo">071</span><a name="line.71"></a>
+<span class="sourceLineNo">072</span>    public Class&lt;T&gt; getProxyType() {<a name="line.72"></a>
+<span class="sourceLineNo">073</span>        return proxyType;<a name="line.73"></a>
+<span class="sourceLineNo">074</span>    }<a name="line.74"></a>
+<span class="sourceLineNo">075</span><a name="line.75"></a>
+<span class="sourceLineNo">076</span>    public final List&lt;String&gt; getSignatures() {<a name="line.76"></a>
+<span class="sourceLineNo">077</span>        return signatures;<a name="line.77"></a>
+<span class="sourceLineNo">078</span>    }<a name="line.78"></a>
+<span class="sourceLineNo">079</span><a name="line.79"></a>
+<span class="sourceLineNo">080</span>    public final void setSignatures(List&lt;String&gt; signatures) {<a name="line.80"></a>
+<span class="sourceLineNo">081</span>        this.signatures = new ArrayList&lt;String&gt;();<a name="line.81"></a>
+<span class="sourceLineNo">082</span>        this.signatures.addAll(signatures);<a name="line.82"></a>
+<span class="sourceLineNo">083</span>    }<a name="line.83"></a>
+<span class="sourceLineNo">084</span><a name="line.84"></a>
+<span class="sourceLineNo">085</span>    public final ClassLoader getClassLoader() {<a name="line.85"></a>
+<span class="sourceLineNo">086</span>        return classLoader;<a name="line.86"></a>
+<span class="sourceLineNo">087</span>    }<a name="line.87"></a>
+<span class="sourceLineNo">088</span><a name="line.88"></a>
+<span class="sourceLineNo">089</span>    public final void setClassLoader(ClassLoader classLoader) {<a name="line.89"></a>
+<span class="sourceLineNo">090</span>        this.classLoader = classLoader;<a name="line.90"></a>
+<span class="sourceLineNo">091</span>    }<a name="line.91"></a>
+<span class="sourceLineNo">092</span><a name="line.92"></a>
+<span class="sourceLineNo">093</span>    /**<a name="line.93"></a>
+<span class="sourceLineNo">094</span>     * Parses the method signatures from {@code getSignatures()}.<a name="line.94"></a>
+<span class="sourceLineNo">095</span>     * @return list of Api methods as {@link ApiMethodModel}<a name="line.95"></a>
+<span class="sourceLineNo">096</span>     */<a name="line.96"></a>
+<span class="sourceLineNo">097</span>    public final List&lt;ApiMethodModel&gt; parse() {<a name="line.97"></a>
+<span class="sourceLineNo">098</span>        // parse sorted signatures and generate descriptions<a name="line.98"></a>
+<span class="sourceLineNo">099</span>        List&lt;ApiMethodModel&gt; result = new ArrayList&lt;ApiMethodModel&gt;();<a name="line.99"></a>
+<span class="sourceLineNo">100</span>        for (String signature : signatures) {<a name="line.100"></a>
+<span class="sourceLineNo">101</span><a name="line.101"></a>
+<span class="sourceLineNo">102</span>            // skip comment or empty lines<a name="line.102"></a>
+<span class="sourceLineNo">103</span>            if (signature.startsWith("##") || ObjectHelper.isEmpty(signature)) {<a name="line.103"></a>
+<span class="sourceLineNo">104</span>                continue;<a name="line.104"></a>
+<span class="sourceLineNo">105</span>            }<a name="line.105"></a>
+<span class="sourceLineNo">106</span><a name="line.106"></a>
+<span class="sourceLineNo">107</span>            // remove all modifiers and type parameters for method<a name="line.107"></a>
+<span class="sourceLineNo">108</span>            signature = signature.replaceAll(METHOD_PREFIX, "$4 $5(");<a name="line.108"></a>
+<span class="sourceLineNo">109</span>            // remove all final modifiers for arguments<a name="line.109"></a>
+<span class="sourceLineNo">110</span>            signature = signature.replaceAll("(\\(|,\\s*)final\\s+", "$1");<a name="line.110"></a>
+<span class="sourceLineNo">111</span>            // remove all redundant spaces in generic parameters<a name="line.111"></a>
+<span class="sourceLineNo">112</span>            signature = signature.replaceAll("\\s*&lt;\\s*", "&lt;").replaceAll("\\s*&gt;", "&gt;");<a name="line.112"></a>
+<span class="sourceLineNo">113</span><a name="line.113"></a>
+<span class="sourceLineNo">114</span>            log.debug("Processing " + signature);<a name="line.114"></a>
+<span class="sourceLineNo">115</span><a name="line.115"></a>
+<span class="sourceLineNo">116</span>            final Matcher methodMatcher = METHOD_PATTERN.matcher(signature);<a name="line.116"></a>
+<span class="sourceLineNo">117</span>            if (!methodMatcher.matches()) {<a name="line.117"></a>
+<span class="sourceLineNo">118</span>                throw new IllegalArgumentException("Invalid method signature " + signature);<a name="line.118"></a>
+<span class="sourceLineNo">119</span>            }<a name="line.119"></a>
+<span class="sourceLineNo">120</span><a name="line.120"></a>
+<span class="sourceLineNo">121</span>            // ignore generic type parameters in result, if any<a name="line.121"></a>
+<span class="sourceLineNo">122</span>            final Class&lt;?&gt; resultType = forName(methodMatcher.group(1));<a name="line.122"></a>
+<span class="sourceLineNo">123</span>            final String name = methodMatcher.group(3);<a name="line.123"></a>
+<span class="sourceLineNo">124</span>            final String argSignature = methodMatcher.group(4);<a name="line.124"></a>
+<span class="sourceLineNo">125</span><a name="line.125"></a>
+<span class="sourceLineNo">126</span>            final List&lt;Argument&gt; arguments = new ArrayList&lt;Argument&gt;();<a name="line.126"></a>
+<span class="sourceLineNo">127</span>            final List&lt;Class&lt;?&gt;&gt; argTypes = new ArrayList&lt;Class&lt;?&gt;&gt;();<a name="line.127"></a>
+<span class="sourceLineNo">128</span><a name="line.128"></a>
+<span class="sourceLineNo">129</span>            final Matcher argsMatcher = ARGS_PATTERN.matcher(argSignature);<a name="line.129"></a>
+<span class="sourceLineNo">130</span>            while (argsMatcher.find()) {<a name="line.130"></a>
+<span class="sourceLineNo">131</span><a name="line.131"></a>
+<span class="sourceLineNo">132</span>                final Class&lt;?&gt; type = forName(argsMatcher.group(1));<a name="line.132"></a>
+<span class="sourceLineNo">133</span>                argTypes.add(type);<a name="line.133"></a>
+<span class="sourceLineNo">134</span><a name="line.134"></a>
+<span class="sourceLineNo">135</span>                final String typeArgsGroup = argsMatcher.group(2);<a name="line.135"></a>
+<span class="sourceLineNo">136</span>                final String typeArgs = typeArgsGroup != null<a name="line.136"></a>
+<span class="sourceLineNo">137</span>                    ? typeArgsGroup.substring(1, typeArgsGroup.length() - 1).replaceAll(" ", "") : null;<a name="line.137"></a>
+<span class="sourceLineNo">138</span>                arguments.add(new Argument(argsMatcher.group(3), type, typeArgs));<a name="line.138"></a>
+<span class="sourceLineNo">139</span>            }<a name="line.139"></a>
+<span class="sourceLineNo">140</span><a name="line.140"></a>
+<span class="sourceLineNo">141</span>            Method method;<a name="line.141"></a>
+<span class="sourceLineNo">142</span>            try {<a name="line.142"></a>
+<span class="sourceLineNo">143</span>                method = proxyType.getMethod(name, argTypes.toArray(new Class&lt;?&gt;[argTypes.size()]));<a name="line.143"></a>
+<span class="sourceLineNo">144</span>            } catch (NoSuchMethodException e) {<a name="line.144"></a>
+<span class="sourceLineNo">145</span>                throw new IllegalArgumentException("Method not found [" + signature + "] in type " + proxyType.getName());<a name="line.145"></a>
+<span class="sourceLineNo">146</span>            }<a name="line.146"></a>
+<span class="sourceLineNo">147</span>            result.add(new ApiMethodModel(name, resultType, arguments, method));<a name="line.147"></a>
+<span class="sourceLineNo">148</span>        }<a name="line.148"></a>
+<span class="sourceLineNo">149</span><a name="line.149"></a>
+<span class="sourceLineNo">150</span>        // allow derived classes to post process<a name="line.150"></a>
+<span class="sourceLineNo">151</span>        result = processResults(result);<a name="line.151"></a>
+<span class="sourceLineNo">152</span><a name="line.152"></a>
+<span class="sourceLineNo">153</span>        // check that argument names have the same type across methods<a name="line.153"></a>
+<span class="sourceLineNo">154</span>        Map&lt;String, Class&lt;?&gt;&gt; allArguments = new HashMap&lt;String, Class&lt;?&gt;&gt;();<a name="line.154"></a>
+<span class="sourceLineNo">155</span>        for (ApiMethodModel model : result) {<a name="line.155"></a>
+<span class="sourceLineNo">156</span>            for (Argument argument : model.getArguments()) {<a name="line.156"></a>
+<span class="sourceLineNo">157</span>                String name = argument.getName();<a name="line.157"></a>
+<span class="sourceLineNo">158</span>                Class&lt;?&gt; argClass = allArguments.get(name);<a name="line.158"></a>
+<span class="sourceLineNo">159</span>                Class&lt;?&gt; type = argument.getType();<a name="line.159"></a>
+<span class="sourceLineNo">160</span>                if (argClass == null) {<a name="line.160"></a>
+<span class="sourceLineNo">161</span>                    allArguments.put(name, type);<a name="line.161"></a>
+<span class="sourceLineNo">162</span>                } else {<a name="line.162"></a>
+<span class="sourceLineNo">163</span>                    if (argClass != type) {<a name="line.163"></a>
+<span class="sourceLineNo">164</span>                        throw new IllegalArgumentException("Argument [" + name <a name="line.164"></a>
+<span class="sourceLineNo">165</span>                                + "] is used in multiple methods with different types " <a name="line.165"></a>
+<span class="sourceLineNo">166</span>                                + argClass.getCanonicalName() + ", " + type.getCanonicalName());<a name="line.166"></a>
+<span class="sourceLineNo">167</span>                    }<a name="line.167"></a>
+<span class="sourceLineNo">168</span>                }<a name="line.168"></a>
+<span class="sourceLineNo">169</span>            }<a name="line.169"></a>
+<span class="sourceLineNo">170</span>        }<a name="line.170"></a>
+<span class="sourceLineNo">171</span>        allArguments.clear();<a name="line.171"></a>
+<span class="sourceLineNo">172</span><a name="line.172"></a>
+<span class="sourceLineNo">173</span>        Collections.sort(result, new Comparator&lt;ApiMethodModel&gt;() {<a name="line.173"></a>
+<span class="sourceLineNo">174</span>            @Override<a name="line.174"></a>
+<span class="sourceLineNo">175</span>            public int compare(ApiMethodModel model1, ApiMethodModel model2) {<a name="line.175"></a>
+<span class="sourceLineNo">176</span>                final int nameCompare = model1.name.compareTo(model2.name);<a name="line.176"></a>
+<span class="sourceLineNo">177</span>                if (nameCompare != 0) {<a name="line.177"></a>
+<span class="sourceLineNo">178</span>                    return nameCompare;<a name="line.178"></a>
+<span class="sourceLineNo">179</span>                } else {<a name="line.179"></a>
+<span class="sourceLineNo">180</span><a name="line.180"></a>
+<span class="sourceLineNo">181</span>                    final int nArgs1 = model1.arguments.size();<a name="line.181"></a>
+<span class="sourceLineNo">182</span>                    final int nArgsCompare = nArgs1 - model2.arguments.size();<a name="line.182"></a>
+<span class="sourceLineNo">183</span>                    if (nArgsCompare != 0) {<a name="line.183"></a>
+<span class="sourceLineNo">184</span>                        return nArgsCompare;<a name="line.184"></a>
+<span class="sourceLineNo">185</span>                    } else {<a name="line.185"></a>
+<span class="sourceLineNo">186</span>                        // same number of args, compare arg names, kinda arbitrary to use alphabetized order<a name="line.186"></a>
+<span class="sourceLineNo">187</span>                        for (int i = 0; i &lt; nArgs1; i++) {<a name="line.187"></a>
+<span class="sourceLineNo">188</span>                            final int argCompare = model1.arguments.get(i).name.compareTo(model2.arguments.get(i).name);<a name="line.188"></a>
+<span class="sourceLineNo">189</span>                            if (argCompare != 0) {<a name="line.189"></a>
+<span class="sourceLineNo">190</span>                                return argCompare;<a name="line.190"></a>
+<span class="sourceLineNo">191</span>                            }<a name="line.191"></a>
+<span class="sourceLineNo">192</span>                        }<a name="line.192"></a>
+<span class="sourceLineNo">193</span>                        // duplicate methods???<a name="line.193"></a>
+<span class="sourceLineNo">194</span>                        log.warn("Duplicate methods found [" + model1 + "], [" + model2 + "]");<a name="line.194"></a>
+<span class="sourceLineNo">195</span>                        return 0;<a name="line.195"></a>
+<span class="sourceLineNo">196</span>                    }<a name="line.196"></a>
+<span class="sourceLineNo">197</span>                }<a name="line.197"></a>
+<span class="sourceLineNo">198</span>            }<a name="line.198"></a>
+<span class="sourceLineNo">199</span>        });<a name="line.199"></a>
+<span class="sourceLineNo">200</span><a name="line.200"></a>
+<span class="sourceLineNo">201</span>        // assign unique names to every method model<a name="line.201"></a>
+<span class="sourceLineNo">202</span>        final Map&lt;String, Integer&gt; dups = new HashMap&lt;String, Integer&gt;();<a name="line.202"></a>
+<span class="sourceLineNo">203</span>        for (ApiMethodModel model : result) {<a name="line.203"></a>
+<span class="sourceLineNo">204</span>            // locale independent upper case conversion<a name="line.204"></a>
+<span class="sourceLineNo">205</span>            final String name = model.getName();<a name="line.205"></a>
+<span class="sourceLineNo">206</span>            final char[] upperCase = new char[name.length()];<a name="line.206"></a>
+<span class="sourceLineNo">207</span>            final char[] lowerCase = name.toCharArray();<a name="line.207"></a>
+<span class="sourceLineNo">208</span>            for (int i = 0; i &lt; upperCase.length; i++) {<a name="line.208"></a>
+<span class="sourceLineNo">209</span>                upperCase[i] = Character.toUpperCase(lowerCase[i]);<a name="line.209"></a>
+<span class="sourceLineNo">210</span>            }<a name="line.210"></a>
+<span class="sourceLineNo">211</span>            String uniqueName = new String(upperCase);<a name="line.211"></a>
+<span class="sourceLineNo">212</span><a name="line.212"></a>
+<span class="sourceLineNo">213</span>            Integer suffix = dups.get(uniqueName);<a name="line.213"></a>
+<span class="sourceLineNo">214</span>            if (suffix == null) {<a name="line.214"></a>
+<span class="sourceLineNo">215</span>                dups.put(uniqueName, 1);<a name="line.215"></a>
+<span class="sourceLineNo">216</span>            } else {<a name="line.216"></a>
+<span class="sourceLineNo">217</span>                dups.put(uniqueName, suffix + 1);<a name="line.217"></a>
+<span class="sourceLineNo">218</span>                StringBuilder builder = new StringBuilder(uniqueName);<a name="line.218"></a>
+<span class="sourceLineNo">219</span>                builder.append("_").append(suffix);<a name="line.219"></a>
+<span class="sourceLineNo">220</span>                uniqueName = builder.toString();<a name="line.220"></a>
+<span class="sourceLineNo">221</span>            }<a name="line.221"></a>
+<span class="sourceLineNo">222</span>            model.uniqueName = uniqueName;<a name="line.222"></a>
+<span class="sourceLineNo">223</span>        }<a name="line.223"></a>
+<span class="sourceLineNo">224</span>        return result;<a name="line.224"></a>
+<span class="sourceLineNo">225</span>    }<a name="line.225"></a>
+<span class="sourceLineNo">226</span><a name="line.226"></a>
+<span class="sourceLineNo">227</span>    protected List&lt;ApiMethodModel&gt; processResults(List&lt;ApiMethodModel&gt; result) {<a name="line.227"></a>
+<span class="sourceLineNo">228</span>        return result;<a name="line.228"></a>
+<span class="sourceLineNo">229</span>    }<a name="line.229"></a>
+<span class="sourceLineNo">230</span><a name="line.230"></a>
+<span class="sourceLineNo">231</span>    protected Class&lt;?&gt; forName(String className) {<a name="line.231"></a>
+<span class="sourceLineNo">232</span>        try {<a name="line.232"></a>
+<span class="sourceLineNo">233</span>            return forName(className, classLoader);<a name="line.233"></a>
+<span class="sourceLineNo">234</span>        } catch (ClassNotFoundException e1) {<a name="line.234"></a>
+<span class="sourceLineNo">235</span>            throw new IllegalArgumentException("Error loading class " + className);<a name="line.235"></a>
+<span class="sourceLineNo">236</span>        }<a name="line.236"></a>
+<span class="sourceLineNo">237</span>    }<a name="line.237"></a>
+<span class="sourceLineNo">238</span><a name="line.238"></a>
+<span class="sourceLineNo">239</span>    public static Class&lt;?&gt; forName(String className, ClassLoader classLoader) throws ClassNotFoundException {<a name="line.239"></a>
+<span class="sourceLineNo">240</span>        Class&lt;?&gt; result = null;<a name="line.240"></a>
+<span class="sourceLineNo">241</span>        try {<a name="line.241"></a>
+<span class="sourceLineNo">242</span>            // lookup primitive types first<a name="line.242"></a>
+<span class="sourceLineNo">243</span>            result = PRIMITIVE_TYPES.get(className);<a name="line.243"></a>
+<span class="sourceLineNo">244</span>            if (result == null) {<a name="line.244"></a>
+<span class="sourceLineNo">245</span>                result = Class.forName(className, true, classLoader);<a name="line.245"></a>
+<span class="sourceLineNo">246</span>            }<a name="line.246"></a>
+<span class="sourceLineNo">247</span>        } catch (ClassNotFoundException e) {<a name="line.247"></a>
+<span class="sourceLineNo">248</span>            // check if array type<a name="line.248"></a>
+<span class="sourceLineNo">249</span>            if (className.endsWith("[]")) {<a name="line.249"></a>
+<span class="sourceLineNo">250</span>                final int firstDim = className.indexOf('[');<a name="line.250"></a>
+<span class="sourceLineNo">251</span>                final int nDimensions = (className.length() - firstDim) / 2;<a name="line.251"></a>
+<span class="sourceLineNo">252</span>                result = Array.newInstance(forName(className.substring(0, firstDim), classLoader), new int[nDimensions]).getClass();<a name="line.252"></a>
+<span class="sourceLineNo">253</span>            } else if (className.indexOf('.') != -1) {<a name="line.253"></a>
+<span class="sourceLineNo">254</span>                // try replacing last '.' with $ to look for inner classes<a name="line.254"></a>
+<span class="sourceLineNo">255</span>                String innerClass = className;<a name="line.255"></a>
+<span class="sourceLineNo">256</span>                while (result == null &amp;&amp; innerClass.indexOf('.') != -1) {<a name="line.256"></a>
+<span class="sourceLineNo">257</span>                    int endIndex = innerClass.lastIndexOf('.');<a name="line.257"></a>
+<span class="sourceLineNo">258</span>                    innerClass = innerClass.substring(0, endIndex) + "$" + innerClass.substring(endIndex + 1);<a name="line.258"></a>
+<span class="sourceLineNo">259</span>                    try {<a name="line.259"></a>
+<span class="sourceLineNo">260</span>                        result = Class.forName(innerClass, true, classLoader);<a name="line.260"></a>
+<span class="sourceLineNo">261</span>                    } catch (ClassNotFoundException ignore) {<a name="line.261"></a>
+<span class="sourceLineNo">262</span>                        // ignore<a name="line.262"></a>
+<span class="sourceLineNo">263</span>                    }<a name="line.263"></a>
+<span class="sourceLineNo">264</span>                }<a name="line.264"></a>
+<span class="sourceLineNo">265</span>            }<a name="line.265"></a>
+<span class="sourceLineNo">266</span>            if (result == null &amp;&amp; !className.startsWith(JAVA_LANG)) {<a name="line.266"></a>
+<span class="sourceLineNo">267</span>                // try loading from default Java package java.lang<a name="line.267"></a>
+<span class="sourceLineNo">268</span>                try {<a name="line.268"></a>
+<span class="sourceLineNo">269</span>                    result = forName(JAVA_LANG + className, classLoader);<a name="line.269"></a>
+<span class="sourceLineNo">270</span>                } catch (ClassNotFoundException ignore) {<a name="line.270"></a>
+<span class="sourceLineNo">271</span>                    // ignore<a name="line.271"></a>
+<span class="sourceLineNo">272</span>                }<a name="line.272"></a>
+<span class="sourceLineNo">273</span>            }<a name="line.273"></a>
+<span class="sourceLineNo">274</span>        }<a name="line.274"></a>
+<span class="sourceLineNo">275</span><a name="line.275"></a>
+<span class="sourceLineNo">276</span>        if (result == null) {<a name="line.276"></a>
+<span class="sourceLineNo">277</span>            throw new ClassNotFoundException(className);<a name="line.277"></a>
+<span class="sourceLineNo">278</span>        }<a name="line.278"></a>
+<span class="sourceLineNo">279</span><a name="line.279"></a>
+<span class="sourceLineNo">280</span>        return result;<a name="line.280"></a>
+<span class="sourceLineNo">281</span>    }<a name="line.281"></a>
+<span class="sourceLineNo">282</span><a name="line.282"></a>
+<span class="sourceLineNo">283</span>    public static final class ApiMethodModel {<a name="line.283"></a>
+<span class="sourceLineNo">284</span>        private final String name;<a name="line.284"></a>
+<span class="sourceLineNo">285</span>        private final Class&lt;?&gt; resultType;<a name="line.285"></a>
+<span class="sourceLineNo">286</span>        private final List&lt;Argument&gt; arguments;<a name="line.286"></a>
+<span class="sourceLineNo">287</span>        private final Method method;<a name="line.287"></a>
+<span class="sourceLineNo">288</span><a name="line.288"></a>
+<span class="sourceLineNo">289</span>        private String uniqueName;<a name="line.289"></a>
+<span class="sourceLineNo">290</span><a name="line.290"></a>
+<span class="sourceLineNo">291</span>        protected ApiMethodModel(String name, Class&lt;?&gt; resultType, List&lt;Argument&gt; arguments, Method method) {<a name="line.291"></a>
+<span class="sourceLineNo">292</span>            this.name = name;<a name="line.292"></a>
+<span class="sourceLineNo">293</span>            this.resultType = resultType;<a name="line.293"></a>
+<span class="sourceLineNo">294</span>            this.arguments = arguments;<a name="line.294"></a>
+<span class="sourceLineNo">295</span>            this.method = method;<a name="line.295"></a>
+<span class="sourceLineNo">296</span>        }<a name="line.296"></a>
+<span class="sourceLineNo">297</span><a name="line.297"></a>
+<span class="sourceLineNo">298</span>        protected ApiMethodModel(String uniqueName, String name, Class&lt;?&gt; resultType, List&lt;Argument&gt; arguments, Method method) {<a name="line.298"></a>
+<span class="sourceLineNo">299</span>            this.name = name;<a name="line.299"></a>
+<span class="sourceLineNo">300</span>            this.uniqueName = uniqueName;<a name="line.300"></a>
+<span class="sourceLineNo">301</span>            this.resultType = resultType;<a name="line.301"></a>
+<span class="sourceLineNo">302</span>            this.arguments = arguments;<a name="line.302"></a>
+<span class="sourceLineNo">303</span>            this.method = method;<a name="line.303"></a>
+<span class="sourceLineNo">304</span>        }<a name="line.304"></a>
+<span class="sourceLineNo">305</span><a name="line.305"></a>
+<span class="sourceLineNo">306</span>        public String getUniqueName() {<a name="line.306"></a>
+<span class="sourceLineNo">307</span>            return uniqueName;<a name="line.307"></a>
+<span class="sourceLineNo">308</span>        }<a name="line.308"></a>
+<span class="sourceLineNo">309</span><a name="line.309"></a>
+<span class="sourceLineNo">310</span>        public String getName() {<a name="line.310"></a>
+<span class="sourceLineNo">311</span>            return name;<a name="line.311"></a>
+<span class="sourceLineNo">312</span>        }<a name="line.312"></a>
+<span class="sourceLineNo">313</span><a name="line.313"></a>
+<span class="sourceLineNo">314</span>        public Class&lt;?&gt; getResultType() {<a name="line.314"></a>
+<span class="sourceLineNo">315</span>            return resultType;<a name="line.315"></a>
+<span class="sourceLineNo">316</span>        }<a name="line.316"></a>
+<span class="sourceLineNo">317</span><a name="line.317"></a>
+<span class="sourceLineNo">318</span>        public Method getMethod() {<a name="line.318"></a>
+<span class="sourceLineNo">319</span>            return method;<a name="line.319"></a>
+<span class="sourceLineNo">320</span>        }<a name="line.320"></a>
+<span class="sourceLineNo">321</span><a name="line.321"></a>
+<span class="sourceLineNo">322</span>        public List&lt;Argument&gt; getArguments() {<a name="line.322"></a>
+<span class="sourceLineNo">323</span>            return arguments;<a name="line.323"></a>
+<span class="sourceLineNo">324</span>        }<a name="line.324"></a>
+<span class="sourceLineNo">325</span><a name="line.325"></a>
+<span class="sourceLineNo">326</span>        @Override<a name="line.326"></a>
+<span class="sourceLineNo">327</span>        public String toString() {<a name="line.327"></a>
+<span class="sourceLineNo">328</span>            StringBuilder builder = new StringBuilder();<a name="line.328"></a>
+<span class="sourceLineNo">329</span>            builder.append(resultType.getName()).append(" ");<a name="line.329"></a>
+<span class="sourceLineNo">330</span>            builder.append(name).append("(");<a name="line.330"></a>
+<span class="sourceLineNo">331</span>            for (Argument argument : arguments) {<a name="line.331"></a>
+<span class="sourceLineNo">332</span>                builder.append(argument.getType().getCanonicalName()).append(" ");<a name="line.332"></a>
+<span class="sourceLineNo">333</span>                builder.append(argument.getName()).append(", ");<a name="line.333"></a>
+<span class="sourceLineNo">334</span>            }<a name="line.334"></a>
+<span class="sourceLineNo">335</span>            if (!arguments.isEmpty()) {<a name="line.335"></a>
+<span class="sourceLineNo">336</span>                builder.delete(builder.length() - 2, builder.length());<a name="line.336"></a>
+<span class="sourceLineNo">337</span>            }<a name="line.337"></a>
+<span class="sourceLineNo">338</span>            builder.append(");");<a name="line.338"></a>
+<span class="sourceLineNo">339</span>            return builder.toString();<a name="line.339"></a>
+<span class="sourceLineNo">340</span>        }<a name="line.340"></a>
+<span class="sourceLineNo">341</span>    }<a name="line.341"></a>
+<span class="sourceLineNo">342</span><a name="line.342"></a>
+<span class="sourceLineNo">343</span>    public static final class Argument {<a name="line.343"></a>
+<span class="sourceLineNo">344</span>        private final String name;<a name="line.344"></a>
+<span class="sourceLineNo">345</span>        private final Class&lt;?&gt; type;<a name="line.345"></a>
+<span class="sourceLineNo">346</span>        private final String typeArgs;<a name="line.346"></a>
+<span class="sourceLineNo">347</span><a name="line.347"></a>
+<span class="sourceLineNo">348</span>        public Argument(String name, Class&lt;?&gt; type, String typeArgs) {<a name="line.348"></a>
+<span class="sourceLineNo">349</span>            this.name = name;<a name="line.349"></a>
+<span class="sourceLineNo">350</span>            this.type = type;<a name="line.350"></a>
+<span class="sourceLineNo">351</span>            this.typeArgs = typeArgs;<a name="line.351"></a>
+<span class="sourceLineNo">352</span>        }<a name="line.352"></a>
+<span class="sourceLineNo">353</span><a name="line.353"></a>
+<span class="sourceLineNo">354</span>        public String getName() {<a name="line.354"></a>
+<span class="sourceLineNo">355</span>            return name;<a name="line.355"></a>
+<span class="sourceLineNo">356</span>        }<a name="line.356"></a>
+<span class="sourceLineNo">357</span><a name="line.357"></a>
+<span class="sourceLineNo">358</span>        public Class&lt;?&gt; getType() {<a name="line.358"></a>
+<span class="sourceLineNo">359</span>            return type;<a name="line.359"></a>
+<span class="sourceLineNo">360</span>        }<a name="line.360"></a>
+<span class="sourceLineNo">361</span><a name="line.361"></a>
+<span class="sourceLineNo">362</span>        public String getTypeArgs() {<a name="line.362"></a>
+<span class="sourceLineNo">363</span>            return typeArgs;<a name="line.363"></a>
+<span class="sourceLineNo">364</span>        }<a name="line.364"></a>
+<span class="sourceLineNo">365</span><a name="line.365"></a>
+<span class="sourceLineNo">366</span>        @Override<a name="line.366"></a>
+<span class="sourceLineNo">367</span>        public String toString() {<a name="line.367"></a>
+<span class="sourceLineNo">368</span>            StringBuilder builder = new StringBuilder();<a name="line.368"></a>
+<span class="sourceLineNo">369</span>            builder.append(type.getCanonicalName());<a name="line.369"></a>
+<span class="sourceLineNo">370</span>            if (typeArgs != null) {<a name="line.370"></a>
+<span class="sourceLineNo">371</span>                builder.append("&lt;").append(typeArgs).append("&gt;");<a name="line.371"></a>
+<span class="sourceLineNo">372</span>            }<a name="line.372"></a>
+<span class="sourceLineNo">373</span>            builder.append(" ").append(name);<a name="line.373"></a>
+<span class="sourceLineNo">374</span>            return builder.toString();<a name="line.374"></a>
+<span class="sourceLineNo">375</span>        }<a name="line.375"></a>
+<span class="sourceLineNo">376</span>    }<a name="line.376"></a>
+<span class="sourceLineNo">377</span>}<a name="line.377"></a>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+</pre>
+</div>
+</body>
+</html>
