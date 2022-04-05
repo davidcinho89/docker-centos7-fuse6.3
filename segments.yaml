@@ -1,0 +1,362 @@
+openapi: 3.0.0
+info:
+  title: Segments API
+  version: v0
+servers:
+  - url: https://apisqadatalake.cloud.terpel.com/api/v1/s
+paths:
+  /segments/{id}/id:
+    put:
+      tags:
+        - segment-controller
+      operationId: update
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/UpdateSegmentRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/ServiceResponseSegment'
+    delete:
+      tags:
+        - segment-controller
+      operationId: delete
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/ServiceResponseString'
+  /segments/{id}/clients:
+    put:
+      tags:
+        - segment-controller
+      operationId: addClients
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/AddClientRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/ServiceResponseString'
+  /segments:
+    get:
+      tags:
+        - segment-controller
+      operationId: getAll
+      parameters:
+        - name: page
+          in: query
+          required: true
+          schema:
+            minimum: 0
+            type: integer
+            format: int32
+        - name: size
+          in: query
+          required: true
+          schema:
+            minimum: 1
+            type: integer
+            format: int32
+        - name: direction
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+        - name: column
+          in: query
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/ServiceResponsePageSegment'
+    post:
+      tags:
+        - segment-controller
+      operationId: save
+      requestBody:
+        content:
+          application/json;charset=UTF-8:
+            schema:
+              $ref: '#/components/schemas/CreateSegmentRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/ServiceResponseString'
+    delete:
+      tags:
+        - segment-controller
+      operationId: delete_1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeleteSegmentRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/ServiceResponseString'
+  /segments/{code}/client:
+    get:
+      tags:
+        - segment-controller
+      operationId: getSegments
+      parameters:
+        - name: code
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json;charset=UTF-8:
+              schema:
+                $ref: '#/components/schemas/ServiceResponseSetSegment'
+components:
+  schemas:
+    UpdateSegmentRequest:
+      required:
+        - name
+      type: object
+      properties:
+        name:
+          maxLength: 255
+          minLength: 0
+          type: string
+        description:
+          type: string
+    Client:
+      type: object
+      properties:
+        code:
+          type: string
+        segments:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Segment'
+    Meta:
+      type: object
+      properties:
+        requestTime:
+          type: string
+          format: date-time
+        apiVersion:
+          type: string
+    Segment:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        description:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+          writeOnly: true
+        updatedAt:
+          type: string
+          format: date-time
+          writeOnly: true
+        clients:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Client'
+    ServiceResponseSegment:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/Segment'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    AddClientRequest:
+      required:
+        - clients
+      type: object
+      properties:
+        clients:
+          type: array
+          items:
+            type: string
+    ServiceResponseString:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        data:
+          type: string
+        meta:
+          $ref: '#/components/schemas/Meta'
+    CreateSegmentRequest:
+      required:
+        - id
+        - name
+      type: object
+      properties:
+        id:
+          maxLength: 18
+          minLength: 0
+          type: string
+        name:
+          maxLength: 255
+          minLength: 0
+          type: string
+        description:
+          type: string
+    ServiceResponseSetSegment:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        data:
+          uniqueItems: true
+          type: array
+          items:
+            $ref: '#/components/schemas/Segment'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    PageSegment:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/Segment'
+        number:
+          type: integer
+          format: int32
+        sort:
+          $ref: '#/components/schemas/Sort'
+        numberOfElements:
+          type: integer
+          format: int32
+        first:
+          type: boolean
+        pageable:
+          $ref: '#/components/schemas/PageableObject'
+        last:
+          type: boolean
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        offset:
+          type: integer
+          format: int64
+        sort:
+          $ref: '#/components/schemas/Sort'
+        pageSize:
+          type: integer
+          format: int32
+        pageNumber:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+    ServiceResponsePageSegment:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+        message:
+          type: string
+        data:
+          $ref: '#/components/schemas/PageSegment'
+        meta:
+          $ref: '#/components/schemas/Meta'
+    Sort:
+      type: object
+      properties:
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+        empty:
+          type: boolean
+    DeleteSegmentRequest:
+      required:
+        - segmentos
+      type: object
+      properties:
+        segmentos:
+          type: array
+          items:
+            type: string
